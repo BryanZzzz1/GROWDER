@@ -1,0 +1,127 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Editar Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="saveChanges()" color="primary">Guardar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <!-- Username -->
+    <ion-item class="input-item">
+      <ion-label position="floating">Nombre de usuario</ion-label>
+      <br>
+      <ion-input 
+        type="text" 
+        [(ngModel)]="user.username" 
+        [readonly]="!editState.username"
+        required>
+      </ion-input>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="!editState.username" (click)="toggleEdit('username')" color="tertiary">
+          <ion-icon name="pencil"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.username" (click)="applyChange('username')" color="success">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.username" (click)="cancelEdit('username')" color="danger">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+
+    <!-- Teléfono -->
+    <ion-item class="input-item">
+      <ion-label position="floating">Teléfono</ion-label>
+      <br>
+      <ion-input 
+        type="text" 
+        [(ngModel)]="user.telefono" 
+        [readonly]="!editState.telefono"
+        required>
+      </ion-input>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="!editState.telefono" (click)="toggleEdit('telefono')" color="tertiary">
+          <ion-icon name="pencil"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.telefono" (click)="applyChange('telefono')" color="success">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.telefono" (click)="cancelEdit('telefono')" color="danger">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+
+    <!-- Fecha de Nacimiento -->
+    <ion-item class="input-item">
+      <ion-label position="floating">Fecha de Nacimiento</ion-label>
+      <br>
+      <ion-input 
+        type="date" 
+        [(ngModel)]="user.fecha_nacimiento"
+        [readonly]="!editState.fecha_nacimiento"
+        required>
+      </ion-input>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="!editState.fecha_nacimiento" (click)="toggleEdit('fecha_nacimiento')" color="tertiary">
+          <ion-icon name="pencil"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.fecha_nacimiento" (click)="applyChange('fecha_nacimiento')" color="success">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="editState.fecha_nacimiento" (click)="cancelEdit('fecha_nacimiento')" color="danger">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+
+    <!-- Password Change Section -->
+    <ion-button expand="full" (click)="togglePasswordChange()" color="secondary" *ngIf="!showPasswordChange">
+      Cambiar Contraseña
+    </ion-button>
+      <ion-back-button></ion-back-button>
+    <!-- Modal de cambio de contraseña -->
+    <ion-modal [isOpen]="showPasswordChange" (willDismiss)="togglePasswordChange()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-buttons slot="start">
+              
+            </ion-buttons>
+            <ion-title>Cambiar Contraseña</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <!-- Contraseña Actual -->
+          <ion-item class="input-item" *ngIf="!isAdmin">
+            <ion-label position="floating">Contraseña Actual</ion-label>
+            <ion-input type="password" [(ngModel)]="contrasenaActual" required></ion-input>
+          </ion-item>
+  
+          <!-- Nueva Contraseña -->
+          <ion-item class="input-item">
+            <ion-label position="floating">Nueva Contraseña</ion-label>
+            <ion-input type="password" [(ngModel)]="nuevaContrasena" required></ion-input>
+          </ion-item>
+  
+          <!-- Botones de acción -->
+          <ion-button expand="full" (click)="changePassword()" color="primary">Actualizar Contraseña</ion-button>
+          <ion-button expand="full" (click)="cancel()" color="light">Cancelar</ion-button>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Foto de Usuario -->
+    <ion-item class="input-item">
+      <ion-label position="floating">Foto</ion-label>
+      <br>
+      <ion-button expand="full" (click)="takePhoto()" color="tertiary">Cambiar Foto</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

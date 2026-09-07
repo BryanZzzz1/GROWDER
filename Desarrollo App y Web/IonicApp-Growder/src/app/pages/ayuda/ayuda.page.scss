@@ -1,0 +1,134 @@
+/* Estilos generales */
+.conversion-history-accordion {
+  margin: 16px;
+}
+
+.accordion-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007AFF;
+}
+
+.conversion-list {
+  margin: 0;
+}
+
+.conversion-item {
+  margin: 8px 0;
+}
+
+.conversion-header {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.conversion-content {
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.conversion-history-accordion .ion-item {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+.empty-card-title {
+  color: #e74c3c;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.empty-card-content {
+  text-align: center;
+  padding: 16px;
+}
+
+.empty-card-icon {
+  font-size: 3rem;
+  color: #e74c3c;
+  margin-bottom: 12px;
+}
+
+.empty-card-text {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* Diseño responsivo */
+@media (max-width: 767px) {
+  .accordion-header {
+    font-size: 1rem;
+  }
+
+  .conversion-header {
+    font-size: 1rem;
+  }
+
+  .conversion-content {
+    font-size: 0.8rem;
+  }
+
+  .empty-card-text {
+    font-size: 0.9rem;
+  }
+
+  .empty-card-icon {
+    font-size: 2.5rem;
+  }
+
+  .conversion-header {
+    font-size: 1rem; /* Reducir el tamaño de la fuente */
+  }
+  
+  .conversion-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .conversion-amount,
+  .conversion-result {
+    font-size: 1rem; /* Ajustar tamaño de la fuente */
+    white-space: nowrap; /* Evitar que el texto se rompa en varias líneas */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Si el texto es demasiado largo, se truncará con "..." */
+  }
+  
+  .conversion-result {
+    margin-left: 8px; /* Espacio entre el valor y el resultado */
+  }
+  
+  /* Estilo adicional si es necesario para el acordeón */
+  ion-accordion {
+    margin-bottom: 8px; /* Añadir algo de separación entre los acordeones */
+  }
+  
+  ion-item {
+    padding: 0;
+  }
+
+  /* Mejorar la visualización de la fecha */
+.conversion-date {
+  font-size: 1rem; /* Tamaño de la fuente más grande */
+  color: #333; /* Color oscuro para un mejor contraste */
+  margin-top: 8px; /* Un poco de espacio arriba para separar de los valores */
+  font-weight: 500; /* Hacer la fecha un poco más negrita para mayor legibilidad */
+}
+
+.conversion-date small {
+  font-size: 0.9rem; /* Reducir ligeramente el tamaño del texto */
+  color: #666; /* Color más claro para la etiqueta "Fecha" */
+  font-weight: normal; /* Dejar el texto "Fecha" en un peso normal */
+}
+
+/* Si necesitas más ajustes de estilo */
+ion-accordion .ion-item {
+  padding: 0;
+}
+
+}

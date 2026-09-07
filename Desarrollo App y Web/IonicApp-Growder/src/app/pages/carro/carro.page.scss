@@ -1,0 +1,59 @@
+ion-content {
+  --background: #f9f9f9;
+  padding: 16px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+h2, p {
+  margin: 0;
+}
+
+ion-list {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+ion-item {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+ion-item:last-child {
+  border-bottom: none;
+}
+
+.custom-button {
+  --background: #a57352ec;
+  --background-hover: #da9e76ec;
+  --color: white;
+
+}
+
+ion-button:focus {
+  outline: none;
+}
+
+ion-footer {
+  background-color: #ffffff;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.total-container {
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin: 16px 0;
+}
+.footer-spacing {
+  height: 70px; /* Ajusta este valor según el alto de tu footer */
+}

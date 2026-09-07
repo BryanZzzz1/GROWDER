@@ -1,0 +1,42 @@
+
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+ion-fab {
+  position: static;
+  margin: 0 5px;
+}
+
+.center-text {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 150px;
+text-align: center;
+}
+
+.custom-button {
+  --background: #a57352ec;
+  --background-hover: #da9e76ec;
+--color: white; 
+--border-radius: 12px; 
+--padding-start: 30px; 
+--padding-end: 30px; 
+--height: 80px; 
+--min-width: 250px;
+font-size: 20px; 
+}
+
+
+
+.custom-button ion-icon {
+font-size: 24px; 
+}
+
+.footer-tienda{
+  --background: #a57352ec;
+}

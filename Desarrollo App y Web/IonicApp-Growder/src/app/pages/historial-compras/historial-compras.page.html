@@ -1,0 +1,33 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Historial de Compras</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding content">
+  <ion-list *ngIf="historialCompras.length > 0; else noCompras">
+    <ion-card *ngFor="let compra of historialCompras" class="compra-card">
+      <div class="compra-content">
+        <img [src]="compra.foto" alt="{{ compra.nombre }}" class="compra-img" />
+        <div class="info-content">
+          <ion-card-header>
+            <ion-card-title>{{ compra.nombre }}</ion-card-title>
+            <ion-card-subtitle>Precio: {{ compra.precio | currency }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Cantidad: {{ compra.cantidad }}</p>
+          </ion-card-content>
+        </div>
+      </div>
+    </ion-card>
+  </ion-list>
+  <ng-template #noCompras>
+    <ion-item>
+      <ion-label>No hay compras registradas.</ion-label>
+    </ion-item>
+  </ng-template>
+  <div class="footer-spacing"></div> <!-- Espacio adicional para el footer -->
+</ion-content>

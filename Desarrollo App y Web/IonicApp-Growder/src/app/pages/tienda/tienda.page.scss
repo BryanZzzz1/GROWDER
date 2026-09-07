@@ -1,0 +1,31 @@
+.product-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .image-container {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    overflow: hidden; /* Para asegurar que la imagen no sobresalga */
+    cursor: pointer; /* Para indicar que es clickeable */
+  }
+  
+  .image-container img {
+    width: 100%;
+    height: auto;
+    display: block; /* Asegura que la imagen se comporte bien */
+  }
+  .content {
+    padding-bottom: 70px; /* Ajusta según el alto de tu footer */
+  }
+  
+  .footer-spacing {
+    height: 70px; /* Ajusta este valor según el alto de tu footer */
+  }

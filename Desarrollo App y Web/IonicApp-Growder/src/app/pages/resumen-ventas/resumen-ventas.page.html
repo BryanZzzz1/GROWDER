@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div class="center-text">
+      <ion-title>Ventas</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let compra of compras" lines="full">
+      <ion-label>
+        <h2>{{ compra.username }}</h2>
+        <p class="product-info">
+          <strong>Producto:</strong> {{ compra.nombre }}
+        </p>
+        <p class="product-info">
+          <strong>Cantidad:</strong> {{ compra.cantidad }}
+        </p>
+        <p class="product-info">
+          <strong>Precio:</strong> {{ compra.precio | currency:'USD':'symbol':'1.0-0' }}
+        </p>
+        <p class="product-info">
+          <strong>Subtotal:</strong> {{ compra.precio * compra.cantidad | currency:'USD':'symbol':'1.0-0' }}
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-footer>
+    <ion-toolbar>
+      <ion-title>Total Vendido: <strong>{{ totalVendido | currency:'USD':'symbol':'1.0-0' }}</strong></ion-title>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>
+

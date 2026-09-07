@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div class="center-text">
+      <ion-title>Registro</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding register-content">
+  <div class="register-container">
+    <h2 class="register-title" style="text-align: center;">Crea tu Cuenta</h2>
+
+    <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+
+    <form (ngSubmit)="register()" class="register-form">
+      <ion-item>
+        <ion-label position="floating">Ingresa tu Correo Electrónico</ion-label>
+        <!-- Tipo email añadido para validación de teclado móvil -->
+        <ion-input type="email" [(ngModel)]="email" (ngModelChange)="onFieldChange()" name="email" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Ingresa tu Contraseña</ion-label>
+        <ion-input type="password" [(ngModel)]="password" (ngModelChange)="onFieldChange()" name="password" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Ingresa tu Teléfono</ion-label>
+        <ion-input 
+          [(ngModel)]="telefono" 
+          (ngModelChange)="onFieldChange()" 
+          type="tel" 
+          inputmode="numeric" 
+          pattern="[0-9]*" 
+          name="telefono" 
+          required 
+          (ionInput)="onPhoneInputChange($event)">
+        </ion-input>
+        <ion-note color="danger" *ngIf="telefono?.includes('-')">No se permiten guiones (-).</ion-note>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Ingresa tu Fecha de Nacimiento</ion-label>
+        <ion-input type="date" [(ngModel)]="fechaNacimiento" (ngModelChange)="onFieldChange()" required></ion-input>
+      </ion-item>
+
+      <div class="foto-container">
+        <ion-button (click)="takePhoto()" expand="block" class="foto-button">
+          <ion-icon name="camera-outline" slot="start"></ion-icon>
+          Tomar foto
+        </ion-button>
+
+        <div *ngIf="foto" class="foto-preview">
+          <img [src]="foto" class="foto-usuario" alt="Foto de Usuario" />
+        </div>
+      </div>
+
+      <ion-button expand="block" type="submit" class="register-button">
+        <ion-icon name="person-add-outline" slot="start"></ion-icon>
+        Registrarse
+      </ion-button>
+    </form>
+
+    <div class="link-container">
+      <ion-button expand="block" fill="clear" routerLink="/login" class="login-button">
+        ¿Ya tienes una cuenta? Inicia sesión
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,31 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+
+    <ion-title>
+      <img (click)="irIniciopagina()" src="../../../assets/img/image_4_1.png" alt="Icono de la App" style="height: 40px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="content">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let producto of arregloProductos">
+        <ion-card (click)="verDetalles(producto.idproducto)" style="cursor: pointer;">
+          <img alt="Producto" [src]="producto.foto || 'https://ionicframework.com/docs/img/demos/card-media.png'" />
+          <ion-card-header>
+            <ion-card-title style="text-align: center; font-size: 30px;">{{ producto.nombre }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+          </ion-card-content>
+          <ion-card-content>
+            <ion-label style="word-wrap: break-word; white-space: normal; font-size: 20px;">${{ producto.precio }}</ion-label>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div class="footer-spacing"></div> <!-- Espacio adicional para el footer -->
+</ion-content>

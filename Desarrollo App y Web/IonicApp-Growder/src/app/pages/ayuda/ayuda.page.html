@@ -1,0 +1,130 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div class="center-text">
+      <ion-text>
+        <ion-title>
+          Ayuda
+        </ion-title>
+      </ion-text>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Sección de Preguntas Frecuentes -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Preguntas Frecuentes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-accordion-group>
+        <ion-accordion value="q1">
+          <ion-item slot="header" color="light">
+            <ion-label>¿Cómo creo una cuenta?</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            Para crear una cuenta, dirígete a la página de registro, ingresa tu nombre, correo electrónico, y crea una contraseña segura. Luego, haz clic en el botón de "Registrar".
+          </div>
+        </ion-accordion>
+        <ion-accordion value="q2">
+          <ion-item slot="header" color="light">
+            <ion-label>¿Necesito un correo electrónico válido?</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            Sí, es necesario utilizar un correo electrónico válido ya que recibirás un enlace de confirmación para activar tu cuenta.
+          </div>
+        </ion-accordion>
+        <ion-accordion value="q3">
+          <ion-item slot="header" color="light">
+            <ion-label>¿Qué hago si olvidé mi contraseña?</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            Puedes restablecer tu contraseña haciendo clic en "¿Olvidaste tu contraseña?" en la página de inicio de sesión y siguiendo las instrucciones.
+          </div>
+        </ion-accordion>
+        <ion-accordion value="q4">
+          <ion-item slot="header" color="light">
+            <ion-label>¿Es gratis crear una cuenta?</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            Sí, la creación de una cuenta es completamente gratuita.
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Conversor Dólar a Peso Chileno -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Conversor Dólar a Peso Chileno</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Valor del Dólar de Hoy -->
+      <div *ngIf="dollarValue !== null">
+        <p>Valor del Dólar: {{ dollarValue | number:'1.0-0' }} CLP</p>
+      </div>
+      <div *ngIf="dollarValue === null">
+        <p>Cargando...</p>
+      </div>
+
+      <!-- Entrada para cantidad en Dólares -->
+      <ion-item>
+        <ion-label position="floating">Cantidad en Dólares</ion-label>
+        <ion-input type="number" [(ngModel)]="amount"></ion-input>
+      </ion-item>
+
+      <!-- Botón de Conversión -->
+      <ion-button expand="full" (click)="convertToChileanPesos()" class="custom-button">Convertir</ion-button>
+
+      <!-- Resultado de la Conversión -->
+      <div *ngIf="pesosChilenos !== null">
+        <p>Equivalente en Pesos Chilenos: {{ pesosChilenos | number:'1.0-0' }}</p>
+      </div>
+
+      <!-- Mensaje de Error -->
+      <div *ngIf="errorMessage">
+        <p class="error-message">{{ errorMessage }}</p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="conversionHistory.length > 0">
+    <ion-card-header>
+      <ion-card-title>Historial de Conversiones</ion-card-title>
+    </ion-card-header>
+  
+    <ion-card-content>
+      <ion-accordion-group>
+        <ion-list>
+          <ion-item *ngFor="let conversion of conversionHistory">
+            <ion-accordion>
+              <ion-item slot="header" color="light">
+                <ion-label class="conversion-header">
+                  <div class="conversion-content">
+                    <span class="conversion-amount">{{ conversion.amountInUSD }} USD</span>
+                    <span class="conversion-result">= {{ conversion.resultInCLP }} CLP</span>
+                  </div>
+                </ion-label>
+              </ion-item>
+              <div slot="content" class="ion-padding">
+                <!-- Estilo actualizado para la fecha -->
+                <p class="conversion-date"><small>Fecha: {{ conversion.date | date: 'dd/MM/yyyy HH:mm' }}</small></p>
+              </div>
+            </ion-accordion>
+          </ion-item>
+        </ion-list>
+      </ion-accordion-group>
+    </ion-card-content>
+  </ion-card>
+  
+  <!-- Mensaje si no hay historial -->
+  <div *ngIf="conversionHistory.length === 0">
+    <p>No hay conversiones guardadas. Realiza una conversión para comenzar.</p>
+  </div>
+  
+</ion-content>

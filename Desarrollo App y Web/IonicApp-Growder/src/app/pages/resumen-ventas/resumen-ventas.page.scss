@@ -1,0 +1,56 @@
+ion-header {
+  background-color: #a57352; // Color de encabezado
+  color: white;
+
+  ion-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-align: center; // Centrar el título
+  }
+}
+
+ion-list {
+  padding: 10px;
+
+  ion-item {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    ion-label {
+      h2 {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: bold; // Hacer el nombre más destacado
+      }
+
+      .product-info {
+        color: #555;
+        margin: 0;
+        font-size: 0.9rem;
+
+        strong {
+          color: #a57352;
+        }
+      }
+    }
+  }
+}
+
+ion-footer {
+  background-color: #f8f8f8;
+
+  ion-toolbar {
+    ion-title {
+      color: #333;
+      font-weight: bold;
+       // Centrar el total vendido
+    }
+  }
+}

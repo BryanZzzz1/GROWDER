@@ -1,0 +1,33 @@
+.compra-card {
+    display: flex; // Usa flexbox para alinear elementos
+    align-items: center; // Centra verticalmente
+    margin-bottom: 16px; // Espacio entre las tarjetas
+  }
+  
+  .compra-content {
+    display: flex; // Contenedor para la imagen y la información
+    width: 100%; // Asegúrate de que el contenido ocupe el ancho completo
+  }
+  
+  .compra-img {
+    width: 80px; // Tamaño de la imagen
+    height: auto; // Mantiene la proporción
+    margin-right: 16px; // Espacio entre la imagen y la información
+  }
+  
+  .info-content {
+    flex: 1; // Permite que la información ocupe el resto del espacio
+  }
+  
+  .content {
+    padding-bottom: 70px; /* Ajusta según el alto de tu footer */
+  }
+  
+  .footer-spacing {
+    height: 70px; /* Ajusta este valor según el alto de tu footer */
+  }
+  
+  .compra-card {
+    margin-bottom: 10px; /* Espacio entre cards */
+  }
+  

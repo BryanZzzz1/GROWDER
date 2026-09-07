@@ -1,0 +1,82 @@
+.register-content {
+  --background: #f4f4f4;
+
+  .register-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .register-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #a57352ec;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .register-form {
+    ion-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+      --background: transparent;
+      margin-bottom: 16px;
+    }
+
+    ion-label {
+      color: #666;
+    }
+
+    ion-input, ion-datetime {
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --background: #f8f8f8;
+      border-radius: 8px;
+    }
+  }
+
+  .foto-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    .foto-button {
+      --background: #a57352ec;
+      --color: #ffffff;
+      margin-bottom: 10px;
+    }
+  }
+
+  .foto-preview {
+    text-align: center;
+
+    .foto-usuario {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #a57352ec;
+    }
+  }
+
+  .register-button {
+    --background: #a57352ec;
+    --color: #ffffff;
+    margin-top: 20px;
+  }
+
+
+  .link-container {
+    margin-top: 20px;
+    text-align: center;
+
+    .login-button {
+      --color: #a57352ec;
+      font-size: 14px;
+    }
+  }
+}
+
+// Estilo global para todos los botones

@@ -1,0 +1,19 @@
+
+<ion-content>
+  <br>
+  <ion-img src="../../../assets/img/image_4_1.png" width="350px" height="350px"/>
+
+  <div class="center-text">
+    <ion-text>
+      <h4 style="font-family: impact; color:  #a57352ec;">Bienvenidos</h4>
+    </ion-text>
+  </div>
+  <div class="button-container">
+    <ion-button (click)="irTienda()" class="custom-button">
+      <ion-icon name="bag-handle-outline"></ion-icon>
+    </ion-button>
+    <ion-button *ngIf="!isLoggedIn" (click)="irRegistro()" class="custom-button">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

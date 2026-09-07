@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div class="center-text">
+      <ion-title>Carrito de Compras</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item *ngFor="let producto of carrito">
+      <ion-label>
+        <h2>{{ producto.nombre }} ({{ producto.cantidad }})</h2>
+        <p>{{ producto.descripcion }}</p>
+        <p>Precio: {{ producto.precio | currency }}</p>
+      </ion-label>
+      <ion-button (click)="actualizarCantidad(producto, (producto.cantidad || 1) - 1)" 
+                  [disabled]="(producto.cantidad || 1) <= 1" class="custom-button">-</ion-button>
+      <ion-button (click)="actualizarCantidad(producto, (producto.cantidad || 1) + 1)" class="custom-button">+</ion-button>
+      <ion-icon name="trash-bin-outline" (click)="presentAlert(producto)"></ion-icon>
+    </ion-item>
+  </ion-list>
+  <ion-footer>
+    <ion-button expand="full" (click)="irAComprar()" class="custom-button">Comprar</ion-button>
+    <ion-button expand="full" (click)="vaciarCarrito()" class="custom-button">Vaciar Carrito</ion-button>
+    <ion-item>
+      <ion-label>Total: {{ totalDisplay | currency }}</ion-label>
+      <ion-button (click)="toggleTotal()"class="custom-button" >Mostrar en {{ mostrarPesos ? 'Dólares' : 'Pesos' }}</ion-button>
+    </ion-item>
+  </ion-footer>
+  <div class="footer-spacing"></div>
+</ion-content>
+

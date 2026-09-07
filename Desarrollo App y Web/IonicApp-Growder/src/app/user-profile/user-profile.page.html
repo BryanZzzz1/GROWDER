@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="color-header">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div class="center-text">
+      <ion-title style="color: white;">Perfil de Usuario</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding perfil-content">
+  <div class="profile-container">
+    <ion-avatar class="profile-avatar">
+      <img [src]="foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="Foto de Usuario">
+    </ion-avatar>
+    <h2 class="profile-name">{{ email }}</h2>
+  </div>
+
+  <ion-card class="description-card">
+    <ion-card-header>
+      <ion-card-title style="text-align: center; color: white;" >Información del Usuario</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Teléfono:</ion-label>
+          <ion-text>{{ telefono }}</ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label>Fecha de Nacimiento:</ion-label>
+          <ion-text>{{ fechaNacimiento }}</ion-text>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="button-container">
+    <ion-button expand="full" class="button-profile-edit" (click)="editarperfil()">
+      Editar Perfil
+    </ion-button>
+    <ion-button expand="full" class="button-profile-edit" (click)="irHistorialCompras()">
+      Ver Historial de Compras
+    </ion-button>
+    <ion-button expand="full" class="button-profile-edit" (click)="logout()">
+      Cerrar Sesión
+    </ion-button>
+  </div>
+</ion-content>

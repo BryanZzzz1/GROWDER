@@ -1,0 +1,47 @@
+
+  
+  .login-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 400px; /* Limitar el ancho del contenedor */
+    text-align: center; /* Centrar el texto */
+    padding: 2rem;
+    border-radius: 8px; /* Bordes redondeados */
+    background-color: #ffffff2c; /* Fondo blanco */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra para profundidad */
+  }
+  
+  .logo {
+    width: 70%; /* Logo ajustable */
+    margin-bottom: 1.5rem; /* Espacio entre el logo y el título */
+  }
+  
+  .login-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .login-button {
+    --background: #1877f2; /* Color azul de Facebook */
+    --color: white;
+    margin-top: 1rem; /* Espacio superior */
+  }
+  
+  .link-container {
+    margin-top: 1rem; /* Espacio superior para los botones de enlace */
+  }
+  
+  .register-button {
+    --background: #42b72a; /* Color verde para crear cuenta */
+    --color: white;
+    margin-top: 0.5rem; /* Espacio entre los botones */
+  }
+  

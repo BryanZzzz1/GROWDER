@@ -1,0 +1,37 @@
+
+/* Asegúrate de que el ion-app ocupa toda la altura de la ventana */
+ion-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+ion-router-outlet {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo para el footer */
+.footer-tienda {
+ 
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  border-radius: 10px;
+  background-color: #a57352ec; /* Asegúrate de que el fondo sea visible */
+  box-shadow: 0 -1px 10px rgba(0,0,0,0.1); /* Opcional: sombra para darle un efecto de elevación */
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit; /* Para que el texto herede el color del footer */
+}
+
+ion-label {
+  margin-top: 4px; /* Ajusta según el espaciado deseado */
+}
+ 
