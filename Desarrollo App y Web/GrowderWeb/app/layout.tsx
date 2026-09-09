@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
+import { ProveedorCarrito } from "./datoscarro/estadocarro";
+import CarroDesplegable from "./datoscarro/carrodesplegable";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -15,8 +17,8 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "SoMate | Mates y Accesorios Artesanales",
-  description: "E-Commerce y Gestión Integral de Inventario para SoMate / SuMateCL",
+  title: "SuMate | Mates y Accesorios Artesanales",
+  description: "E-Commerce y Gestión Integral de Inventario para SuMate / SuMateCL",
 };
 
 export default function RootLayout({
@@ -25,11 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="es"
-      className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="es" className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
+        <ProveedorCarrito>
+          {children}
+          <CarroDesplegable />
+        </ProveedorCarrito>
+      </body>
     </html>
   );
 }

@@ -3,10 +3,10 @@
 :root {
   --ink: #2d2a23;
   --cream: #f8f3e9;
-  --olive: #746a52;
+  --olive: hwb(42 32% 55%);
   --leaf: #314235;
   --terra: #a75632;
-  --sand: #ddd1ba;
+  --sand: #f0eeec;
   --line: rgba(45, 42, 35, 0.14);
 }
 

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase';
+import { usarCarrito } from '@/app/datoscarro/estadocarro';
+
 
 interface Producto {
   idproducto: number;
@@ -18,7 +20,16 @@ interface Producto {
 export default function Home() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
-
+ const { 
+  carrito, 
+  carritoAbierto, 
+  setCarritoAbierto, 
+  eliminarDelCarrito, 
+  total 
+} = usarCarrito();
+  
+  const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  
   useEffect(() => {
     async function cargarCatalogo() {
       setCargando(true);
@@ -74,36 +85,117 @@ export default function Home() {
   return (
     <div className="site-shell flex flex-col min-h-screen">
       {/* Header */}
-      <header className="w-full border-b border-stone-800/10 bg-[#f8f3e9]/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
-          <Link href="/" className="flex items-center gap-3 text-left">
-            <div className="w-12 h-12 rounded-full border border-stone-300 bg-white flex items-center justify-center font-serif font-bold text-lg text-[#314235] shadow-xs">
-              SM
+      {/* HEADER CON TU LOGO REAL */}
+<header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
+  <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
+    
+    {/* LADO IZQUIERDO: Logo */}
+    <Link href="/" className="flex items-center gap-3 text-left group">
+      <img
+        src="/logocircular.png"
+        alt="SuMate Logo"
+        className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+      />
+      <div>
+        <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">
+          SuMateCL
+        </span>
+        <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">
+          Más que un mate, una experiencia
+        </span>
+      </div>
+    </Link>
+
+    {/* LADO DERECHO: Carrito + Panel Admin */}
+    {/* LADO DERECHO: Carrito + Panel Admin */}
+          <div className="flex items-center gap-3">
+            
+            {/* Widget Carrito con Desplegable */}
+            <div className="relative group">
+              <button
+                onClick={() => setCarritoAbierto(!carritoAbierto)}
+                className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer"
+                aria-label="Abrir carrito"
+              >
+                <span className="text-xs">${(total || 0).toLocaleString('es-CL')}</span>
+                <div className="relative flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="8" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                  </svg>
+
+                  {totalProductos > 0 && (
+                    <span className="bg-[#8C7762] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center -ml-1 -mt-2">
+                      {totalProductos}
+                    </span>
+                  )}
+                </div>
+              </button>
+
+              {/* Ventana flotante al pasar el mouse */}
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-stone-200 rounded-2xl shadow-xl p-4 hidden group-hover:block transition-all z-50">
+                {carrito.length === 0 ? (
+                  <p className="text-center text-xs text-stone-500 py-3">El carrito está vacío</p>
+                ) : (
+                  <>
+                    <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                      {carrito.map((item: any) => (
+                        <div key={item.id || item.idproducto} className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2">
+                          <img src={item.imagen || item.foto} alt={item.nombre} className="w-9 h-9 object-cover rounded-md" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-stone-800 truncate">{item.nombre}</p>
+                            <p className="text-stone-500">{item.cantidad} × ${(item.precio || 0).toLocaleString('es-CL')}</p>
+                          </div>
+                          {eliminarDelCarrito && (
+                            <button 
+                              onClick={() => eliminarDelCarrito(item.id || item.idproducto)}
+                              className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center my-3 text-xs font-bold text-stone-800 border-t pt-2">
+                      <span>Subtotal:</span>
+                      <span>${(total || 0).toLocaleString('es-CL')}</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setCarritoAbierto(true)}
+                        className="w-full border border-[#8C7762] text-[#8C7762] hover:bg-[#8C7762]/10 text-xs font-bold py-2 rounded-full transition cursor-pointer uppercase"
+                      >
+                        VER CARRITO
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="hidden sm:block">
-              <span className="block brand-serif font-bold tracking-tight text-lg leading-none">SoMate</span>
-              <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-stone-500">
-                Mates y accesorios
-              </span>
-            </div>
-          </Link>
-          <nav aria-label="Navegación principal" className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={scrollAlCatalogo}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-[#314235] transition hover:bg-[#e8e0d0] cursor-pointer"
-            >
-              Catálogo
-            </button>
-            <Link
-              href="/admin"
-              className="rounded-full bg-[#314235] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#243127]"
-            >
-              Administración
+
+            <Link href="/admin">
+              <button className="bg-[#8C7762] hover:bg-[#725F4C] text-white text-sm font-semibold px-4 py-2 rounded-full transition cursor-pointer">
+                Panel Admin
+              </button>
             </Link>
-          </nav>
-        </div>
-      </header>
+          </div>
+
+  </div>
+</header>
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -204,7 +296,7 @@ export default function Home() {
 
           {cargando ? (
             <div className="mt-12 py-20 text-center">
-              <p className="text-stone-600 font-medium">Cargando inventario de SoMate...</p>
+              <p className="text-stone-600 font-medium">Cargando inventario de SuMateCL...</p>
             </div>
           ) : productos.length === 0 ? (
             <div className="mt-9 rounded-3xl border border-dashed border-[#746a52]/45 bg-white/45 px-6 py-14 text-center">
@@ -216,60 +308,59 @@ export default function Home() {
           ) : (
             <div id="product-grid" className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {productos.map((product) => {
-                const sinStock = product.cantidad <= 0;
-                return (
-                  <article
-                    key={product.idproducto}
-                    className="rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">
-                        {product.foto ? (
-                          <img
-                            src={product.foto}
-                            alt={product.nombre}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80';
-                            }}
-                          />
-                        ) : (
-                          <span className="font-serif text-sm opacity-80">SoMate Artesanal</span>
-                        )}
-                      </div>
-                      <div className="mt-5 flex items-start justify-between gap-3">
-                        <div>
-                          <span className="inline-block rounded-full bg-[#e8e0d0] px-3 py-1 text-xs font-bold text-[#314235]">
-                            {product.categoria || 'Mates Artesanales'}
-                          </span>
-                          <h3 className="brand-serif mt-3 text-2xl leading-tight text-[#2d2a23]">
-                            {product.nombre}
-                          </h3>
-                        </div>
-                        <span className="whitespace-nowrap text-lg font-bold text-[#a75632]">
-                          {formatearPrecio(product.precio)}
+              const sinStock = product.cantidad <= 0;
+              return (
+                <article
+                  key={product.idproducto}
+                 className="relative group cursor-pointer rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                >
+              
+                  <Link href={`/product/${product.idproducto}`} className="absolute inset-0 z-10" />
+                  <div>
+                    <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">
+                      {product.foto ? (
+                        <img
+                          src={product.foto}
+                          alt={product.nombre}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80';
+                          }}
+                        />
+                      ) : (
+                        <span className="font-serif text-sm opacity-80">SoMate Artesanal</span>
+                      )}
+                    </div>
+                    <div className="mt-5 flex items-start justify-between gap-3">
+                      <div>
+                        <span className="inline-block rounded-full bg-[#e8e0d0] px-3 py-1 text-xs font-bold text-[#314235]">
+                          {product.categoria || 'Mates Artesanales'}
                         </span>
+                        <h3 className="brand-serif mt-3 text-2xl leading-tight text-[#2d2a23]">
+                          {product.nombre}
+                        </h3>
                       </div>
-                      <p className="mt-3 text-sm leading-6 text-stone-600 line-clamp-3">
-                        {product.descripcion}
-                      </p>
-                    </div>
-
-                    <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-4">
-                      <span className="text-xs font-bold text-[#314235]">
-                        {sinStock ? 'Sin stock' : `${product.cantidad} unidades disponibles`}
+                      <span className="whitespace-nowrap text-lg font-bold text-[#a75632]">
+                        {formatearPrecio(product.precio)}
                       </span>
-                      <svg className="w-4 h-4 text-[#746a52]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 17L17 7M17 7H7M17 7V17" />
-                      </svg>
                     </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
+                    <p className="mt-3 text-sm leading-6 text-stone-600 line-clamp-3">
+                      {product.descripcion}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-4">
+                    <span className="text-xs font-bold text-[#314235]">
+                      {sinStock ? 'Sin stock' : `${product.cantidad} unidades disponibles`}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
         {/* Featured Section */}
         <section className="w-full bg-[#e8e0d0] py-16">
