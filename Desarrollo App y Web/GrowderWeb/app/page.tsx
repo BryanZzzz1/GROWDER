@@ -20,16 +20,17 @@ interface Producto {
 export default function Home() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
- const { 
-  carrito, 
-  carritoAbierto, 
-  setCarritoAbierto, 
-  eliminarDelCarrito, 
-  total 
-} = usarCarrito();
-  
+  const [usuario, setUsuario] = useState<any>(null);
+  const {
+    carrito,
+    carritoAbierto,
+    setCarritoAbierto,
+    eliminarDelCarrito,
+    total
+  } = usarCarrito();
+
   const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-  
+
   useEffect(() => {
     async function cargarCatalogo() {
       setCargando(true);
@@ -67,6 +68,28 @@ export default function Home() {
     cargarCatalogo();
   }, []);
 
+  useEffect(() => {
+    async function revisarSesion() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setUsuario(session?.user ?? null);
+    }
+
+    revisarSesion();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUsuario(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const formatearPrecio = (valor: number) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
@@ -86,30 +109,30 @@ export default function Home() {
     <div className="site-shell flex flex-col min-h-screen">
       {/* Header */}
       {/* HEADER CON TU LOGO REAL */}
-<header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-  <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
-    
-    {/* LADO IZQUIERDO: Logo */}
-    <Link href="/" className="flex items-center gap-3 text-left group">
-      <img
-        src="/logocircular.png"
-        alt="SuMate Logo"
-        className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
-      />
-      <div>
-        <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">
-          SuMateCL
-        </span>
-        <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">
-          Más que un mate, una experiencia
-        </span>
-      </div>
-    </Link>
+      <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
+        <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
 
-    {/* LADO DERECHO: Carrito + Panel Admin */}
-    {/* LADO DERECHO: Carrito + Panel Admin */}
+          {/* LADO IZQUIERDO: Logo */}
+          <Link href="/" className="flex items-center gap-3 text-left group">
+            <img
+              src="/logocircular.png"
+              alt="SuMate Logo"
+              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <div>
+              <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">
+                SuMateCL
+              </span>
+              <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">
+                Más que un mate, una experiencia
+              </span>
+            </div>
+          </Link>
+
+          {/* LADO DERECHO: Carrito + Panel Admin */}
+          {/* LADO DERECHO: Carrito + Panel Admin */}
           <div className="flex items-center gap-3">
-            
+
             {/* Widget Carrito con Desplegable */}
             <div className="relative group">
               <button
@@ -158,7 +181,7 @@ export default function Home() {
                             <p className="text-stone-500">{item.cantidad} × ${(item.precio || 0).toLocaleString('es-CL')}</p>
                           </div>
                           {eliminarDelCarrito && (
-                            <button 
+                            <button
                               onClick={() => eliminarDelCarrito(item.id || item.idproducto)}
                               className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer"
                             >
@@ -187,6 +210,55 @@ export default function Home() {
               </div>
             </div>
 
+            {usuario ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/cuenta"
+                  className="hidden md:flex items-center gap-3 bg-[#f8f3e9] border border-[#8C7762]/20 rounded-full pl-3 pr-4 py-1.5 hover:bg-[#efe7d8] transition"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#314235] text-white flex items-center justify-center font-bold uppercase">
+                    {usuario.email?.charAt(0)}
+                  </div>
+
+                  <div className="leading-tight max-w-[170px]">
+                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-bold">
+                      Mi cuenta
+                    </p>
+
+                    <p className="text-xs font-semibold text-stone-700 truncate">
+                      {usuario.email}
+                    </p>
+                  </div>
+                </Link>
+
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    setUsuario(null);
+                  }}
+                  className="border border-[#8C7762] text-[#8C7762] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#8C7762] hover:text-white transition cursor-pointer"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="text-sm font-semibold text-[#8C7762] hover:text-[#725F4C] transition"
+                >
+                  Iniciar sesión
+                </Link>
+
+                <Link
+                  href="/registro"
+                  className="bg-[#314235] hover:bg-[#243127] text-white text-sm font-semibold px-4 py-2 rounded-full transition"
+                >
+                  Crear cuenta
+                </Link>
+              </div>
+            )}
+
             <Link href="/admin">
               <button className="bg-[#8C7762] hover:bg-[#725F4C] text-white text-sm font-semibold px-4 py-2 rounded-full transition cursor-pointer">
                 Panel Admin
@@ -194,8 +266,8 @@ export default function Home() {
             </Link>
           </div>
 
-  </div>
-</header>
+        </div>
+      </header>
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -289,8 +361,8 @@ export default function Home() {
               {cargando
                 ? 'Cargando catálogo...'
                 : productos.length === 1
-                ? '1 producto disponible'
-                : `${productos.length} productos disponibles`}
+                  ? '1 producto disponible'
+                  : `${productos.length} productos disponibles`}
             </p>
           </div>
 
@@ -308,59 +380,59 @@ export default function Home() {
           ) : (
             <div id="product-grid" className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {productos.map((product) => {
-              const sinStock = product.cantidad <= 0;
-              return (
-                <article
-                  key={product.idproducto}
-                 className="relative group cursor-pointer rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-                >
-              
-                  <Link href={`/product/${product.idproducto}`} className="absolute inset-0 z-10" />
-                  <div>
-                    <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">
-                      {product.foto ? (
-                        <img
-                          src={product.foto}
-                          alt={product.nombre}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80';
-                          }}
-                        />
-                      ) : (
-                        <span className="font-serif text-sm opacity-80">SoMate Artesanal</span>
-                      )}
-                    </div>
-                    <div className="mt-5 flex items-start justify-between gap-3">
-                      <div>
-                        <span className="inline-block rounded-full bg-[#e8e0d0] px-3 py-1 text-xs font-bold text-[#314235]">
-                          {product.categoria || 'Mates Artesanales'}
-                        </span>
-                        <h3 className="brand-serif mt-3 text-2xl leading-tight text-[#2d2a23]">
-                          {product.nombre}
-                        </h3>
+                const sinStock = product.cantidad <= 0;
+                return (
+                  <article
+                    key={product.idproducto}
+                    className="relative group cursor-pointer rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                  >
+
+                    <Link href={`/product/${product.idproducto}`} className="absolute inset-0 z-10" />
+                    <div>
+                      <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">
+                        {product.foto ? (
+                          <img
+                            src={product.foto}
+                            alt={product.nombre}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80';
+                            }}
+                          />
+                        ) : (
+                          <span className="font-serif text-sm opacity-80">SoMate Artesanal</span>
+                        )}
                       </div>
-                      <span className="whitespace-nowrap text-lg font-bold text-[#a75632]">
-                        {formatearPrecio(product.precio)}
+                      <div className="mt-5 flex items-start justify-between gap-3">
+                        <div>
+                          <span className="inline-block rounded-full bg-[#e8e0d0] px-3 py-1 text-xs font-bold text-[#314235]">
+                            {product.categoria || 'Mates Artesanales'}
+                          </span>
+                          <h3 className="brand-serif mt-3 text-2xl leading-tight text-[#2d2a23]">
+                            {product.nombre}
+                          </h3>
+                        </div>
+                        <span className="whitespace-nowrap text-lg font-bold text-[#a75632]">
+                          {formatearPrecio(product.precio)}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-stone-600 line-clamp-3">
+                        {product.descripcion}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-4">
+                      <span className="text-xs font-bold text-[#314235]">
+                        {sinStock ? 'Sin stock' : `${product.cantidad} unidades disponibles`}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-stone-600 line-clamp-3">
-                      {product.descripcion}
-                    </p>
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-4">
-                    <span className="text-xs font-bold text-[#314235]">
-                      {sinStock ? 'Sin stock' : `${product.cantidad} unidades disponibles`}
-                    </span>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
         {/* Featured Section */}
         <section className="w-full bg-[#e8e0d0] py-16">

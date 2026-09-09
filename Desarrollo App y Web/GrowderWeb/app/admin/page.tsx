@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/src/lib/supabase';
 
 export interface Producto {
@@ -17,8 +18,24 @@ export interface Producto {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
+
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+  async function verificarSesion() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login");
+    }
+  }
+
+  verificarSesion();
+}, [router]);
 
   // Edit / Form state
   const [editingId, setEditingId] = useState<number | null>(null);
