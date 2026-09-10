@@ -765,7 +765,7 @@ export default function AdminPage() {
                             }`}
                           >
                             <span>
-                              {isPendingDelete ? "¿Confirmar?" : "Eliminar"}
+                              {isPendingDelete ? "¿Confirmar?" : "Quitar"}
                             </span>
                           </button>
                         </div>
