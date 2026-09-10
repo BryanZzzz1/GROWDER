@@ -3,6 +3,7 @@ import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ProveedorCarrito } from "./datoscarro/estadocarro";
 import CarroDesplegable from "./datoscarro/carrodesplegable";
+import { AuthProvider } from "@/src/lib/context/AuthContext";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -30,7 +31,7 @@ export default function RootLayout({
     <html lang="es" className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <ProveedorCarrito>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
           <CarroDesplegable />
         </ProveedorCarrito>
       </body>

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { supabase } from '@/src/lib/supabase';
-import { usarCarrito } from '@/app/datoscarro/estadocarro';
-
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { supabase } from "@/src/lib/supabase";
+import { usarCarrito } from "@/app/datoscarro/estadocarro";
+import { useAuth } from "@/src/lib/context/AuthContext";
 
 interface Producto {
   idproducto: number;
@@ -20,13 +20,14 @@ interface Producto {
 export default function Home() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
+  const {isEditor} = useAuth();
   const [usuario, setUsuario] = useState<any>(null);
   const {
     carrito,
     carritoAbierto,
     setCarritoAbierto,
     eliminarDelCarrito,
-    total
+    total,
   } = usarCarrito();
 
   const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
@@ -36,31 +37,33 @@ export default function Home() {
       setCargando(true);
       try {
         const { data: dataProductos, error: errorProd } = await supabase
-          .from('producto')
-          .select('*')
-          .eq('activo', true)
-          .order('idproducto', { ascending: false });
+          .from("producto")
+          .select("*")
+          .eq("activo", true)
+          .order("idproducto", { ascending: false });
 
         if (errorProd) throw errorProd;
 
         const { data: dataImagenes } = await supabase
-          .from('imagenes')
-          .select('*');
+          .from("imagenes")
+          .select("*");
 
         const productosConFoto = (dataProductos || []).map((p: any) => {
           const fotoEncontrada = (dataImagenes || []).find(
-            (img: any) => img.productoid === p.idproducto || img.idproducto === p.idproducto
+            (img: any) =>
+              img.productoid === p.idproducto ||
+              img.idproducto === p.idproducto,
           );
           return {
             ...p,
             foto: fotoEncontrada ? fotoEncontrada.url : p.foto,
-            categoria: p.categoria || 'Mates Artesanales'
+            categoria: p.categoria || "Mates Artesanales",
           };
         });
 
         setProductos(productosConFoto);
       } catch (err) {
-        console.error('Error al cargar catálogo:', err);
+        console.error("Error al cargar catálogo:", err);
       } finally {
         setCargando(false);
       }
@@ -91,17 +94,17 @@ export default function Home() {
   }, []);
 
   const formatearPrecio = (valor: number) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0
+    return new Intl.NumberFormat("es-CL", {
+      style: "currency",
+      currency: "CLP",
+      maximumFractionDigits: 0,
     }).format(valor);
   };
 
   const scrollAlCatalogo = () => {
-    const el = document.getElementById('product-grid');
+    const el = document.getElementById("product-grid");
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -111,7 +114,6 @@ export default function Home() {
       {/* HEADER CON TU LOGO REAL */}
       <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
         <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
-
           {/* LADO IZQUIERDO: Logo */}
           <Link href="/" className="flex items-center gap-3 text-left group">
             <img
@@ -132,7 +134,6 @@ export default function Home() {
           {/* LADO DERECHO: Carrito + Panel Admin */}
           {/* LADO DERECHO: Carrito + Panel Admin */}
           <div className="flex items-center gap-3">
-
             {/* Widget Carrito con Desplegable */}
             <div className="relative group">
               <button
@@ -140,7 +141,9 @@ export default function Home() {
                 className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer"
                 aria-label="Abrir carrito"
               >
-                <span className="text-xs">${(total || 0).toLocaleString('es-CL')}</span>
+                <span className="text-xs">
+                  ${(total || 0).toLocaleString("es-CL")}
+                </span>
                 <div className="relative flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -169,20 +172,36 @@ export default function Home() {
               {/* Ventana flotante al pasar el mouse */}
               <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-stone-200 rounded-2xl shadow-xl p-4 hidden group-hover:block transition-all z-50">
                 {carrito.length === 0 ? (
-                  <p className="text-center text-xs text-stone-500 py-3">El carrito está vacío</p>
+                  <p className="text-center text-xs text-stone-500 py-3">
+                    El carrito está vacío
+                  </p>
                 ) : (
                   <>
                     <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
                       {carrito.map((item: any) => (
-                        <div key={item.id || item.idproducto} className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2">
-                          <img src={item.imagen || item.foto} alt={item.nombre} className="w-9 h-9 object-cover rounded-md" />
+                        <div
+                          key={item.id || item.idproducto}
+                          className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2"
+                        >
+                          <img
+                            src={item.imagen || item.foto}
+                            alt={item.nombre}
+                            className="w-9 h-9 object-cover rounded-md"
+                          />
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-stone-800 truncate">{item.nombre}</p>
-                            <p className="text-stone-500">{item.cantidad} × ${(item.precio || 0).toLocaleString('es-CL')}</p>
+                            <p className="font-semibold text-stone-800 truncate">
+                              {item.nombre}
+                            </p>
+                            <p className="text-stone-500">
+                              {item.cantidad} × $
+                              {(item.precio || 0).toLocaleString("es-CL")}
+                            </p>
                           </div>
                           {eliminarDelCarrito && (
                             <button
-                              onClick={() => eliminarDelCarrito(item.id || item.idproducto)}
+                              onClick={() =>
+                                eliminarDelCarrito(item.id || item.idproducto)
+                              }
                               className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer"
                             >
                               ✕
@@ -194,7 +213,7 @@ export default function Home() {
 
                     <div className="flex justify-between items-center my-3 text-xs font-bold text-stone-800 border-t pt-2">
                       <span>Subtotal:</span>
-                      <span>${(total || 0).toLocaleString('es-CL')}</span>
+                      <span>${(total || 0).toLocaleString("es-CL")}</span>
                     </div>
 
                     <div className="space-y-2">
@@ -209,7 +228,6 @@ export default function Home() {
                 )}
               </div>
             </div>
-
             {usuario ? (
               <div className="flex items-center gap-3">
                 <Link
@@ -258,14 +276,15 @@ export default function Home() {
                 </Link>
               </div>
             )}
-
-            <Link href="/admin">
-              <button className="bg-[#8C7762] hover:bg-[#725F4C] text-white text-sm font-semibold px-4 py-2 rounded-full transition cursor-pointer">
-                Panel Admin
-              </button>
-            </Link>
+            {isEditor && (
+              <Link
+                href="/admin"
+                className="rounded-full bg-[#314235] px-4 py-2 text-white font-semibold"
+              >
+                Administración
+              </Link>
+            )}
           </div>
-
         </div>
       </header>
 
@@ -281,7 +300,9 @@ export default function Home() {
                 El ritual del buen mate, en cada detalle.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-stone-600">
-                Descubre nuestra selección exclusiva de mates artesanales, calabazas uruguayas, bombillas cinceladas y accesorios diseñados para perdurar.
+                Descubre nuestra selección exclusiva de mates artesanales,
+                calabazas uruguayas, bombillas cinceladas y accesorios diseñados
+                para perdurar.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
@@ -290,31 +311,51 @@ export default function Home() {
                   className="inline-flex items-center gap-2 rounded-full bg-[#a75632] px-6 py-3.5 font-bold text-white shadow-lg shadow-[#a75632]/20 transition hover:-translate-y-0.5 hover:bg-[#884326] cursor-pointer"
                 >
                   <span>Explorar catálogo</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                    />
                   </svg>
                 </button>
-                <Link
-                  href="/admin"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#314235] px-6 py-3.5 font-bold text-[#314235] transition hover:bg-[#314235] hover:text-white"
-                >
-                  <span>Panel administrativo</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </Link>
               </div>
               <div className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-stone-600">
                 <span className="inline-flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-4 h-4 text-[#314235]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   <span>Mates 100% artesanales</span>
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <svg
+                    className="w-4 h-4 text-[#314235]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
                   </svg>
                   <span>Control de stock en tiempo real</span>
                 </span>
@@ -331,7 +372,8 @@ export default function Home() {
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/75 to-transparent">
                   <p className="max-w-xs text-sm font-medium text-white">
-                    Mates artesanales elaborados con calabaza seleccionada y virola cincelada.
+                    Mates artesanales elaborados con calabaza seleccionada y
+                    virola cincelada.
                   </p>
                 </div>
               </div>
@@ -342,11 +384,15 @@ export default function Home() {
         {/* Value Proposition Bar */}
         <section className="w-full border-y border-stone-800/10 bg-[#314235] grain">
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-5 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[#f8f3e9]">
-            <p className="text-center text-sm font-semibold">Mates y calabazas seleccionadas a mano</p>
+            <p className="text-center text-sm font-semibold">
+              Mates y calabazas seleccionadas a mano
+            </p>
             <p className="text-center text-sm font-semibold border-y sm:border-y-0 sm:border-x border-white/20 py-3 sm:py-0">
               Sincronización de inventario en tiempo real
             </p>
-            <p className="text-center text-sm font-semibold">Envíos protegidos a todo Chile</p>
+            <p className="text-center text-sm font-semibold">
+              Envíos protegidos a todo Chile
+            </p>
           </div>
         </section>
 
@@ -354,31 +400,43 @@ export default function Home() {
         <section className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-16">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">Nuestros Productos</p>
-              <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">Catálogo general</h2>
+              <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">
+                Nuestros Productos
+              </p>
+              <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">
+                Catálogo general
+              </h2>
             </div>
             <p className="text-sm font-semibold text-stone-500">
               {cargando
-                ? 'Cargando catálogo...'
+                ? "Cargando catálogo..."
                 : productos.length === 1
-                  ? '1 producto disponible'
+                  ? "1 producto disponible"
                   : `${productos.length} productos disponibles`}
             </p>
           </div>
 
           {cargando ? (
             <div className="mt-12 py-20 text-center">
-              <p className="text-stone-600 font-medium">Cargando inventario de SuMateCL...</p>
+              <p className="text-stone-600 font-medium">
+                Cargando inventario de SuMateCL...
+              </p>
             </div>
           ) : productos.length === 0 ? (
             <div className="mt-9 rounded-3xl border border-dashed border-[#746a52]/45 bg-white/45 px-6 py-14 text-center">
-              <h3 className="brand-serif mt-4 text-2xl text-[#2d2a23]">No hay productos disponibles</h3>
+              <h3 className="brand-serif mt-4 text-2xl text-[#2d2a23]">
+                No hay productos disponibles
+              </h3>
               <p className="mt-2 text-stone-600">
-                Añade nuevos productos desde el panel administrativo para verlos aquí.
+                Añade nuevos productos desde el panel administrativo para verlos
+                aquí.
               </p>
             </div>
           ) : (
-            <div id="product-grid" className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <div
+              id="product-grid"
+              className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+            >
               {productos.map((product) => {
                 const sinStock = product.cantidad <= 0;
                 return (
@@ -386,8 +444,10 @@ export default function Home() {
                     key={product.idproducto}
                     className="relative group cursor-pointer rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
                   >
-
-                    <Link href={`/product/${product.idproducto}`} className="absolute inset-0 z-10" />
+                    <Link
+                      href={`/product/${product.idproducto}`}
+                      className="absolute inset-0 z-10"
+                    />
                     <div>
                       <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">
                         {product.foto ? (
@@ -397,17 +457,19 @@ export default function Home() {
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src =
-                                'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80';
+                                "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80";
                             }}
                           />
                         ) : (
-                          <span className="font-serif text-sm opacity-80">SoMate Artesanal</span>
+                          <span className="font-serif text-sm opacity-80">
+                            SoMate Artesanal
+                          </span>
                         )}
                       </div>
                       <div className="mt-5 flex items-start justify-between gap-3">
                         <div>
                           <span className="inline-block rounded-full bg-[#e8e0d0] px-3 py-1 text-xs font-bold text-[#314235]">
-                            {product.categoria || 'Mates Artesanales'}
+                            {product.categoria || "Mates Artesanales"}
                           </span>
                           <h3 className="brand-serif mt-3 text-2xl leading-tight text-[#2d2a23]">
                             {product.nombre}
@@ -424,7 +486,9 @@ export default function Home() {
 
                     <div className="mt-5 flex items-center justify-between border-t border-stone-200 pt-4">
                       <span className="text-xs font-bold text-[#314235]">
-                        {sinStock ? 'Sin stock' : `${product.cantidad} unidades disponibles`}
+                        {sinStock
+                          ? "Sin stock"
+                          : `${product.cantidad} unidades disponibles`}
                       </span>
                     </div>
                   </article>
@@ -439,8 +503,12 @@ export default function Home() {
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8">
             <div className="flex items-end justify-between gap-4 mb-7">
               <div>
-                <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">Selección Destacada</p>
-                <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">Hechos a mano con dedicación</h2>
+                <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">
+                  Selección Destacada
+                </p>
+                <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">
+                  Hechos a mano con dedicación
+                </h2>
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -451,9 +519,13 @@ export default function Home() {
                   className="h-64 w-full object-cover"
                 />
                 <div className="p-6">
-                  <h3 className="brand-serif text-2xl text-[#2d2a23]">El arte del curado tradicional</h3>
+                  <h3 className="brand-serif text-2xl text-[#2d2a23]">
+                    El arte del curado tradicional
+                  </h3>
                   <p className="mt-2 leading-7 text-stone-600">
-                    Cada calabaza es tratada con procesos naturales para garantizar el mejor sabor en cada cebada y una larga vida útil.
+                    Cada calabaza es tratada con procesos naturales para
+                    garantizar el mejor sabor en cada cebada y una larga vida
+                    útil.
                   </p>
                 </div>
               </article>
@@ -464,9 +536,12 @@ export default function Home() {
                   className="h-64 w-full object-cover"
                 />
                 <div className="p-6">
-                  <h3 className="brand-serif text-2xl text-[#2d2a23]">Virolas y apliques cincelados</h3>
+                  <h3 className="brand-serif text-2xl text-[#2d2a23]">
+                    Virolas y apliques cincelados
+                  </h3>
                   <p className="mt-2 leading-7 text-stone-600">
-                    Diseños en alpaca maciza trabajados a mano por orfebres especializados en la tradición matera del Río de la Plata.
+                    Diseños en alpaca maciza trabajados a mano por orfebres
+                    especializados en la tradición matera del Río de la Plata.
                   </p>
                 </div>
               </article>
@@ -479,7 +554,9 @@ export default function Home() {
       <footer className="w-full border-t border-stone-800/10 bg-[#f8f3e9]">
         <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-7 flex flex-col sm:flex-row justify-between gap-3 text-sm">
           <p className="font-bold text-[#314235]">SoMate • GROWDER</p>
-          <p className="text-stone-500">Gestión Integral de Inventario y E-Commerce</p>
+          <p className="text-stone-500">
+            Gestión Integral de Inventario y E-Commerce
+          </p>
         </div>
       </footer>
     </div>
