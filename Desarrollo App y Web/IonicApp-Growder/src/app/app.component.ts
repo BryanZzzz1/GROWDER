@@ -36,26 +36,13 @@ export class AppComponent implements OnDestroy {
   }
 
   private async setupStatusBar() {
-    await StatusBar.setBackgroundColor({ color: '#a57352ec' }); 
+    await StatusBar.setBackgroundColor({ color: '#18342f' });
     await StatusBar.setOverlaysWebView({ overlay: false });
     // Barra debajo de la app
   }
 
   private async updateStatusBar(url: string) {
-    let color = '#a57352ec'; // Color por defecto
-
-    if (url.includes('/login')) {
-      color = '#a57352ec'; // Rojo para la página de login (por ejemplo)
-    } else if (url.includes('/tienda')) {
-      color = '#a57352ec'; // Verde para la página de la tienda (por ejemplo)
-    } else if (url.includes('/carro')) {
-      color = '#a57352ec'; // Azul para la página del carro
-    } else if (url.includes('/iniciotienda')) {
-      color = '#a57352ec'; 
-    } 
-
-
-    await StatusBar.setBackgroundColor({ color });
+    await StatusBar.setBackgroundColor({ color: '#18342f' });
   }
 
   ocultabarrabaja(url: string): boolean {
@@ -91,13 +78,20 @@ export class AppComponent implements OnDestroy {
   }
 
   private async scheduleNotification() {
+    const permission = await LocalNotifications.checkPermissions();
+    if (permission.display !== 'granted') {
+      const requested = await LocalNotifications.requestPermissions();
+      if (requested.display !== 'granted') return;
+    }
+
+    await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
     await LocalNotifications.schedule({
       notifications: [
         {
-          title: '¡Grandes descuentos disponibles!',
-          body: 'No te pierdas nuestras ofertas en nuevos productos.',
+          title: 'Una nueva selección te espera',
+          body: 'Descubre productos elegidos para acompañar tu día en Growder.',
           id: 1,
-          schedule: { at: new Date(Date.now() + 10000) }, 
+          schedule: { at: new Date(Date.now() + 24 * 60 * 60 * 1000), repeats: true },
           actionTypeId: '',
           extra: null,
         },

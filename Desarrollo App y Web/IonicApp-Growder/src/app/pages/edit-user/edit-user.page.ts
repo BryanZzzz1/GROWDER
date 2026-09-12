@@ -51,19 +51,20 @@ export class EditUserPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    const username = this.route.snapshot.paramMap.get('username');
-    if (username) {
-      this.user = await this.servicebd.getUserByUsername(username);
-      if (!this.user) {
-        console.error('Usuario no encontrado:', username);
-        this.router.navigate(['/pages/adminusuario']);
-      } else {
-        this.isAdmin = await this.servicebd.isAdmin();
-      }
-    } else {
-      console.error('No se encontró el username en la ruta');
-      this.router.navigate(['/pages/adminusuario']);
+    const identifier = this.route.snapshot.paramMap.get('username');
+    const currentUser = await this.servicebd.getCurrentUser();
+    if (!identifier || !currentUser) {
+      await this.presentAlert('Error', 'Debes iniciar sesión para editar tu perfil.', 'Aceptar');
+      this.router.navigate(['/login']);
+      return;
     }
+
+    this.user = currentUser;
+    this.user.username = this.user.username || this.user.email;
+    this.user.fecha_nacimiento = this.user.fecha_nacimiento || '';
+    this.user.telefono = this.user.telefono || '';
+    this.user.foto = this.user.foto || '';
+    this.isAdmin = await this.servicebd.isAdmin();
   }
 
   // Método para abrir y cerrar el modal de cambio de contraseña
@@ -75,20 +76,21 @@ export class EditUserPage implements OnInit {
 
   // Este método se llama cuando el usuario intenta cambiar su contraseña
   async changePassword() {
-    // Verifica si la nueva contraseña tiene al menos 8 caracteres
+    if (!this.contrasenaActual.trim()) {
+      await this.presentAlert('Falta tu contraseña actual', 'Escríbela para confirmar el cambio.', 'Entendido');
+      return;
+    }
+
     if (this.nuevaContrasena.length < 8) {
-      await this.presentAlert("Error", "La nueva contraseña debe tener al menos 8 caracteres.", "Aceptar");
+      await this.presentAlert("Contraseña insegura", "La nueva contraseña debe tener al menos 8 caracteres.", "Entendido");
       return;
     }
 
     try {
-      if (this.isAdmin) {
-        // Si el usuario es admin, se cambia la contraseña a través de este servicio
-        await this.servicebd.cambiarContrasenaAdmin(this.user.username, this.nuevaContrasena);
-      } else {
-        // Si el usuario no es admin, se cambia la contraseña a través de este otro servicio
-        const result = await this.servicebd.cambiarContrasenaActual(this.user.username, this.contrasenaActual, this.nuevaContrasena);
-        if (!result) return; // Si el cambio de contraseña falla, no continúa
+      const result = await this.servicebd.cambiarContrasenaActual(this.user.username, this.contrasenaActual, this.nuevaContrasena);
+      if (!result) {
+        await this.presentAlert('No se pudo actualizar', 'La contraseña actual no coincide.', 'Entendido');
+        return;
       }
 
       // Muestra una alerta indicando que el cambio de contraseña fue exitoso

@@ -1,31 +1,98 @@
-<ion-header [translucent]="true">
+<ion-header class="store-header">
   <ion-toolbar>
-
-    <ion-title>
-      <img (click)="irIniciopagina()" src="../../../assets/img/image_4_1.png" alt="Icono de la App" style="height: 40px;" />
-    </ion-title>
-    <ion-buttons slot="end">
-    </ion-buttons>
+    <div class="topbar">
+      <button class="brand-mark" type="button" (click)="irIniciopagina()" aria-label="Ir al inicio">
+        <img src="../../../assets/img/image_4_1.png" alt="Growder - SumateCL" />
+        <span><strong>Growder</strong><small>SUMATECL</small></span>
+      </button>
+      <div class="topbar-meta">
+        <span class="eyebrow">SELECCIÓN LOCAL</span>
+        <div class="context-actions">
+          <button type="button" (click)="irAyuda()" title="Ayuda"><ion-icon name="help-circle-outline"></ion-icon><span>Ayuda</span></button>
+          <button type="button" (click)="irCarrito()" title="Carrito"><ion-icon name="bag-handle-outline"></ion-icon><span>Carrito</span></button>
+          <button type="button" (click)="irPerfil()" [title]="isLoggedIn ? 'Perfil' : 'Iniciar sesión'"><ion-icon [name]="isLoggedIn ? 'person-outline' : 'log-in-outline'"></ion-icon><span>{{ isLoggedIn ? 'Perfil' : 'Ingresar' }}</span></button>
+        </div>
+        <ion-button fill="clear" class="admin-link" *ngIf="isAdmin" (click)="irAdministracion()">
+          Administración
+        </ion-button>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="content">
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let producto of arregloProductos">
-        <ion-card (click)="verDetalles(producto.idproducto)" style="cursor: pointer;">
-          <img alt="Producto" [src]="producto.foto || 'https://ionicframework.com/docs/img/demos/card-media.png'" />
-          <ion-card-header>
-            <ion-card-title style="text-align: center; font-size: 30px;">{{ producto.nombre }}</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-          </ion-card-content>
-          <ion-card-content>
-            <ion-label style="word-wrap: break-word; white-space: normal; font-size: 20px;">${{ producto.precio }}</ion-label>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <div class="footer-spacing"></div> <!-- Espacio adicional para el footer -->
+<ion-content [fullscreen]="true" class="store-content">
+  <main class="store-shell">
+    <section class="hero-panel">
+      <div class="hero-copy">
+        <span class="kicker">GROWDER - SUMATECL</span>
+        <h1>Encuentra algo que se sienta tuyo.</h1>
+        <p>Productos seleccionados para acompañar tus días, con el cuidado de los emprendimientos que los hacen posibles.</p>
+        <div class="hero-actions">
+          <a class="hero-link" href="#catalogo">Explorar catálogo <ion-icon name="arrow-down-outline"></ion-icon></a>
+          <span class="hero-note"><ion-icon name="shield-checkmark-outline"></ion-icon> Compra segura y stock actualizado</span>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="../../../assets/img/fondo testeo.png" alt="Selección de productos Growder" />
+        <div class="hero-stamp"><strong>Hecho</strong><span>con intención</span></div>
+      </div>
+    </section>
+
+    <section class="value-strip" aria-label="Beneficios de Growder">
+      <div><ion-icon name="sparkles-outline"></ion-icon><span><strong>Selección cuidada</strong><small>Lo que vale la pena mostrar</small></span></div>
+      <div><ion-icon name="cube-outline"></ion-icon><span><strong>Envíos protegidos</strong><small>Preparamos cada pedido</small></span></div>
+      <div><ion-icon name="sync-outline"></ion-icon><span><strong>Stock en tiempo real</strong><small>Información siempre clara</small></span></div>
+    </section>
+
+    <section id="catalogo" class="catalog-section">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">NUESTROS PRODUCTOS</span>
+          <h2>Catálogo general</h2>
+        </div>
+        <div class="catalog-meta">
+          <span>{{ arregloProductos.length }} productos disponibles</span>
+          <button type="button" (click)="recargarProductos()" aria-label="Actualizar catálogo" title="Actualizar catálogo">
+            <ion-icon name="refresh-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="product-grid" *ngIf="arregloProductos.length; else emptyCatalog">
+        <article class="product-card" *ngFor="let producto of arregloProductos" (click)="verDetalles(producto.idproducto)">
+          <div class="product-image">
+            <img [src]="producto.foto || 'https://ionicframework.com/docs/img/demos/card-media.png'" [alt]="producto.nombre" />
+            <span class="stock-badge">{{ producto.cantidad || 0 }} disponibles</span>
+            <button class="quick-add" type="button" (click)="$event.stopPropagation(); agregarAlCarrito(producto)" aria-label="Agregar al carrito" title="Agregar al carrito">
+              <ion-icon name="add-outline"></ion-icon>
+            </button>
+          </div>
+          <div class="product-info">
+            <span class="product-category">SELECCIÓN GROWDER</span>
+            <h3>{{ producto.nombre }}</h3>
+            <div class="product-footer">
+              <strong>${{ producto.precio | number:'1.0-0' }}</strong>
+              <span>Ver detalle <ion-icon name="arrow-forward-outline"></ion-icon></span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #emptyCatalog>
+        <div class="empty-catalog"><ion-icon name="leaf-outline"></ion-icon><h3>Estamos preparando la selección</h3><p>Vuelve pronto para descubrir los productos disponibles.</p></div>
+      </ng-template>
+    </section>
+
+    <section class="craft-section">
+      <div class="craft-image"><img src="../../../assets/img/image_4_1.png" alt="Identidad de Growder" /></div>
+      <div class="craft-copy">
+        <span class="kicker">LA IDEA DETRÁS DE GROWDER</span>
+        <h2>Comprar también puede ser una forma de apoyar.</h2>
+        <p>Conectamos personas con productos y emprendimientos que merecen crecer. Una experiencia simple para elegir mejor, descubrir algo nuevo y hacerlo parte de tu día.</p>
+        <a class="text-link" href="#catalogo">Conoce la selección <ion-icon name="arrow-forward-outline"></ion-icon></a>
+      </div>
+    </section>
+
+    <div class="footer-spacing"></div>
+  </main>
 </ion-content>

@@ -1,88 +1,38 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ producto.nombre }}</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="ion-padding-top">
-  <div class="producto-container">
-    <img [src]="producto.foto" alt="Producto" class="producto-imagen"/>
-
-    <div class="producto-info-card" style="background-color: #ffffffec; padding: 20px; border-radius: 8px; margin: 16px 0; border: 1px solid #e0e0e0;">
-      <h1 class="producto-nombre" style="color: #333333; font-size: 24px; margin-bottom: 10px; font-weight: bold;">{{ producto.nombre }}</h1>
-      <p class="producto-descripcion" style="color: #666666; font-size: 16px; margin-bottom: 15px;">{{ producto.descripcion }}</p>
-      <div class="precio-container">
-        <span class="precio-actual" style="color: #333333; font-size: 22px; font-weight: bold;">{{ producto.precio | currency }}</span>
-      </div>  
-      <ion-button expand="block" (click)="agregarAlCarrito(producto)">
-        Agregar al carrito
-      </ion-button>
-    </div>
-
-    <div class="imagenes-container">
-      <h2 style="color: #333333; font-size: 20px; margin-bottom: 10px;"></h2>
-      <div *ngFor="let imagen of imagenes" class="imagen-item">
-        <img [src]="imagen" alt="Imagen del producto" class="imagen-adicional" />
+<ion-content [fullscreen]="true" class="detail-content">
+  <main class="detail-shell" *ngIf="producto"><ion-button fill="clear" class="view-back" routerLink="/tienda" aria-label="Volver a la tienda"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button>
+    <section class="product-hero">
+      <div class="gallery-main" *ngIf="productImages.length">
+        <img [src]="productImages[currentImageIndex]" [alt]="producto.nombre" />
+        <button type="button" class="gallery-arrow gallery-prev" (click)="previousImage()" *ngIf="productImages.length > 1" aria-label="Imagen anterior"><ion-icon name="chevron-back-outline"></ion-icon></button>
+        <button type="button" class="gallery-arrow gallery-next" (click)="nextImage()" *ngIf="productImages.length > 1" aria-label="Imagen siguiente"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+        <span class="gallery-counter">{{ currentImageIndex + 1 }} / {{ productImages.length }}</span>
       </div>
-
-      <!-- Mostrar opciones para agregar imagen solo si es admin -->
-      <div *ngIf="isAdmin">
-        <ion-button expand="block" (click)="takePhoto()" class="enviar-imagen-boton" style="margin-top: 10px;">
-          Agregar Imagen
-        </ion-button>
+      <div class="product-summary">
+        <span class="detail-kicker">SELECCIÓN GROWDER</span>
+        <h1>{{ producto.nombre }}</h1>
+        <div class="rating-line"><span class="stars">★★★★★</span><span>{{ resenas.length }} reseñas</span></div>
+        <p class="product-description">{{ producto.descripcion || 'Una pieza seleccionada para acompañar tus momentos con calidad y personalidad.' }}</p>
+        <div class="price-row"><strong>{{ producto.precio | currency:'USD':'symbol':'1.0-0' }}</strong><span><ion-icon name="checkmark-circle-outline"></ion-icon> Disponible</span></div>
+        <ion-button expand="block" class="primary-action" (click)="agregarAlCarrito(producto)"><ion-icon name="bag-add-outline" slot="start"></ion-icon>Agregar al carrito</ion-button>
+        <div class="purchase-note"><ion-icon name="shield-checkmark-outline"></ion-icon><span>Compra protegida · Stock actualizado</span></div>
       </div>
-    </div>
+    </section>
 
-    <div class="resenas-container" style="background-color: #a57352ec; padding: 16px; border-radius: 8px; margin-top: 16px;">
-      <ion-button expand="block" (click)="toggleComentarios()" fill="clear">
-        {{ mostrarComentarios ? 'Ocultar Reseñas' : 'Mostrar Reseñas' }}
-        <ion-icon [name]="mostrarComentarios ? 'chevron-up-outline' : 'chevron-down-outline'" slot="end"></ion-icon>
-      </ion-button>
+    <section class="gallery-extra" *ngIf="productImages.length > 1"><button type="button" *ngFor="let imagen of productImages; let i = index" [class.selected]="i === currentImageIndex" (click)="selectImage(i)"><img [src]="imagen" alt="Vista adicional del producto" /></button></section>
+    <ion-button *ngIf="isAdmin" fill="outline" class="admin-image-button" (click)="takePhoto()"><ion-icon name="image-outline" slot="start"></ion-icon>Agregar imagen</ion-button>
 
-      <div *ngIf="mostrarComentarios">
-        <h2 style="color: white;">Reseñas</h2>
-        <ion-list>
-          <div *ngFor="let resena of resenas" class="resena-card" style="background-color: white; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 10px; padding: 15px;">
-            <ion-item lines="none" style="--background: transparent;">
-              <ion-avatar slot="start" style="width: 40px; height: 40px;">
-                <img [src]="resena.foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="avatar" style="border-radius: 50%;" />
-              </ion-avatar>
-              <ion-label>
-                <strong style="color: #333333; font-size: 16px;">{{ resena.username }}</strong>
-                <p class="resena-text" style="color: #666666; margin-top: 5px;">{{ resena.texto }}</p>
-              </ion-label>
-            </ion-item>
-
-            <ion-item lines="none" style="--background: transparent;">
-              <ion-label position="stacked" style="color: #333333;">Responder</ion-label>
-              <ion-textarea [(ngModel)]="respuestaTexto[resena.id]" rows="2" placeholder="Escribe tu respuesta..." style="border: 1px solid #e0e0e0; border-radius: 4px; --padding-start: 10px;"></ion-textarea>
-            </ion-item>
-
-            <ion-button expand="full" (click)="agregarRespuesta(resena.id)" [disabled]="!username" style="margin-top: 10px;">
-              Enviar Respuesta
-            </ion-button>
-
-            <div *ngIf="resena.respuestas && resena.respuestas.length > 0" class="respuestas" style="margin-top: 15px;">
-              <h4 style="color: #333333; margin-bottom: 10px;">Respuestas:</h4>
-              <div *ngFor="let respuesta of resena.respuestas" class="respuesta-card" style="background-color: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid #e0e0e0;">
-                <strong style="color: #333333; font-size: 14px;">{{ respuesta.respuesta_username }}</strong>
-                <p style="color: #666666; margin-top: 5px;">{{ respuesta.respuesta_texto }}</p>
-              </div>
-            </div>
-          </div>
-        </ion-list>
-
-        <ion-item lines="none" style="--background: transparent; margin-top: 15px;">
-          <ion-label position="stacked" style="color: white;">Agregar Reseña</ion-label>
-          <ion-textarea [(ngModel)]="nuevaResena" rows="3" placeholder="Escribe tu reseña..." style="background: white; border-radius: 8px; margin-top: 5px; --padding-start: 10px;"></ion-textarea>
-        </ion-item>
-        <ion-button expand="block" (click)="agregarResena()" [disabled]="!username" style="margin-top: 10px;">
-          Enviar Reseña
-        </ion-button>
+    <section class="reviews-section">
+      <div class="reviews-heading"><div><span class="detail-kicker">EXPERIENCIAS REALES</span><h2>Lo que dice la comunidad</h2></div><button type="button" class="review-toggle" (click)="toggleComentarios()"><span>{{ mostrarComentarios ? 'Ocultar' : 'Ver' }} reseñas</span><ion-icon [name]="mostrarComentarios ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon></button></div>
+      <div *ngIf="mostrarComentarios" class="reviews-body">
+        <div *ngIf="!resenas.length" class="empty-reviews"><ion-icon name="chatbubble-ellipses-outline"></ion-icon><p>Sé la primera persona en compartir su experiencia.</p></div>
+        <article *ngFor="let resena of resenas" class="review-card">
+          <div class="review-top"><div class="review-person"><ion-avatar><img [src]="resena.foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="Avatar" /></ion-avatar><div><strong>{{ resena.username || 'Cliente Growder' }}</strong><small>Compra verificada</small></div></div><span class="review-stars"><span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= (resena.calificacion || 0)">★</span></span></div>
+          <p class="review-text">{{ resena.texto }}</p>
+          <div class="reply-area"><ion-textarea [(ngModel)]="respuestaTexto[resena.id]" rows="2" placeholder="Escribe una respuesta..."></ion-textarea><ion-button fill="clear" (click)="agregarRespuesta(resena.id)" [disabled]="!username"><ion-icon name="send-outline" slot="start"></ion-icon>Responder</ion-button></div>
+          <div *ngFor="let respuesta of resena.respuestas" class="reply-card"><strong>{{ respuesta.respuesta_username || 'Respuesta' }}</strong><p>{{ respuesta.respuesta_texto }}</p></div>
+        </article>
+        <div class="new-review"><h3>Comparte tu experiencia</h3><div class="rating-picker" aria-label="Calificación de 1 a 5 estrellas"><button type="button" *ngFor="let star of [1,2,3,4,5]" (click)="setRating(star)" [class.selected]="star <= nuevaCalificacion" [attr.aria-label]="star + ' estrellas'">★</button></div><ion-textarea [(ngModel)]="nuevaResena" rows="3" placeholder="¿Qué te pareció este producto?"></ion-textarea><ion-button class="primary-action" (click)="agregarResena()" [disabled]="!username || !nuevaResena.trim() || !nuevaCalificacion">Publicar reseña</ion-button></div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </ion-content>

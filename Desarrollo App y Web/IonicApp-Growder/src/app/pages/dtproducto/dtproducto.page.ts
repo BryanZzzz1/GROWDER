@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ServicebdService } from 'src/app/services/servicesbd.service';
 import { Productos } from 'src/app/services/productos';
 import { take } from 'rxjs/operators';
@@ -15,16 +15,19 @@ export class DtproductoPage implements OnInit {
   producto!: Productos;
   resenas: any[] = [];
   nuevaResena: string = '';
+  nuevaCalificacion = 0;
   respuestaTexto: { [key: number]: string } = {};
   username: string = '';
   foto!: string;
   imagenes: string[] = [];
   nuevaImagenUrl: string = '';
   isAdmin: boolean = false;
+  currentImageIndex = 0;
 
   mostrarComentarios: boolean = false;
 
   constructor(private route: ActivatedRoute,
+              private router: Router,
               private bd: ServicebdService,
               private toastController: ToastController) {}
 
@@ -51,6 +54,7 @@ export class DtproductoPage implements OnInit {
     this.bd.fetchProductos().then(async productos => {
       this.producto = productos.find(p => p.idproducto === idproducto)!;
       this.imagenes = await this.bd.obtenerImagenes(idproducto);
+      this.currentImageIndex = 0;
     });
   }
 
@@ -76,26 +80,38 @@ export class DtproductoPage implements OnInit {
     if (currentUser) {
       await this.bd.agregarAlCarrito(producto, currentUser.username);
     } else {
-      this.presentToast('Debes iniciar sesión antes de agregar un producto');
+      const toast = await this.toastController.create({
+        message: 'Inicia sesión para guardar este producto.',
+        duration: 4000,
+        position: 'bottom',
+        icon: 'person-outline',
+        buttons: [{ text: 'Ingresar', handler: () => this.router.navigate(['/login']) }]
+      });
+      await toast.present();
     }
   }
 
   async agregarResena() {
     const currentUser = await this.bd.getCurrentUser();
     if (currentUser) {
-      if (this.nuevaResena.trim()) {
-        this.bd.insertarResena(this.producto.idproducto, currentUser.username, this.nuevaResena)
-          .then(() => {
-            this.resenas.push({ id: Date.now(), username: currentUser.username, texto: this.nuevaResena, respuestas: [], foto: this.foto });
+      if (this.nuevaResena.trim() && this.nuevaCalificacion >= 1) {
+        this.bd.insertarResena(this.producto.idproducto, currentUser.username, this.nuevaResena, this.nuevaCalificacion)
+          .then((saved) => {
+            if (!saved) throw new Error('No se pudo guardar la reseña');
+            this.resenas.push({ id: Date.now(), username: currentUser.username, texto: this.nuevaResena, calificacion: this.nuevaCalificacion, respuestas: [], foto: this.foto });
             this.nuevaResena = '';
+            this.nuevaCalificacion = 0;
           })
           .catch(err => {
             console.error(err);
             this.bd.presentAlert('Error', 'No se pudo agregar la reseña.');
           });
       }
+      else if (this.nuevaCalificacion < 1) {
+        await this.presentToast('Elige una calificación de 1 a 5 estrellas.');
+      }
     } else {
-      this.bd.presentAlert('Error', 'Debes iniciar sesión para comentar.');
+      this.presentToast('Inicia sesión para dejar una reseña.');
     }
   }
 
@@ -114,13 +130,13 @@ export class DtproductoPage implements OnInit {
           }
         } catch (error) {
           console.error(error);
-          this.bd.presentAlert('Error', 'No se pudo guardar la respuesta.');
+          this.presentToast('No se pudo guardar la respuesta.');
         }
       } else {
-        this.bd.presentAlert('Error', 'La respuesta no puede estar vacía.');
+        this.presentToast('Escribe una respuesta antes de enviarla.');
       }
     } else {
-      this.bd.presentAlert('Error', 'Debes iniciar sesión para responder.');
+      this.presentToast('Inicia sesión para responder.');
     }
   }
 
@@ -179,5 +195,25 @@ export class DtproductoPage implements OnInit {
 
   toggleComentarios() {
     this.mostrarComentarios = !this.mostrarComentarios;
+  }
+
+  get productImages(): string[] {
+    return [this.producto?.foto, ...this.imagenes].filter(Boolean) as string[];
+  }
+
+  nextImage() {
+    if (this.productImages.length) this.currentImageIndex = (this.currentImageIndex + 1) % this.productImages.length;
+  }
+
+  previousImage() {
+    if (this.productImages.length) this.currentImageIndex = (this.currentImageIndex - 1 + this.productImages.length) % this.productImages.length;
+  }
+
+  selectImage(index: number) {
+    this.currentImageIndex = index;
+  }
+
+  setRating(rating: number) {
+    this.nuevaCalificacion = rating;
   }
 }

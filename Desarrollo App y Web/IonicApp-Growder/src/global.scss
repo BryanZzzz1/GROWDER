@@ -36,23 +36,37 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 /*@import "@ionic/angular/css/palettes/dark.system.css";*/
 
-ion-content {
-  --background: url('./assets/img/fondo\ testeo.png') no-repeat center center / cover;
-    --background-attachment: fixed;
-    
-  }
+:root {
+  --ion-font-family: Arial, sans-serif;
+  --ion-color-primary: #18342f;
+  --ion-color-primary-rgb: 24, 52, 47;
+  --ion-color-secondary: #e1785b;
+  --ion-color-secondary-rgb: 225, 120, 91;
+  --ion-color-medium: #718078;
+  --ion-color-light: #f7f8f4;
+  --app-ink: #18342f;
+  --app-muted: #718078;
+  --app-bg: #f7f8f4;
+  --app-surface: #ffffff;
+  --app-line: #e2e8df;
+  --app-accent: #e1785b;
+}
 
-  .footer-tienda{
-    --background: #a57352ec;
+html, body { background: var(--app-bg); color: var(--app-ink); }
+ion-content { --background: var(--app-bg); }
+ion-toolbar { --background: var(--app-surface); --border-width: 0; }
+ion-button { --border-radius: 10px; font-weight: 700; }
+ion-item { --background: transparent; --border-color: var(--app-line); }
+.view-back { --color: var(--app-ink); margin: 2px 0 8px -8px; }
 
-  }
+ion-toast.app-toast {
+  --background: #18342f;
+  --color: #ffffff;
+  --border-radius: 14px;
+  --box-shadow: 0 14px 32px rgba(24, 52, 47, .2);
+}
 
-  ion-button {
-    --background: #a57352ec;  /* Cambia este color al que desees */
-    --color: white;          /* Cambia el color del texto si es necesario */
-    --border-radius: 8px;    /* Ajusta el radio de borde para botones redondeados */
-  }
-  
-  ion-button:hover {
-    --background: #a57352ec;  /* Cambia el color cuando el botón está en hover */
-  } 
+ion-alert.app-alert {
+  --backdrop-opacity: .35;
+  --width: min(360px, calc(100% - 32px));
+}

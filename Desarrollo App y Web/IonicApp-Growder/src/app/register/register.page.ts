@@ -2,10 +2,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ServicebdService } from '../services/servicesbd.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
 })
 export class RegisterPage {
   email!: string; // Cambiado de username a email
@@ -15,7 +17,11 @@ export class RegisterPage {
   foto!: string;
   progress: number = 0; 
 
-  constructor(private serviceBD: ServicebdService, private router: Router) {}
+  constructor(
+    private serviceBD: ServicebdService,
+    private router: Router,
+    private alertController: AlertController
+  ) {}
 
   async takePhoto() {
     const actionSheet = document.createElement('ion-action-sheet');
@@ -88,23 +94,34 @@ export class RegisterPage {
 
   async register() {
     // Verificación de campos vacíos
-    if (!this.email || !this.password || !this.telefono || !this.fechaNacimiento || !this.foto) {
-      alert('Por favor, completa todos los campos y añade una foto.');
+    if (!this.email || !this.password || !this.telefono || !this.fechaNacimiento) {
+      await this.presentAlert('Datos incompletos', 'Completa los campos obligatorios para crear tu cuenta.');
       return;
     }
 
     if (!this.validarEmail(this.email)) {
-      alert('Por favor, ingresa un correo electrónico válido.');
+      await this.presentAlert('Correo inválido', 'Ingresa una dirección de correo válida.');
       return;
     }
 
     if (this.password.length < 8) {
-      alert('La contraseña debe tener al menos 8 caracteres.');
+      await this.presentAlert('Contraseña insegura', 'Usa al menos 8 caracteres para proteger tu cuenta.');
       return; 
     }
 
     // Si todo está correcto, enviamos a Supabase
-    await this.serviceBD.registrarUsuario(this.email, this.password, this.telefono, this.fechaNacimiento, 'https://ionicframework.com/docs/img/demos/avatar.svg');
-    this.router.navigate(['./login']);
+    const registered = await this.serviceBD.registrarUsuario(
+      this.email,
+      this.password,
+      this.telefono,
+      this.fechaNacimiento,
+      this.foto || 'https://ionicframework.com/docs/img/demos/avatar.svg'
+    );
+    if (registered) this.router.navigate(['./login']);
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({ header, message, buttons: ['Entendido'], cssClass: 'app-alert' });
+    await alert.present();
   }
 }

@@ -48,6 +48,10 @@ const routes: Routes = [
     loadChildren: () => import('./user-profile/user-profile.module').then(m => m.UserProfilePageModule)
   },
   {
+    path: 'edit-user/:username',
+    loadChildren: () => import('./pages/edit-user/edit-user.module').then(m => m.EditUserPageModule)
+  },
+  {
     path: 'historial-compras',
     loadChildren: () => import('./pages/historial-compras/historial-compras.module').then( m => m.HistorialComprasPageModule)
   },

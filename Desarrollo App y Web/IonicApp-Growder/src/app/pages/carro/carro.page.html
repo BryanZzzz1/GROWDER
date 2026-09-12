@@ -1,36 +1,17 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <div class="center-text">
-      <ion-title>Carrito de Compras</ion-title>
-    </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-list>
-    <ion-item *ngFor="let producto of carrito">
-      <ion-label>
-        <h2>{{ producto.nombre }} ({{ producto.cantidad }})</h2>
-        <p>{{ producto.descripcion }}</p>
-        <p>Precio: {{ producto.precio | currency }}</p>
-      </ion-label>
-      <ion-button (click)="actualizarCantidad(producto, (producto.cantidad || 1) - 1)" 
-                  [disabled]="(producto.cantidad || 1) <= 1" class="custom-button">-</ion-button>
-      <ion-button (click)="actualizarCantidad(producto, (producto.cantidad || 1) + 1)" class="custom-button">+</ion-button>
-      <ion-icon name="trash-bin-outline" (click)="presentAlert(producto)"></ion-icon>
-    </ion-item>
-  </ion-list>
-  <ion-footer>
-    <ion-button expand="full" (click)="irAComprar()" class="custom-button">Comprar</ion-button>
-    <ion-button expand="full" (click)="vaciarCarrito()" class="custom-button">Vaciar Carrito</ion-button>
-    <ion-item>
-      <ion-label>Total: {{ totalDisplay | currency }}</ion-label>
-      <ion-button (click)="toggleTotal()"class="custom-button" >Mostrar en {{ mostrarPesos ? 'Dólares' : 'Pesos' }}</ion-button>
-    </ion-item>
-  </ion-footer>
-  <div class="footer-spacing"></div>
+<ion-content [fullscreen]="true" class="cart-content">
+  <main class="cart-shell"><ion-button fill="clear" class="view-back" routerLink="/tienda" aria-label="Volver a la tienda"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button>
+    <div class="cart-heading"><div><span class="cart-kicker">GROWDER · RESUMEN</span><h1>Lo que elegiste</h1></div><span class="item-count">{{ carrito.length }} {{ carrito.length === 1 ? 'producto' : 'productos' }}</span></div>
+    <div *ngIf="!carrito.length" class="empty-cart"><ion-icon name="bag-handle-outline"></ion-icon><h2>Tu carrito está esperando</h2><p>Explora la selección y guarda aquí lo que quieras llevar contigo.</p><ion-button (click)="volverATienda()">Explorar tienda</ion-button></div>
+    <section *ngIf="carrito.length" class="cart-layout">
+      <div class="cart-list">
+        <article *ngFor="let producto of carrito" class="cart-item">
+          <img [src]="producto.foto || 'https://ionicframework.com/docs/img/demos/card-media.png'" [alt]="producto.nombre" />
+          <div class="item-info"><span class="item-label">SELECCIÓN GROWDER</span><h2>{{ producto.nombre }}</h2><p>{{ producto.descripcion }}</p><strong>{{ producto.precio | currency:'USD':'symbol':'1.0-0' }}</strong></div>
+          <div class="item-actions"><div class="quantity"><button type="button" (click)="actualizarCantidad(producto, (producto.cantidad || 1) - 1)" [disabled]="(producto.cantidad || 1) <= 1" aria-label="Disminuir cantidad">−</button><span>{{ producto.cantidad || 1 }}</span><button type="button" (click)="actualizarCantidad(producto, (producto.cantidad || 1) + 1)" aria-label="Aumentar cantidad">+</button></div><button type="button" class="remove-button" (click)="presentAlert(producto)" aria-label="Eliminar producto"><ion-icon name="trash-outline"></ion-icon></button></div>
+        </article>
+      </div>
+      <aside class="order-summary"><span class="cart-kicker">RESUMEN DEL PEDIDO</span><div class="summary-line"><span>Subtotal</span><strong>{{ totalDisplay | currency }}</strong></div><div class="summary-line muted"><span>Envío</span><span>Calculado al finalizar</span></div><div class="summary-total"><span>Total</span><strong>{{ totalDisplay | currency }}</strong></div><ion-button expand="block" class="checkout-button" (click)="irAComprar()">Finalizar compra <ion-icon name="arrow-forward-outline" slot="end"></ion-icon></ion-button><button type="button" class="clear-button" (click)="vaciarCarrito()">Vaciar carrito</button><button type="button" class="currency-button" (click)="toggleTotal()">Mostrar en {{ mostrarPesos ? 'dólares' : 'pesos chilenos' }}</button></aside>
+    </section>
+    <div class="footer-spacing"></div>
+  </main>
 </ion-content>
-

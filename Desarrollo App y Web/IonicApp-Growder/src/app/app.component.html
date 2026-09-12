@@ -1,38 +1,3 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
-
-  <!-- Footer Bar -->
-  <ion-footer *ngIf="ocultarnavbar" class="footer-tienda">
-    <ion-toolbar>
-      <ion-grid>
-        <ion-row>
-          <ion-col class="ion-text-center">
-            <a (click)="irTienda()" class="footer-link">
-              <ion-icon name="bag-handle-outline" style="width: 65px;"></ion-icon>
-              <ion-label>Tienda</ion-label>
-            </a>
-          </ion-col>
-          <ion-col class="ion-text-center">
-            <a (click)="irAyuda()" class="footer-link">
-              <ion-icon name="help-circle-outline" style="width: 65px;"></ion-icon>
-              <ion-label>Ayuda</ion-label>
-            </a>
-          </ion-col>
-
-          <ion-col class="ion-text-center">
-            <a (click)="irCarro()" class="footer-link">
-              <ion-icon name="cart-outline" style="width: 65px;"></ion-icon>
-              <ion-label>Carrito</ion-label>
-            </a>
-          </ion-col>
-          <ion-col class="ion-text-center">
-            <a (click)="isLoggedIn ? irPerfil() : irIngresar()" class="footer-link">
-              <ion-icon name="person-outline" style="width: 65px;"></ion-icon>
-              <ion-label>{{ buttonLabel }}</ion-label>
-            </a>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-toolbar>
-  </ion-footer>
 </ion-app>

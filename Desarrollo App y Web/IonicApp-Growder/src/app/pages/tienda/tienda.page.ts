@@ -12,6 +12,7 @@ import { ServicebdService } from 'src/app/services/servicesbd.service';
 export class TiendaPage implements OnInit {
   arregloProductos: Productos[] = []; // Arreglo para almacenar los productos
   isAdmin: boolean = false; // Propiedad para verificar si el usuario es admin
+  isLoggedIn = false;
 
   constructor(
     private bd: ServicebdService,
@@ -27,6 +28,7 @@ export class TiendaPage implements OnInit {
     this.bd.getAdminStatus().subscribe((status) => {
       this.isAdmin = status; // Actualizar el estado de isAdmin
     });
+    this.bd.isUserLoggedIn.subscribe(status => this.isLoggedIn = status);
   }
 
   // Cuando la vista está a punto de entrar, recargamos los productos
@@ -70,13 +72,27 @@ export class TiendaPage implements OnInit {
     this.router.navigate(['/carro']); // Navegar a la página del carrito
   }
 
+  irAyuda() {
+    this.router.navigate(['/ayuda']);
+  }
+
+  irPerfil() {
+    this.router.navigate([this.isLoggedIn ? '/user-profile' : '/login']);
+  }
+
   async agregarAlCarrito(producto: Productos) {
     const currentUser = await this.bd.getCurrentUser(); // Obtener el usuario actual
     if (currentUser) {
       await this.bd.agregarAlCarrito(producto, currentUser.username); // Agregar producto al carrito con el usuario
-      this.presentToast('Producto agregado al carrito');
     } else {
-      this.presentToast('Debes iniciar sesión para agregar productos');
+      const toast = await this.toastController.create({
+        message: 'Inicia sesión para guardar productos en tu carrito.',
+        duration: 4000,
+        position: 'bottom',
+        icon: 'person-outline',
+        buttons: [{ text: 'Ingresar', handler: () => this.router.navigate(['/login']) }]
+      });
+      await toast.present();
     }
   }
 

@@ -1,14 +1,5 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <div class="center-text">
-      <ion-title>Ventas</ion-title>
-    </div>
-  </ion-toolbar>
-</ion-header>
 <ion-content>
+  <ion-button fill="clear" class="view-back" routerLink="/tienda" aria-label="Volver a la tienda"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button>
   <ion-list>
     <ion-item *ngFor="let compra of compras" lines="full">
       <ion-label>

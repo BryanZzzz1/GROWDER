@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ServicebdService } from '../services/servicesbd.service';
-import { AlertController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-user-profile',
@@ -17,7 +17,7 @@ export class UserProfilePage implements OnInit {
   constructor(
     private serviceBD: ServicebdService,
     private router: Router,
-    private alertController: AlertController
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
@@ -37,12 +37,11 @@ export class UserProfilePage implements OnInit {
         this.fechaNacimiento = this.formatDate(user.fecha_nacimiento);
         this.foto = user.foto || 'https://docs-demo.ionic.io/assets/madison.jpg';
       } else {
-        this.presentAlert('Error', 'No se encontró el usuario');
-        this.router.navigate(['./login']);
+        await this.router.navigate(['/login']);
       }
     } catch (error) {
       console.error('Error al cargar los datos del usuario:', error);
-      this.presentAlert('Error', 'Hubo un problema al cargar tus datos');
+      await this.router.navigate(['/login']);
     }
   }
 
@@ -58,38 +57,34 @@ export class UserProfilePage implements OnInit {
     this.router.navigate(['./edit-user', this.email]);
   }
 
+  cambiarContrasena() {
+    this.router.navigate(['/change-password']);
+  }
+
   irHistorialCompras() {
     this.router.navigate(['./historial-compras']);
   }
 
   async logout() {
-    const alert = await this.alertController.create({
-      header: 'Confirmar salida',
-      message: '¿Estás seguro de que quieres cerrar sesión?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        }, {
-          text: 'Sí, salir',
-          handler: () => {
-            this.serviceBD.logout();
-            this.router.navigate(['./tienda']);
-          }
-        }
-      ]
+    await this.serviceBD.logout();
+    const toast = await this.toastController.create({
+      message: 'Sesión cerrada correctamente.',
+      duration: 2200,
+      position: 'bottom',
+      icon: 'log-out-outline',
+      cssClass: 'app-toast'
     });
-
-    await alert.present();
+    await toast.present();
+    await this.router.navigate(['/tienda']);
   }
 
   async presentAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK']
+    const toast = await this.toastController.create({
+      message: `${header}: ${message}`,
+      duration: 2600,
+      position: 'bottom',
+      cssClass: 'app-toast'
     });
-
-    await alert.present();
+    await toast.present();
   }
 }
