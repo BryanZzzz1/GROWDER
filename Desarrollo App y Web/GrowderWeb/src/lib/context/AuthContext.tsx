@@ -6,7 +6,8 @@ import { supabase } from '@/src/lib/supabase';
 interface UsuarioData {
   id: string;
   email: string;
-  rol: 'cliente' | 'editor' | 'admin';
+  rol_id: number;
+  activo: boolean;
 }
 
 interface AuthContextType {
@@ -32,15 +33,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        // Consultar el rol en la tabla usuario
+        // Consultamos el número de rol y el estado en la tabla usuario
         const { data } = await supabase
           .from('usuario')
-          .select('id, email, rol')
+          .select('id, email, rol_id, activo')
           .eq('id', session.user.id)
           .single();
 
         if (data) {
           setUsuario(data as UsuarioData);
+        } else {
+          setUsuario(null);
         }
       } else {
         setUsuario(null);
@@ -50,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     obtenerDatos();
 
-    // Escuchar si inicia o cierra sesión
+    // Escuchar si el usuario inicia o cierra sesión
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       obtenerDatos();
     });
@@ -58,13 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+  // Validaciones directas usando el sistema numérico
+  // 1 = Admin, 2 = Editor, 3 = Cliente
+  const esAdmin = usuario?.rol_id === 1 && usuario?.activo === true;
+  const esEditor = (usuario?.rol_id === 1 || usuario?.rol_id === 2) && usuario?.activo === true;
+
   return (
     <AuthContext.Provider
       value={{
         usuario,
         cargando,
-        isAdmin: usuario?.rol === 'admin',
-        isEditor: usuario?.rol === 'editor' || usuario?.rol === 'admin',
+        isAdmin: esAdmin,
+        isEditor: esEditor,
       }}
     >
       {children}

@@ -20,7 +20,7 @@ export interface Producto {
 export interface Usuario {
   id: string;
   email: string;
-  rol?: string;
+  rol_id?: number;
   telefono?: string;
   activo?: boolean;
 }
@@ -43,13 +43,16 @@ export default function AdminPage() {
   const [categoria, setCategoria] = useState("");
   const [precio, setPrecio] = useState("");
   const [cantidad, setCantidad] = useState("");
-  const [foto, setFoto] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     text: string;
     type: "success" | "error" | "info";
   } | null>(null);
+
+  // NUEVO: ESTADOS PARA GALERÍA (MÁXIMO 3 FOTOS)
+  const [fotos, setFotos] = useState<string[]>([]);
+  const [urlTemporal, setUrlTemporal] = useState("");
 
   // Buscador de inventario
   const [busquedaInventario, setBusquedaInventario] = useState("");
@@ -70,6 +73,79 @@ export default function AdminPage() {
     }
   };
 
+  // =========================================================================
+  // OPTIMIZACIÓN DE IMÁGENES A WEBP (BASE64)
+  // =========================================================================
+  const optimizarImagen = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject("Error en Canvas");
+
+          const MAX_WIDTH = 1000; const MAX_HEIGHT = 1000;
+          let width = img.width; let height = img.height;
+
+          if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+          else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+
+          canvas.width = width; canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/webp", 0.7)); // Compresión al 70%
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const procesarImagenesMultiples = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (fotos.length + files.length > 3) {
+      setStatus("Solo puedes subir un máximo de 3 fotos por producto.", "error");
+      e.target.value = '';
+      return;
+    }
+
+    setStatus(`Optimizando imagen(es)...`, "info");
+    const nuevasFotos: string[] = [];
+
+    for (const file of files) {
+      try {
+        const webpBase64 = await optimizarImagen(file);
+        nuevasFotos.push(webpBase64);
+      } catch (error) {
+        console.error("Error al optimizar", error);
+      }
+    }
+
+    setFotos(prev => [...prev, ...nuevasFotos]);
+    setStatus(`Imágenes añadidas. Total: ${fotos.length + nuevasFotos.length}/3`, "success");
+    e.target.value = ''; 
+  };
+
+  const agregarUrlManual = () => {
+    if (urlTemporal.trim() !== "") {
+      if (fotos.length >= 3) {
+        setStatus("Límite de 3 fotos alcanzado.", "error");
+        return;
+      }
+      setFotos(prev => [...prev, urlTemporal.trim()]);
+      setUrlTemporal("");
+    }
+  };
+
+  const eliminarFotoDeGaleria = (index: number) => {
+    setFotos(prev => prev.filter((_, i) => i !== index));
+  };
+  // =========================================================================
+
   const cargarProductos = async () => {
     setCargando(true);
     try {
@@ -87,12 +163,9 @@ export default function AdminPage() {
       const productosMapeados: Producto[] = (dataProductos || []).map(
         (p: any) => {
           const fotosAsociadas = (dataImagenes || []).filter(
-            (img: any) =>
-              img.productoid === p.idproducto ||
-              img.idproducto === p.idproducto,
+            (img: any) => img.productoid === p.idproducto
           );
-          const urlFoto =
-            fotosAsociadas.length > 0 ? fotosAsociadas[0].url : p.foto;
+          const urlFoto = fotosAsociadas.length > 0 ? fotosAsociadas[0].url : p.foto;
           return {
             ...p,
             foto: urlFoto,
@@ -105,11 +178,7 @@ export default function AdminPage() {
       setProductos(productosMapeados);
     } catch (err: any) {
       console.error("Error al cargar productos:", err);
-      setStatus(
-        "No fue posible cargar los productos: " +
-          (err.message || "Error desconocido"),
-        "error",
-      );
+      setStatus("No fue posible cargar los productos.", "error");
     } finally {
       setCargando(false);
     }
@@ -120,65 +189,94 @@ export default function AdminPage() {
     try {
       const { data, error } = await supabase
         .from("usuario")
-        .select("*")
+        .select("id, email, telefono, rol_id, activo")
         .order("email", { ascending: true });
 
       if (error) throw error;
       setListaUsuarios(data || []);
     } catch (err: any) {
       console.error("Error al cargar usuarios:", err);
-      setStatus(
-        "No fue posible cargar los usuarios: " +
-          (err.message || "Verifica las políticas RLS en Supabase"),
-        "error",
-      );
+      setStatus("No fue posible cargar los usuarios.", "error");
     } finally {
       setCargandoUsuarios(false);
     }
   };
 
-  const cambiarRol = async (idUsuario: string, nuevoRol: string) => {
+  const cambiarRol = async (idUsuario: string, nuevoRolId: number) => {
     setGuardandoRolId(idUsuario);
     try {
       const { error } = await supabase
         .from("usuario")
-        .update({ rol: nuevoRol })
+        .update({ rol_id: nuevoRolId })
         .eq("id", idUsuario);
 
       if (error) throw error;
 
       setListaUsuarios((prev) =>
-        prev.map((u) => (u.id === idUsuario ? { ...u, rol: nuevoRol } : u)),
+        prev.map((u) => (u.id === idUsuario ? { ...u, rol_id: nuevoRolId } : u)),
       );
-      setStatus(`Rol asignado correctamente a "${nuevoRol}".`, "success");
+      setStatus(`Rol asignado correctamente.`, "success");
     } catch (err: any) {
       console.error("Error al cambiar rol:", err);
-      setStatus(
-        "No se pudo actualizar el rol: " +
-          (err.message || "Verifica permisos en Supabase"),
-        "error",
+      setStatus("No se pudo actualizar el rol.", "error");
+    } finally {
+      setGuardandoRolId(null);
+    }
+  };
+
+  const toggleEstadoUsuario = async (idUsuario: string, estadoActual: boolean) => {
+    setGuardandoRolId(idUsuario);
+    try {
+      const nuevoEstado = !estadoActual;
+      // Si se desactiva, por seguridad lo degradamos a cliente (rol_id: 3)
+      const payload = nuevoEstado ? { activo: true } : { activo: false, rol_id: 3 };
+      
+      const { error } = await supabase
+        .from("usuario")
+        .update(payload)
+        .eq("id", idUsuario);
+
+      if (error) throw error;
+
+      setListaUsuarios((prev) =>
+        prev.map((u) => (u.id === idUsuario ? { ...u, ...payload } : u)),
       );
+      setStatus(`Cuenta de usuario ${nuevoEstado ? "activada" : "suspendida"}.`, "success");
+    } catch (err: any) {
+      console.error("Error al cambiar estado:", err);
+      setStatus("No se pudo actualizar el estado de la cuenta.", "error");
     } finally {
       setGuardandoRolId(null);
     }
   };
 
   useEffect(() => {
-    async function verificarSesion() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    async function verificarSesionYRoles() {
+      const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
         router.replace("/login");
-      } else {
-        setVerificandoAuth(false);
-        cargarProductos();
-        cargarUsuarios();
+        return;
       }
+
+      // Validar que el usuario sea Admin (1) o Editor (2) y esté activo
+      const { data: userData, error } = await supabase
+        .from("usuario")
+        .select("rol_id, activo")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error || !userData?.activo || userData?.rol_id === 3) {
+        router.replace("/");
+        return;
+      }
+
+      setVerificandoAuth(false);
+      cargarProductos();
+      cargarUsuarios();
     }
 
-    verificarSesion();
+    verificarSesionYRoles();
   }, [router]);
 
   const totalProductos = useMemo(() => productos.length, [productos]);
@@ -200,7 +298,6 @@ export default function AdminPage() {
     return listaUsuarios.filter(
       (u) =>
         (u.email && u.email.toLowerCase().includes(q)) ||
-        (u.rol && u.rol.toLowerCase().includes(q)) ||
         (u.telefono && u.telefono.toLowerCase().includes(q)),
     );
   }, [listaUsuarios, busquedaUsuario]);
@@ -211,8 +308,15 @@ export default function AdminPage() {
     setCategoria(product.categoria || "Mates Artesanales");
     setPrecio(product.precio.toString());
     setCantidad(product.cantidad.toString());
-    setFoto(product.foto || "");
     setDescripcion(product.descripcion || "");
+
+    // Cargar fotos existentes en la galería
+    const fotosExistentes = product.imagenes?.map(img => img.url) || [];
+    if (product.foto && !fotosExistentes.includes(product.foto)) {
+      fotosExistentes.unshift(product.foto); 
+    }
+    setFotos(fotosExistentes.slice(0, 3)); // Cargamos un máximo de 3
+
     setStatus(`Editando "${product.nombre}".`, "info");
     setPestanaActiva("producto");
 
@@ -225,8 +329,9 @@ export default function AdminPage() {
     setCategoria("");
     setPrecio("");
     setCantidad("");
-    setFoto("");
     setDescripcion("");
+    setFotos([]);
+    setUrlTemporal("");
     setStatusMessage(null);
   };
 
@@ -236,28 +341,20 @@ export default function AdminPage() {
     const precioNum = parseFloat(precio) || 0;
     const cantidadNum = parseInt(cantidad, 10) || 0;
 
-    if (
-      !nombre.trim() ||
-      !descripcion.trim() ||
-      precioNum < 0 ||
-      cantidadNum < 0
-    ) {
-      setStatus(
-        "Completa todos los campos obligatorios con valores válidos.",
-        "error",
-      );
+    if (!nombre.trim() || !descripcion.trim() || precioNum < 0 || cantidadNum < 0) {
+      setStatus("Completa todos los campos obligatorios con valores válidos.", "error");
       return;
     }
 
     setGuardando(true);
-    setStatus(
-      editingId ? "Guardando cambios..." : "Creando producto...",
-      "info",
-    );
+    setStatus(editingId ? "Subiendo fotos y guardando cambios..." : "Subiendo fotos y creando producto...", "info");
 
     try {
+      const fotoPrincipal = fotos.length > 0 ? fotos[0] : null;
+      let idProd = editingId;
+
       if (editingId) {
-        // Actualizar
+        // ACTUALIZAR PRODUCTO
         const { error: errorUpdate } = await supabase
           .from("producto")
           .update({
@@ -265,73 +362,47 @@ export default function AdminPage() {
             descripcion: descripcion.trim(),
             precio: precioNum,
             cantidad: cantidadNum,
+            foto: fotoPrincipal,
             activo: true,
           })
           .eq("idproducto", editingId);
 
         if (errorUpdate) throw errorUpdate;
 
-        // Actualizar o insertar imagen
-        if (foto.trim()) {
-          const { data: imgExistente } = await supabase
-            .from("imagenes")
-            .select("idimagen")
-            .eq("productoid", editingId)
-            .limit(1);
-
-          if (imgExistente && imgExistente.length > 0) {
-            await supabase
-              .from("imagenes")
-              .update({ url: foto.trim() })
-              .eq("idimagen", imgExistente[0].idimagen);
-          } else {
-            await supabase
-              .from("imagenes")
-              .insert([{ productoid: editingId, url: foto.trim() }]);
-          }
-        }
-
-        setStatus("Cambios guardados correctamente.", "success");
-        resetForm();
-        await cargarProductos();
-        setPestanaActiva("inventario");
+        // Limpiar galería anterior
+        await supabase.from("imagenes").delete().eq("productoid", editingId);
       } else {
-        // Crear
+        // CREAR PRODUCTO
         const { data: nuevoProd, error: errorInsert } = await supabase
           .from("producto")
-          .insert([
-            {
-              nombre: nombre.trim(),
-              descripcion: descripcion.trim(),
-              precio: precioNum,
-              cantidad: cantidadNum,
-              activo: true,
-            },
-          ])
+          .insert([{
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim(),
+            precio: precioNum,
+            cantidad: cantidadNum,
+            foto: fotoPrincipal,
+            activo: true,
+          }])
           .select();
 
         if (errorInsert) throw errorInsert;
-
-        if (nuevoProd && nuevoProd[0] && foto.trim()) {
-          await supabase
-            .from("imagenes")
-            .insert([
-              { productoid: nuevoProd[0].idproducto, url: foto.trim() },
-            ]);
-        }
-
-        setStatus("Producto creado correctamente.", "success");
-        resetForm();
-        await cargarProductos();
-        setPestanaActiva("inventario");
+        idProd = nuevoProd[0].idproducto;
       }
+
+      // SUBIDA INDIVIDUAL A LA GALERÍA
+      if (idProd && fotos.length > 0) {
+        for (const f of fotos) {
+          await supabase.from("imagenes").insert({ productoid: idProd, url: f });
+        }
+      }
+
+      setStatus(editingId ? "Cambios guardados correctamente." : "Producto creado correctamente.", "success");
+      resetForm();
+      await cargarProductos();
+      setPestanaActiva("inventario");
     } catch (err: any) {
       console.error("Error al guardar:", err);
-      setStatus(
-        "No se pudo guardar el producto: " +
-          (err.message || "Error desconocido"),
-        "error",
-      );
+      setStatus("No se pudo guardar el producto.", "error");
     } finally {
       setGuardando(false);
     }
@@ -340,16 +411,12 @@ export default function AdminPage() {
   const requestDelete = async (id: number) => {
     if (pendingDeleteId !== id) {
       setPendingDeleteId(id);
-      setStatus(
-        'Pulsa "Confirmar" para eliminar el producto permanentemente.',
-        "info",
-      );
+      setStatus('Pulsa "Confirmar" para eliminar el producto permanentemente.', "info");
       return;
     }
 
     try {
       await supabase.from("imagenes").delete().eq("productoid", id);
-
       const { error } = await supabase
         .from("producto")
         .delete()
@@ -363,10 +430,7 @@ export default function AdminPage() {
       await cargarProductos();
     } catch (err: any) {
       console.error("Error al eliminar:", err);
-      setStatus(
-        "No se pudo eliminar el producto: " + (err.message || ""),
-        "error",
-      );
+      setStatus("No se pudo eliminar el producto.", "error");
     }
   };
 
@@ -466,7 +530,6 @@ export default function AdminPage() {
 
         {/* BOTONES DE NAVEGACIÓN DE SECCIONES (TABS) */}
         <div className="mt-8 flex flex-wrap items-center gap-3 border-b border-stone-200 pb-4">
-          {/* Botón: Inventario en tiempo real */}
           <button
             type="button"
             onClick={() => setPestanaActiva("inventario")}
@@ -476,38 +539,19 @@ export default function AdminPage() {
                 : "bg-white text-stone-700 border border-stone-300/80 hover:bg-[#f3ede1]"
             }`}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
             <span>Inventario en tiempo real</span>
-            <span
-              className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${
-                pestanaActiva === "inventario"
-                  ? "bg-white/20 text-white"
-                  : "bg-stone-100 text-stone-600"
-              }`}
-            >
+            <span className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${pestanaActiva === "inventario" ? "bg-white/20 text-white" : "bg-stone-100 text-stone-600"}`}>
               {totalProductos}
             </span>
           </button>
 
-          {/* Botón: Agregar / Editar Producto */}
           <button
             type="button"
             onClick={() => {
-              if (pestanaActiva !== "producto") {
-                resetForm();
-              }
+              if (pestanaActiva !== "producto") resetForm();
               setPestanaActiva("producto");
             }}
             className={`inline-flex items-center gap-2.5 rounded-2xl px-5 py-3 text-sm font-bold transition-all cursor-pointer ${
@@ -516,28 +560,15 @@ export default function AdminPage() {
                 : "bg-white text-stone-700 border border-stone-300/80 hover:bg-[#f3ede1]"
             }`}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 4v16m8-8H4"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
             <span>{editingId ? "Editar Producto" : "Agregar Producto"}</span>
             {editingId && (
-              <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 font-bold">
-                Editando
-              </span>
+              <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 font-bold">Editando</span>
             )}
           </button>
 
-          {/* Botón: Gestión de Roles */}
           <button
             type="button"
             onClick={() => {
@@ -550,28 +581,12 @@ export default function AdminPage() {
                 : "bg-white text-stone-700 border border-stone-300/80 hover:bg-[#f3ede1]"
             }`}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             <span>Gestión de Roles</span>
             {listaUsuarios.length > 0 && (
-              <span
-                className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${
-                  pestanaActiva === "roles"
-                    ? "bg-white/20 text-white"
-                    : "bg-stone-100 text-stone-600"
-                }`}
-              >
+              <span className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${pestanaActiva === "roles" ? "bg-white/20 text-white" : "bg-stone-100 text-stone-600"}`}>
                 {listaUsuarios.length}
               </span>
             )}
@@ -590,12 +605,7 @@ export default function AdminPage() {
             }`}
           >
             <span>{statusMessage.text}</span>
-            <button
-              onClick={() => setStatusMessage(null)}
-              className="text-stone-400 hover:text-stone-700 font-bold"
-            >
-              ✕
-            </button>
+            <button onClick={() => setStatusMessage(null)} className="text-stone-400 hover:text-stone-700 font-bold">✕</button>
           </div>
         )}
 
@@ -612,7 +622,6 @@ export default function AdminPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                {/* Buscador en inventario */}
                 <div className="relative min-w-56 sm:min-w-64">
                   <input
                     type="text"
@@ -622,12 +631,7 @@ export default function AdminPage() {
                     className="w-full rounded-xl border border-stone-300 bg-[#fdfbf7] px-3.5 py-2 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#314235]"
                   />
                   {busquedaInventario && (
-                    <button
-                      onClick={() => setBusquedaInventario("")}
-                      className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 text-xs"
-                    >
-                      ✕
-                    </button>
+                    <button onClick={() => setBusquedaInventario("")} className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 text-xs">✕</button>
                   )}
                 </div>
 
@@ -656,16 +660,12 @@ export default function AdminPage() {
             {cargando ? (
               <div className="my-12 py-12 text-center">
                 <div className="w-8 h-8 border-4 border-[#314235] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-stone-600 font-medium">
-                  Cargando inventario...
-                </p>
+                <p className="text-sm text-stone-600 font-medium">Cargando inventario...</p>
               </div>
             ) : productosFiltrados.length === 0 ? (
               <div className="my-12 rounded-2xl bg-[#f8f3e9] px-5 py-12 text-center">
                 <h3 className="brand-serif text-xl text-[#2d2a23]">
-                  {busquedaInventario
-                    ? "No se encontraron coincidencias"
-                    : "Inventario vacío"}
+                  {busquedaInventario ? "No se encontraron coincidencias" : "Inventario vacío"}
                 </h3>
                 <p className="mt-1 text-sm text-stone-600 max-w-md mx-auto">
                   {busquedaInventario
@@ -673,10 +673,7 @@ export default function AdminPage() {
                     : "No hay productos registrados en la base de datos actualmente."}
                 </p>
                 <button
-                  onClick={() => {
-                    resetForm();
-                    setPestanaActiva("producto");
-                  }}
+                  onClick={() => { resetForm(); setPestanaActiva("producto"); }}
                   className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#314235] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#243127] transition"
                 >
                   Crear primer producto
@@ -685,8 +682,7 @@ export default function AdminPage() {
             ) : (
               <div className="mt-6 space-y-3">
                 {productosFiltrados.map((product) => {
-                  const isPendingDelete =
-                    pendingDeleteId === product.idproducto;
+                  const isPendingDelete = pendingDeleteId === product.idproducto;
                   const stockBajo = product.cantidad <= 3;
 
                   return (
@@ -696,57 +692,31 @@ export default function AdminPage() {
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-                          {/* Foto miniatura */}
                           <div className="w-16 h-16 rounded-xl bg-[#f8f3e9] border border-stone-200 overflow-hidden shrink-0 flex items-center justify-center">
                             {product.foto ? (
-                              <img
-                                src={product.foto}
-                                alt={product.nombre}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80";
-                                }}
-                              />
+                              <img src={product.foto} alt={product.nombre} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />
                             ) : (
-                              <span className="text-xs text-stone-400 font-serif">
-                                Sin foto
-                              </span>
+                              <span className="text-xs text-stone-400 font-serif">Sin foto</span>
                             )}
                           </div>
 
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="brand-serif text-lg text-[#2d2a23] truncate">
-                                {product.nombre}
-                              </h3>
+                              <h3 className="brand-serif text-lg text-[#2d2a23] truncate">{product.nombre}</h3>
                               <span className="rounded-full bg-[#e8e0d0] px-2.5 py-0.5 text-[11px] font-bold text-[#314235]">
                                 {product.categoria || "Mates Artesanales"}
                               </span>
                             </div>
-                            <p className="mt-1 text-xs text-stone-600 line-clamp-1">
-                              {product.descripcion}
-                            </p>
+                            <p className="mt-1 text-xs text-stone-600 line-clamp-1">{product.descripcion}</p>
                             <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-semibold">
-                              <span className="text-[#314235] font-bold text-sm">
-                                {formatearPrecio(product.precio)}
-                              </span>
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-[11px] ${
-                                  stockBajo
-                                    ? "bg-red-100 text-red-800 font-bold"
-                                    : "bg-emerald-100 text-emerald-800"
-                                }`}
-                              >
-                                {stockBajo
-                                  ? `Stock crítico: ${product.cantidad} un.`
-                                  : `Stock: ${product.cantidad} unidades`}
+                              <span className="text-[#314235] font-bold text-sm">{formatearPrecio(product.precio)}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-[11px] ${stockBajo ? "bg-red-100 text-red-800 font-bold" : "bg-emerald-100 text-emerald-800"}`}>
+                                {stockBajo ? `Stock crítico: ${product.cantidad} un.` : `Stock: ${product.cantidad} unidades`}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Botones de acción */}
                         <div className="flex shrink-0 gap-2 items-center self-end sm:self-center">
                           <button
                             type="button"
@@ -759,14 +729,10 @@ export default function AdminPage() {
                             type="button"
                             onClick={() => requestDelete(product.idproducto)}
                             className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-bold transition cursor-pointer ${
-                              isPendingDelete
-                                ? "bg-[#a75632] text-white border-[#a75632]"
-                                : "border-[#a75632] text-[#a75632] hover:bg-[#a75632] hover:text-white"
+                              isPendingDelete ? "bg-[#a75632] text-white border-[#a75632]" : "border-[#a75632] text-[#a75632] hover:bg-[#a75632] hover:text-white"
                             }`}
                           >
-                            <span>
-                              {isPendingDelete ? "¿Confirmar?" : "Quitar"}
-                            </span>
+                            <span>{isPendingDelete ? "¿Confirmar?" : "Quitar"}</span>
                           </button>
                         </div>
                       </div>
@@ -791,7 +757,7 @@ export default function AdminPage() {
                 <p className="mt-1 text-sm text-stone-600">
                   {editingId
                     ? `Modifica los datos del producto #${editingId} y guarda los cambios para sincronizarlos.`
-                    : "Registra un nuevo mate, bombilla, termo o accesorio en el catálogo general."}
+                    : "Registra un nuevo producto en el catálogo general."}
                 </p>
               </div>
               <button
@@ -803,16 +769,9 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <form
-              id="product-form"
-              onSubmit={handleSubmit}
-              className="mt-8 space-y-6"
-            >
+            <form id="product-form" onSubmit={handleSubmit} className="mt-8 space-y-6">
               <div>
-                <label
-                  className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                  htmlFor="product-name"
-                >
+                <label className="mb-2 block text-sm font-bold text-[#2d2a23]" htmlFor="product-name">
                   Nombre del producto *
                 </label>
                 <input
@@ -828,10 +787,7 @@ export default function AdminPage() {
 
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label
-                    className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                    htmlFor="product-category"
-                  >
+                  <label className="mb-2 block text-sm font-bold text-[#2d2a23]" htmlFor="product-category">
                     Categoría *
                   </label>
                   <input
@@ -844,12 +800,8 @@ export default function AdminPage() {
                     className="w-full rounded-xl border border-stone-300 bg-[#fdfbf7] px-4 py-3 placeholder:text-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#314235]"
                   />
                 </div>
-
                 <div>
-                  <label
-                    className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                    htmlFor="product-price"
-                  >
+                  <label className="mb-2 block text-sm font-bold text-[#2d2a23]" htmlFor="product-price">
                     Precio ($ CLP) *
                   </label>
                   <input
@@ -868,10 +820,7 @@ export default function AdminPage() {
 
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label
-                    className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                    htmlFor="product-stock"
-                  >
+                  <label className="mb-2 block text-sm font-bold text-[#2d2a23]" htmlFor="product-stock">
                     Stock en bodega *
                   </label>
                   <input
@@ -886,48 +835,60 @@ export default function AdminPage() {
                     className="w-full rounded-xl border border-stone-300 bg-[#fdfbf7] px-4 py-3 placeholder:text-stone-400 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#314235]"
                   />
                 </div>
-
-                <div>
-                  <label
-                    className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                    htmlFor="product-image-url"
-                  >
-                    URL de la fotografía
-                  </label>
-                  <input
-                    id="product-image-url"
-                    type="url"
-                    placeholder="https://ejemplo.com/foto.jpg"
-                    value={foto}
-                    onChange={(e) => setFoto(e.target.value)}
-                    className="w-full rounded-xl border border-stone-300 bg-[#fdfbf7] px-4 py-3 placeholder:text-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#314235]"
-                  />
-                </div>
               </div>
 
-              {foto && (
-                <div className="p-3 bg-[#f8f3e9] rounded-xl border border-stone-200 flex items-center gap-3">
-                  <img
-                    src={foto}
-                    alt="Vista previa"
-                    className="w-14 h-14 rounded-lg object-cover bg-white border border-stone-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80";
-                    }}
+              {/* ZONA DE CARGA LIMITADA A 3 FOTOS */}
+              <div className="p-5 border border-dashed border-stone-300 bg-[#fdfbf7] rounded-xl">
+                <label className="mb-3 block text-sm font-bold text-[#2d2a23]">
+                  Galería de Imágenes (Máximo 3 fotos)
+                </label>
+                
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <input 
+                    type="file" 
+                    multiple 
+                    accept="image/png, image/jpeg, image/jpg, image/webp" 
+                    onChange={procesarImagenesMultiples} 
+                    className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#314235] file:text-white hover:file:bg-[#243127] cursor-pointer" 
                   />
-                  <div className="text-xs text-stone-600 truncate flex-1">
-                    <p className="font-semibold text-[#2d2a23]">Vista previa cargada</p>
-                    <p className="truncate text-stone-500">{foto}</p>
-                  </div>
                 </div>
-              )}
+                
+                <div className="flex items-center gap-2 my-4">
+                  <div className="h-px bg-stone-200 flex-1"></div>
+                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">O usa un enlace web</span>
+                  <div className="h-px bg-stone-200 flex-1"></div>
+                </div>
+
+                <div className="flex gap-2">
+                  <input 
+                    type="url" 
+                    placeholder="https://ejemplo.com/foto.jpg" 
+                    value={urlTemporal} 
+                    onChange={e => setUrlTemporal(e.target.value)} 
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 placeholder:text-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#314235]" 
+                  />
+                  <button type="button" onClick={agregarUrlManual} className="bg-[#a75632] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#884326] transition">Añadir</button>
+                </div>
+
+                {/* VISTA PREVIA */}
+                {fotos.length > 0 && (
+                  <div className="mt-6 pt-4 border-t border-stone-200">
+                    <p className="text-xs font-bold text-stone-500 mb-3">Fotos cargadas ({fotos.length}/3) - <span className="text-[#a75632]">La primera será la principal.</span></p>
+                    <div className="flex flex-wrap gap-3">
+                      {fotos.map((f, i) => (
+                        <div key={i} className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 ${i === 0 ? "border-[#527953]" : "border-stone-300"} bg-white shadow-sm group`}>
+                          <img src={f} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />
+                          {i === 0 && <span className="absolute bottom-0 left-0 right-0 bg-[#527953]/90 text-white text-[9px] font-bold text-center py-0.5">Principal</span>}
+                          <button type="button" onClick={() => eliminarFotoDeGaleria(i)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition shadow-md cursor-pointer">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div>
-                <label
-                  className="mb-2 block text-sm font-bold text-[#2d2a23]"
-                  htmlFor="product-description"
-                >
+                <label className="mb-2 block text-sm font-bold text-[#2d2a23]" htmlFor="product-description">
                   Descripción detallada *
                 </label>
                 <textarea
@@ -948,11 +909,7 @@ export default function AdminPage() {
                   className="inline-flex items-center gap-2 rounded-full bg-[#a75632] px-6 py-3 font-bold text-white transition hover:bg-[#884326] disabled:opacity-60 cursor-pointer shadow-sm"
                 >
                   <span>
-                    {guardando
-                      ? "Guardando..."
-                      : editingId
-                        ? "Guardar cambios"
-                        : "Guardar producto"}
+                    {guardando ? "Guardando..." : editingId ? "Guardar cambios" : "Guardar producto"}
                   </span>
                 </button>
 
@@ -986,27 +943,21 @@ export default function AdminPage() {
                   Gestión de Roles y Permisos
                 </h2>
                 <p className="mt-1 text-sm text-stone-600">
-                  Asigna permisos dentro de la plataforma a los usuarios registrados.
+                  Asigna permisos dentro de la plataforma o suspende usuarios.
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Buscador de usuarios */}
                 <div className="relative min-w-56 sm:min-w-64">
                   <input
                     type="text"
-                    placeholder="Buscar por correo o rol..."
+                    placeholder="Buscar por correo o teléfono..."
                     value={busquedaUsuario}
                     onChange={(e) => setBusquedaUsuario(e.target.value)}
                     className="w-full rounded-xl border border-stone-300 bg-[#fdfbf7] px-3.5 py-2 text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#314235]"
                   />
                   {busquedaUsuario && (
-                    <button
-                      onClick={() => setBusquedaUsuario("")}
-                      className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 text-xs"
-                    >
-                      ✕
-                    </button>
+                    <button onClick={() => setBusquedaUsuario("")} className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 text-xs">✕</button>
                   )}
                 </div>
 
@@ -1025,7 +976,7 @@ export default function AdminPage() {
             <div className="mt-6 grid sm:grid-cols-3 gap-4">
               <div className="rounded-2xl bg-[#f8f3e9] p-4 border border-stone-200/80">
                 <div className="flex items-center gap-2 font-bold text-sm text-[#314235]">
-                  <span>Administrador (`admin`)</span>
+                  <span>Administrador (1)</span>
                 </div>
                 <p className="mt-2 text-xs text-stone-600 leading-relaxed">
                   Control total de la tienda. Puede gestionar productos, stock, y asignar o revocar roles de otros usuarios.
@@ -1034,7 +985,7 @@ export default function AdminPage() {
 
               <div className="rounded-2xl bg-[#f8f3e9] p-4 border border-stone-200/80">
                 <div className="flex items-center gap-2 font-bold text-sm text-[#a75632]">
-                  <span>Editor (`editor`)</span>
+                  <span>Editor (2)</span>
                 </div>
                 <p className="mt-2 text-xs text-stone-600 leading-relaxed">
                   Acceso al panel para añadir productos, editar precios, descripciones y actualizar el inventario.
@@ -1043,10 +994,10 @@ export default function AdminPage() {
 
               <div className="rounded-2xl bg-[#f8f3e9] p-4 border border-stone-200/80">
                 <div className="flex items-center gap-2 font-bold text-sm text-stone-700">
-                  <span>Cliente (`cliente`)</span>
+                  <span>Cliente (3)</span>
                 </div>
                 <p className="mt-2 text-xs text-stone-600 leading-relaxed">
-                  Usuario estándar. Puede explorar el catálogo, agregar al carrito, comprar y dejar valoraciones.
+                  Usuario estándar. Puede explorar el catálogo, agregar al carrito, comprar y dejar valoraciones. No accede aquí.
                 </p>
               </div>
             </div>
@@ -1067,7 +1018,7 @@ export default function AdminPage() {
                 <p className="mt-1 text-sm text-stone-600">
                   {busquedaUsuario
                     ? `No hay usuarios con el criterio "${busquedaUsuario}".`
-                    : "No hay usuarios registrados en la tabla usuario de Supabase."}
+                    : "No hay usuarios registrados en la base de datos."}
                 </p>
               </div>
             ) : (
@@ -1078,23 +1029,24 @@ export default function AdminPage() {
                       <th className="py-3 px-4">Usuario</th>
                       <th className="py-3 px-4">Teléfono</th>
                       <th className="py-3 px-4">Rol actual</th>
+                      <th className="py-3 px-4 text-center">Estado</th>
                       <th className="py-3 px-4 text-right">Asignar Rol</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100 text-sm">
                     {usuariosFiltrados.map((u) => {
-                      const rolActual = u.rol || "cliente";
+                      const rolActual = u.rol_id || 3;
                       const esGuardando = guardandoRolId === u.id;
 
                       return (
-                        <tr key={u.id} className="hover:bg-stone-50/60 transition">
+                        <tr key={u.id} className={`transition ${!u.activo ? "bg-stone-50/70" : "hover:bg-stone-50/60"}`}>
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-[#314235] text-white flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                              <div className={`w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm uppercase shrink-0 ${u.activo ? "bg-[#314235]" : "bg-stone-400"}`}>
                                 {u.email?.charAt(0) || "U"}
                               </div>
                               <div className="min-w-0">
-                                <p className="font-semibold text-[#2d2a23] truncate">
+                                <p className={`font-semibold truncate ${!u.activo ? "text-stone-500 line-through" : "text-[#2d2a23]"}`}>
                                   {u.email}
                                 </p>
                                 <span className="text-[11px] text-stone-400 font-mono">
@@ -1111,18 +1063,33 @@ export default function AdminPage() {
                           <td className="py-4 px-4">
                             <span
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                                rolActual === "admin"
-                                  ? "bg-[#314235] text-white"
-                                  : rolActual === "editor"
-                                    ? "bg-[#e8d5c4] text-[#884326]"
-                                    : "bg-stone-100 text-stone-700"
+                                !u.activo
+                                  ? "bg-stone-100 text-stone-500"
+                                  : rolActual === 1
+                                    ? "bg-[#314235] text-white"
+                                    : rolActual === 2
+                                      ? "bg-[#e8d5c4] text-[#884326]"
+                                      : "bg-stone-100 text-stone-700"
                               }`}
                             >
-                              {rolActual === "admin" && "👑 "}
-                              {rolActual === "editor" && "✍️ "}
-                              {rolActual === "cliente" && "👤 "}
-                              {rolActual}
+                              {rolActual === 1 && "👑 Admin"}
+                              {rolActual === 2 && "✍️ Editor"}
+                              {rolActual === 3 && "👤 Cliente"}
                             </span>
+                          </td>
+
+                          <td className="py-4 px-4 text-center">
+                            <button
+                              onClick={() => toggleEstadoUsuario(u.id, !!u.activo)}
+                              disabled={esGuardando}
+                              className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold transition cursor-pointer disabled:opacity-50 ${
+                                u.activo
+                                  ? "bg-emerald-100 text-emerald-800 hover:bg-red-100 hover:text-red-800"
+                                  : "bg-red-100 text-red-800 hover:bg-emerald-100 hover:text-emerald-800"
+                              }`}
+                            >
+                              {u.activo ? "Activa" : "Suspendida"}
+                            </button>
                           </td>
 
                           <td className="py-4 px-4 text-right">
@@ -1132,13 +1099,13 @@ export default function AdminPage() {
                               )}
                               <select
                                 value={rolActual}
-                                disabled={esGuardando}
-                                onChange={(e) => cambiarRol(u.id, e.target.value)}
+                                disabled={esGuardando || !u.activo}
+                                onChange={(e) => cambiarRol(u.id, parseInt(e.target.value))}
                                 className="rounded-xl border border-stone-300 bg-[#fdfbf7] px-3 py-1.5 text-xs font-semibold text-[#2d2a23] focus:outline-none focus:ring-2 focus:ring-[#314235] cursor-pointer disabled:opacity-50"
                               >
-                                <option value="cliente">Cliente (compras)</option>
-                                <option value="editor">Editor (inventario)</option>
-                                <option value="admin">Administrador (total)</option>
+                                <option value={3}>3 - Cliente</option>
+                                <option value={2}>2 - Editor</option>
+                                <option value={1}>1 - Administrador</option>
                               </select>
                             </div>
                           </td>
