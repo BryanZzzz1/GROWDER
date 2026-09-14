@@ -13,6 +13,8 @@ interface ContextoCarritoTipo {
   carrito: ItemCarrito[]
   agregarAlCarrito: (producto: Omit<ItemCarrito, 'cantidad'>, cantidad?: number) => void
   eliminarDelCarrito: (id: string) => void
+  actualizarCantidad?: (id: string, delta: number) => void
+  limpiarCarrito?: () => void
   carritoAbierto: boolean
   setCarritoAbierto: (abierto: boolean) => void
   total: number
@@ -41,6 +43,24 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
     setCarrito((previo) => previo.filter((item) => item.id !== id))
   }
 
+  const actualizarCantidad = (id: string, delta: number) => {
+    setCarrito((previo) => {
+      return previo
+        .map((item) => {
+          if (item.id === id) {
+            const nuevaCantidad = item.cantidad + delta
+            return nuevaCantidad > 0 ? { ...item, cantidad: nuevaCantidad } : null
+          }
+          return item
+        })
+        .filter((item): item is ItemCarrito => item !== null)
+    })
+  }
+
+  const limpiarCarrito = () => {
+    setCarrito([])
+  }
+
   const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0)
 
   return (
@@ -48,7 +68,9 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
       value={{ 
         carrito, 
         agregarAlCarrito, 
-        eliminarDelCarrito, 
+        eliminarDelCarrito,
+        actualizarCantidad,
+        limpiarCarrito,
         carritoAbierto, 
         setCarritoAbierto, 
         total 

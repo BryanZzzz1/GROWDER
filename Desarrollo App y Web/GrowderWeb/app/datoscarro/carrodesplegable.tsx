@@ -1,10 +1,17 @@
 'use client'
+import { useRouter } from 'next/navigation'
 import { usarCarrito } from './estadocarro'
 
 export default function CarroDesplegable() {
+  const router = useRouter()
   const { carrito, eliminarDelCarrito, carritoAbierto, setCarritoAbierto, total } = usarCarrito()
 
   if (!carritoAbierto) return null
+
+  const irAlPago = () => {
+    setCarritoAbierto(false)
+    router.push('/confirmacion-pago')
+  }
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs">
@@ -54,7 +61,7 @@ export default function CarroDesplegable() {
             </div>
 
             <button
-              onClick={() => alert('Próximamente paso a pago')}
+              onClick={irAlPago}
               disabled={carrito.length === 0}
               className="w-full bg-[#8C7762] hover:bg-[#725F4C] text-white py-3 rounded-full font-bold transition shadow-md disabled:bg-gray-300 cursor-pointer"
             >

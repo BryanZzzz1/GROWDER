@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/src/lib/supabase';
 
 interface UsuarioData {
@@ -29,33 +30,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    async function obtenerDatos() {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        // Consultamos el número de rol y el estado en la tabla usuario
-        const { data } = await supabase
-          .from('usuario')
-          .select('id, email, rol_id, activo')
-          .eq('id', session.user.id)
-          .single();
+    async function obtenerDatos(sesionActual?: Session | null) {
+      try {
+        const session = sesionActual !== undefined ? sesionActual : (await supabase.auth.getSession()).data.session;
+        
+        if (session?.user) {
+          // Consultamos el número de rol y el estado en la tabla usuario
+          const { data, error } = await supabase
+            .from('usuario')
+            .select('id, email, rol_id, activo')
+            .eq('id', session.user.id)
+            .single();
 
-        if (data) {
-          setUsuario(data as UsuarioData);
+          if (data && !error) {
+            setUsuario(data as UsuarioData);
+          } else {
+            // El usuario está autenticado mediante su sesión JWT de Supabase Auth.
+            // Si aún no se ha sincronizado la fila en public.usuario, se asigna temporalmente
+            // el rol base de cliente (3) en memoria de solo lectura para navegación, sin modificar la base de datos desde el cliente.
+            const usuarioFallback: UsuarioData = {
+              id: session.user.id,
+              email: session.user.email || '',
+              rol_id: 3,
+              activo: true,
+            };
+            setUsuario(usuarioFallback);
+          }
         } else {
           setUsuario(null);
         }
-      } else {
+      } catch (err) {
+        console.error('Error al obtener datos de sesión:', err);
         setUsuario(null);
+      } finally {
+        setCargando(false);
       }
-      setCargando(false);
     }
 
     obtenerDatos();
 
     // Escuchar si el usuario inicia o cierra sesión
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
-      obtenerDatos();
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      obtenerDatos(session);
     });
 
     return () => listener.subscription.unsubscribe();

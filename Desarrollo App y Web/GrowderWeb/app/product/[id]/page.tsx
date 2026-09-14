@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase';
-import { usarCarrito } from "@/app/datoscarro/estadocarro";
+import { usarCarrito, ItemCarrito } from "@/app/datoscarro/estadocarro";
+import SubNavbar from '@/app/components/SubNavbar';
+import BarraBusquedaNav from '@/app/components/BarraBusquedaNav';
 
 export default function DetalleProductoPage() {
   const { carrito, carritoAbierto, setCarritoAbierto, eliminarDelCarrito, total, agregarAlCarrito } = usarCarrito(); 
@@ -134,7 +136,7 @@ export default function DetalleProductoPage() {
           </div>
           <h1 className="brand-serif text-3xl sm:text-4xl font-bold text-[#2d2a23] mb-4">Producto no encontrado</h1>
           <p className="text-stone-600 mb-8 max-w-md mx-auto leading-relaxed">
-            Parece que el artículo que buscas no existe, ha sido eliminado del inventario o el enlace es incorrecto.
+            Parece que el artículo que buscas no existe, ha sido quitado del inventario o el enlace es incorrecto.
           </p>
           <Link href="/" className="inline-flex items-center gap-2 rounded-full bg-[#a75632] px-8 py-3.5 font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#884326] shadow-md cursor-pointer">
             Volver al catálogo
@@ -150,16 +152,34 @@ export default function DetalleProductoPage() {
     <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A]">
       {/* HEADER */}
       <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
-          <Link href="/" className="flex items-center gap-3 text-left group">
-            <img src="/logocircular.png" alt="SuMate Logo" className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
-            <div>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
+          <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
+            <img src="/logocircular.png" alt="SuMate Logo" className="h-11 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+            <div className="hidden lg:block">
               <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">SuMateCL</span>
               <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">Más que un mate, una experiencia</span>
             </div>
           </Link>
 
-          <div className="flex items-center gap-3">
+          {/* CENTRO: Barra de búsqueda en el Navbar */}
+          <div className="flex-1 max-w-md mx-1 sm:mx-4">
+            <BarraBusquedaNav
+              placeholder="Buscar mates, bombillas, termos..."
+            />
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Botón de acceso a Búsqueda Filtrada */}
+            <Link
+              href="/buscar"
+              className="hidden sm:flex items-center gap-1.5 border border-[#8C7762]/30 hover:border-[#314235] text-stone-700 hover:text-[#314235] rounded-full px-3 py-1.5 text-xs font-semibold transition hover:bg-[#8C7762]/5"
+              title="Buscar productos con filtros y orden de precio"
+            >
+              <svg className="w-3.5 h-3.5 text-[#8C7762]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span>Filtros</span>
+            </Link>
             <div className="relative group">
               <button onClick={() => setCarritoAbierto(!carritoAbierto)} className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer">
                 <span className="text-xs">${(total || 0).toLocaleString('es-CL')}</span>
@@ -175,15 +195,15 @@ export default function DetalleProductoPage() {
                 ) : (
                   <>
                     <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                      {carrito.map((item: any) => (
-                        <div key={item.id || item.idproducto} className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2">
-                          <img src={item.imagen || item.foto} alt={item.nombre} className="w-9 h-9 object-cover rounded-md" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />
+                      {carrito.map((item: ItemCarrito) => (
+                        <div key={item.id} className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2">
+                          <img src={item.imagen} alt={item.nombre} className="w-9 h-9 object-cover rounded-md" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-stone-800 truncate">{item.nombre}</p>
                             <p className="text-stone-500">{item.cantidad} × ${(item.precio || 0).toLocaleString('es-CL')}</p>
                           </div>
                           {eliminarDelCarrito && (
-                            <button onClick={() => eliminarDelCarrito(item.id || item.idproducto)} className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer">✕</button>
+                            <button onClick={() => eliminarDelCarrito(item.id)} className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer" title="Quitar producto">✕</button>
                           )}
                         </div>
                       ))}
@@ -206,6 +226,9 @@ export default function DetalleProductoPage() {
             )}
           </div>
         </div>
+
+        {/* SUBNAVBAR DE NAVEGACIÓN ENTRE CATEGORÍAS */}
+        <SubNavbar />
       </header>
 
       {/* SECCIÓN PRINCIPAL DE PRODUCTO */}

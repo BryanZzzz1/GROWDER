@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
-import { usarCarrito } from "@/app/datoscarro/estadocarro";
+import { usarCarrito, ItemCarrito } from "@/app/datoscarro/estadocarro";
 import { useAuth } from "@/src/lib/context/AuthContext";
+import SubNavbar, { CategoriaBD } from "@/app/components/SubNavbar";
+import BarraBusquedaNav from "@/app/components/BarraBusquedaNav";
 
 interface Producto {
   idproducto: number;
@@ -14,14 +18,27 @@ interface Producto {
   cantidad: number;
   activo: boolean;
   categoria?: string;
+  categoria_id?: number | null;
   foto?: string;
 }
 
-export default function Home() {
+interface ImagenDB {
+  id?: number;
+  url?: string;
+  productoid?: number;
+  idproducto?: number;
+}
+
+function ContenidoHome() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramCat = searchParams.get("categoria") || "todos";
+  const paramQ = searchParams.get("q") || "";
+
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
-  const {isEditor} = useAuth();
-  const [usuario, setUsuario] = useState<any>(null);
+  const { isEditor } = useAuth();
+  const [usuario, setUsuario] = useState<User | null>(null);
   const {
     carrito,
     carritoAbierto,
@@ -30,12 +47,35 @@ export default function Home() {
     total,
   } = usarCarrito();
 
+  const [categoriasBD, setCategoriasBD] = useState<CategoriaBD[]>([]);
+  const [categoriaActiva, setCategoriaActiva] = useState<string | number>(paramCat);
+  const [busquedaNav, setBusquedaNav] = useState<string>(paramQ);
+
+  // Sincronizar si cambian los parámetros de la URL externamente
+  const [prevParams, setPrevParams] = useState(searchParams);
+  if (searchParams !== prevParams) {
+    setPrevParams(searchParams);
+    if (searchParams.get("categoria")) {
+      setCategoriaActiva(searchParams.get("categoria")!);
+    }
+    if (searchParams.get("q")) {
+      setBusquedaNav(searchParams.get("q")!);
+    }
+  }
+
+  const nombreCategoriaActiva = useMemo(() => {
+    if (String(categoriaActiva) === "todos") return "Todos los Productos";
+    const encontrada = categoriasBD.find((c) => String(c.id) === String(categoriaActiva));
+    return encontrada ? encontrada.nombre : "Todos los Productos";
+  }, [categoriaActiva, categoriasBD]);
+
   const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
 
   useEffect(() => {
     async function cargarCatalogo() {
       setCargando(true);
       try {
+        // Cargar productos activos
         const { data: dataProductos, error: errorProd } = await supabase
           .from("producto")
           .select("*")
@@ -44,13 +84,24 @@ export default function Home() {
 
         if (errorProd) throw errorProd;
 
+        // Cargar categorías activas de la base de datos
+        const { data: dataCategorias } = await supabase
+          .from("categorias")
+          .select("id, nombre, descripcion, activo")
+          .eq("activo", true)
+          .order("id", { ascending: true });
+
+        if (dataCategorias && dataCategorias.length > 0) {
+          setCategoriasBD(dataCategorias);
+        }
+
         const { data: dataImagenes } = await supabase
           .from("imagenes")
           .select("*");
 
-        const productosConFoto = (dataProductos || []).map((p: any) => {
-          const fotoEncontrada = (dataImagenes || []).find(
-            (img: any) =>
+        const productosConFoto = ((dataProductos as Producto[]) || []).map((p) => {
+          const fotoEncontrada = ((dataImagenes as ImagenDB[]) || []).find(
+            (img) =>
               img.productoid === p.idproducto ||
               img.idproducto === p.idproducto,
           );
@@ -102,26 +153,167 @@ export default function Home() {
   };
 
   const scrollAlCatalogo = () => {
-    const el = document.getElementById("product-grid");
+    const el = document.getElementById("seccion-catalogo") || document.getElementById("product-grid");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const handleSeleccionarCategoria = (catId: string | number) => {
+    setCategoriaActiva(catId);
+
+    const el = document.getElementById("seccion-catalogo") || document.getElementById("product-grid");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const productosFiltrados = productos.filter((p) => {
+    // 0. Búsqueda por escrito desde el Navbar Principal
+    if (busquedaNav.trim()) {
+      const q = busquedaNav.toLowerCase().trim();
+      const texto = `${p.nombre || ""} ${p.descripcion || ""} ${p.categoria || ""}`.toLowerCase();
+      if (!texto.includes(q)) {
+        return false;
+      }
+    }
+
+    if (String(categoriaActiva) === "todos") return true;
+
+    // 1. Coincidencia por ID de categoría en la base de datos
+    if (p.categoria_id && String(p.categoria_id) === String(categoriaActiva)) {
+      return true;
+    }
+
+    // 2. Coincidencia por nombre de categoría de la BD
+    const catEncontrada = categoriasBD.find((c) => String(c.id) === String(categoriaActiva));
+    const nombreFiltro = (catEncontrada ? catEncontrada.nombre : String(categoriaActiva)).toLowerCase();
+
+    const catProducto = (p.categoria || "").toLowerCase();
+    if (
+      catProducto &&
+      (catProducto === nombreFiltro ||
+        catProducto.includes(nombreFiltro) ||
+        nombreFiltro.includes(catProducto))
+    ) {
+      return true;
+    }
+
+    // 3. Búsqueda inteligente por palabras clave según la categoría
+    const texto = `${p.nombre || ""} ${p.descripcion || ""} ${p.categoria || ""}`.toLowerCase();
+
+    if (nombreFiltro.includes("mate")) {
+      const subTerm = nombreFiltro.replace("mates", "").replace("mate", "").trim();
+      if (subTerm.length > 2 && texto.includes(subTerm)) return true;
+      return (
+        texto.includes("mate") ||
+        texto.includes("torpedo") ||
+        texto.includes("camionero") ||
+        texto.includes("imperial") ||
+        texto.includes("algarrobo")
+      );
+    }
+
+    if (nombreFiltro.includes("calabaza") || nombreFiltro.includes("porongo")) {
+      return (
+        texto.includes("calabaza") ||
+        texto.includes("porongo") ||
+        texto.includes("uruguay")
+      );
+    }
+
+    if (nombreFiltro.includes("bombilla")) {
+      return (
+        texto.includes("bombill") ||
+        texto.includes("pico loro") ||
+        texto.includes("alpaca") ||
+        texto.includes("acero") ||
+        texto.includes("resorte")
+      );
+    }
+
+    if (nombreFiltro.includes("termo") || nombreFiltro.includes("matera")) {
+      return (
+        texto.includes("termo") ||
+        texto.includes("matera") ||
+        texto.includes("bolso") ||
+        texto.includes("canasta") ||
+        texto.includes("botell")
+      );
+    }
+
+    if (nombreFiltro.includes("accesorio") || nombreFiltro.includes("limpieza")) {
+      return (
+        texto.includes("accesorio") ||
+        texto.includes("yerbera") ||
+        texto.includes("despolvillador") ||
+        texto.includes("cepillo") ||
+        texto.includes("limpieza")
+      );
+    }
+
+    return texto.includes(nombreFiltro);
+  });
+
+  const conteoPorCategoria = useMemo(() => {
+    const mapa: { [key: string | number]: number } = {
+      todos: productos.length,
+    };
+
+    categoriasBD.forEach((cat) => {
+      const nombreCat = cat.nombre.toLowerCase();
+      const cant = productos.filter((p) => {
+        if (p.categoria_id && String(p.categoria_id) === String(cat.id)) return true;
+        const catProd = (p.categoria || "").toLowerCase();
+        if (
+          catProd &&
+          (catProd === nombreCat ||
+            catProd.includes(nombreCat) ||
+            nombreCat.includes(catProd))
+        ) {
+          return true;
+        }
+
+        const texto = `${p.nombre || ""} ${p.descripcion || ""} ${p.categoria || ""}`.toLowerCase();
+        if (nombreCat.includes("mate")) {
+          const subTerm = nombreCat.replace("mates", "").replace("mate", "").trim();
+          if (subTerm.length > 2 && texto.includes(subTerm)) return true;
+          return (
+            texto.includes("mate") ||
+            texto.includes("torpedo") ||
+            texto.includes("camionero") ||
+            texto.includes("imperial")
+          );
+        }
+        if (nombreCat.includes("calabaza")) return texto.includes("calabaza") || texto.includes("porongo");
+        if (nombreCat.includes("bombilla")) return texto.includes("bombill") || texto.includes("pico loro");
+        if (nombreCat.includes("termo") || nombreCat.includes("matera")) return texto.includes("termo") || texto.includes("matera") || texto.includes("botell");
+        if (nombreCat.includes("accesorio")) return texto.includes("accesorio") || texto.includes("yerbera") || texto.includes("limpieza");
+
+        return texto.includes(nombreCat);
+      }).length;
+
+      mapa[cat.id] = cant;
+      mapa[cat.nombre] = cant;
+    });
+
+    return mapa;
+  }, [productos, categoriasBD]);
 
   return (
     <div className="site-shell flex flex-col min-h-screen">
       {/* Header */}
       {/* HEADER CON TU LOGO REAL */}
       <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
           {/* LADO IZQUIERDO: Logo */}
-          <Link href="/" className="flex items-center gap-3 text-left group">
+          <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
             <img
               src="/logocircular.png"
               alt="SuMate Logo"
-              className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+              className="h-11 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <div>
+            <div className="hidden lg:block">
               <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">
                 SuMateCL
               </span>
@@ -131,24 +323,40 @@ export default function Home() {
             </div>
           </Link>
 
+          {/* CENTRO: Barra de búsqueda por escrito en el Navbar Principal */}
+          <div className="flex-1 min-w-[200px] sm:min-w-[280px] max-w-lg mx-2 sm:mx-4">
+            <BarraBusquedaNav
+              valorInicial={busquedaNav}
+              alCambiarTexto={(val) => setBusquedaNav(val)}
+              alBuscar={(term) => {
+                const q = term.trim();
+                if (q) {
+                  router.push(`/buscar?q=${encodeURIComponent(q)}`);
+                } else {
+                  router.push('/buscar');
+                }
+              }}
+              placeholder="Buscar mates, bombillas, termos..."
+            />
+          </div>
+
           {/* LADO DERECHO: Carrito + Panel Admin */}
-          {/* LADO DERECHO: Carrito + Panel Admin */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Widget Carrito con Desplegable */}
             <div className="relative group">
               <button
                 onClick={() => setCarritoAbierto(!carritoAbierto)}
-                className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer"
+                className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer text-xs"
                 aria-label="Abrir carrito"
               >
-                <span className="text-xs">
+                <span>
                   ${(total || 0).toLocaleString("es-CL")}
                 </span>
                 <div className="relative flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -178,13 +386,13 @@ export default function Home() {
                 ) : (
                   <>
                     <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                      {carrito.map((item: any) => (
+                      {carrito.map((item: ItemCarrito) => (
                         <div
-                          key={item.id || item.idproducto}
+                          key={item.id}
                           className="flex items-center justify-between text-xs border-b border-stone-100 pb-2 gap-2"
                         >
                           <img
-                            src={item.imagen || item.foto}
+                            src={item.imagen}
                             alt={item.nombre}
                             className="w-9 h-9 object-cover rounded-md"
                           />
@@ -200,9 +408,10 @@ export default function Home() {
                           {eliminarDelCarrito && (
                             <button
                               onClick={() =>
-                                eliminarDelCarrito(item.id || item.idproducto)
+                                eliminarDelCarrito(item.id)
                               }
                               className="text-stone-400 hover:text-red-500 text-sm font-bold cursor-pointer"
+                              title="Quitar producto"
                             >
                               ✕
                             </button>
@@ -229,17 +438,17 @@ export default function Home() {
               </div>
             </div>
             {usuario ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Link
                   href="/cuenta"
-                  className="hidden md:flex items-center gap-3 bg-[#f8f3e9] border border-[#8C7762]/20 rounded-full pl-3 pr-4 py-1.5 hover:bg-[#efe7d8] transition"
+                  className="hidden xl:flex items-center gap-2 bg-[#f8f3e9] border border-[#8C7762]/20 rounded-full pl-2.5 pr-3 py-1 hover:bg-[#efe7d8] transition"
                 >
-                  <div className="w-9 h-9 rounded-full bg-[#314235] text-white flex items-center justify-center font-bold uppercase">
+                  <div className="w-7 h-7 rounded-full bg-[#314235] text-white flex items-center justify-center font-bold text-xs uppercase">
                     {usuario.email?.charAt(0)}
                   </div>
 
-                  <div className="leading-tight max-w-[170px]">
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400 font-bold">
+                  <div className="leading-tight max-w-[110px]">
+                    <p className="text-[9px] uppercase tracking-wider text-stone-400 font-bold">
                       Mi cuenta
                     </p>
 
@@ -254,7 +463,7 @@ export default function Home() {
                     await supabase.auth.signOut();
                     setUsuario(null);
                   }}
-                  className="border border-[#8C7762] text-[#8C7762] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#8C7762] hover:text-white transition cursor-pointer"
+                  className="border border-[#8C7762] text-[#8C7762] text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[#8C7762] hover:text-white transition cursor-pointer"
                 >
                   Cerrar sesión
                 </button>
@@ -263,14 +472,14 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="text-sm font-semibold text-[#8C7762] hover:text-[#725F4C] transition"
+                  className="text-xs font-semibold text-[#8C7762] hover:text-[#725F4C] transition"
                 >
                   Iniciar sesión
                 </Link>
 
                 <Link
                   href="/registro"
-                  className="bg-[#314235] hover:bg-[#243127] text-white text-sm font-semibold px-4 py-2 rounded-full transition"
+                  className="bg-[#314235] hover:bg-[#243127] text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition"
                 >
                   Crear cuenta
                 </Link>
@@ -279,13 +488,21 @@ export default function Home() {
             {isEditor && (
               <Link
                 href="/admin"
-                className="rounded-full bg-[#314235] px-4 py-2 text-white font-semibold"
+                className="rounded-full bg-[#314235] hover:bg-[#243127] px-3.5 py-1.5 text-white text-xs font-semibold transition"
               >
                 Administración
               </Link>
             )}
           </div>
         </div>
+
+        {/* SUBNAVBAR DE PRODUCTOS Y CATEGORÍAS (BASADO EN LA BD) */}
+        <SubNavbar
+          categorias={categoriasBD}
+          categoriaActiva={categoriaActiva}
+          onSeleccionarCategoria={handleSeleccionarCategoria}
+          conteoPorCategoria={conteoPorCategoria}
+        />
       </header>
 
       <main className="flex-1">
@@ -397,22 +614,60 @@ export default function Home() {
         </section>
 
         {/* Catalog Section */}
-        <section className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-16">
+        <section id="seccion-catalogo" className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-16 scroll-mt-28">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">
-                Nuestros Productos
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="uppercase tracking-[0.22em] text-xs font-bold text-[#a75632]">
+                  Nuestros Productos
+                </p>
+                {busquedaNav.trim() && (
+                  <>
+                    <span className="text-xs text-stone-400">·</span>
+                    <span className="text-xs font-bold text-[#8C7762] bg-[#8C7762]/10 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5">
+                      <span>Búsqueda: &quot;{busquedaNav}&quot;</span>
+                      <button
+                        type="button"
+                        onClick={() => setBusquedaNav("")}
+                        className="hover:text-red-500 cursor-pointer text-xs ml-0.5"
+                        title="Quitar término de búsqueda"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </>
+                )}
+                {String(categoriaActiva) !== "todos" && (
+                  <>
+                    <span className="text-xs text-stone-400">·</span>
+                    <span className="text-xs font-bold text-[#314235] bg-[#314235]/10 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5">
+                      <span>{nombreCategoriaActiva}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleSeleccionarCategoria("todos")}
+                        className="hover:text-red-500 cursor-pointer text-xs ml-0.5"
+                        title="Quitar filtro"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </>
+                )}
+              </div>
               <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">
-                Catálogo general
+                {busquedaNav.trim()
+                  ? `Resultados para "${busquedaNav}"`
+                  : String(categoriaActiva) === "todos"
+                    ? "Catálogo general"
+                    : nombreCategoriaActiva}
               </h2>
             </div>
             <p className="text-sm font-semibold text-stone-500">
               {cargando
                 ? "Cargando catálogo..."
-                : productos.length === 1
+                : productosFiltrados.length === 1
                   ? "1 producto disponible"
-                  : `${productos.length} productos disponibles`}
+                  : `${productosFiltrados.length} productos disponibles`}
             </p>
           </div>
 
@@ -422,22 +677,44 @@ export default function Home() {
                 Cargando inventario de SuMateCL...
               </p>
             </div>
-          ) : productos.length === 0 ? (
+          ) : productosFiltrados.length === 0 ? (
             <div className="mt-9 rounded-3xl border border-dashed border-[#746a52]/45 bg-white/45 px-6 py-14 text-center">
               <h3 className="brand-serif mt-4 text-2xl text-[#2d2a23]">
-                No hay productos disponibles
+                {busquedaNav.trim() ? "No se encontraron productos coincidentes" : "No hay productos en esta categoría"}
               </h3>
               <p className="mt-2 text-stone-600">
-                Añade nuevos productos desde el panel administrativo para verlos
-                aquí.
+                {busquedaNav.trim()
+                  ? `No encontramos artículos que coincidan con "${busquedaNav}". Prueba con otra palabra clave o quita los filtros.`
+                  : `Aún no disponemos de artículos bajo la categoría "${nombreCategoriaActiva}".`}
               </p>
+              <div className="mt-5 flex items-center justify-center gap-3">
+                {busquedaNav.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => setBusquedaNav("")}
+                    className="inline-flex items-center gap-2 rounded-full border border-[#314235] px-5 py-2 text-xs font-bold text-[#314235] hover:bg-[#314235]/10 transition cursor-pointer"
+                  >
+                    Quitar búsqueda
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBusquedaNav("");
+                    handleSeleccionarCategoria("todos");
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#314235] px-6 py-2 text-xs font-bold text-white transition hover:bg-[#243127] cursor-pointer"
+                >
+                  Ver todos los productos
+                </button>
+              </div>
             </div>
           ) : (
             <div
               id="product-grid"
               className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
             >
-              {productos.map((product) => {
+              {productosFiltrados.map((product) => {
                 const sinStock = product.cantidad <= 0;
                 return (
                   <article
@@ -560,5 +837,22 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense
+      fallback={
+        <div className="site-shell min-h-screen bg-[#f8f3e9] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-3 border-[#8C7762] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-stone-500">Cargando catálogo...</p>
+          </div>
+        </div>
+      }
+    >
+      <ContenidoHome />
+    </Suspense>
   );
 }

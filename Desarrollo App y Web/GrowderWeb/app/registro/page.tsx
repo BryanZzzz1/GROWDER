@@ -1,21 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/src/lib/supabase";
 
-export default function RegistroPage() {
+function RegistroForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [telefono, setTelefono] = useState("");
     const [fechaNacimiento, setFechaNacimiento] = useState("");
     const [cargando, setCargando] = useState(false);
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get("redirect") || "/";
+
     const handleRegistro = async (e: React.FormEvent) => {
         e.preventDefault();
         setCargando(true);
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -33,14 +38,22 @@ export default function RegistroPage() {
             return;
         }
 
+        // Si la confirmación de email no es requerida y ya hay sesión, redirigir
+        if (data.session) {
+            router.push(redirect);
+            router.refresh();
+            return;
+        }
+
         alert(
-            "Registro realizado correctamente. Revisa tu correo para confirmar tu cuenta."
+            "Registro realizado correctamente. Si tu cuenta requiere confirmación, revisa tu correo antes de continuar."
         );
 
-        setEmail("");
-        setPassword("");
-        setTelefono("");
-        setFechaNacimiento("");
+        router.push(
+            redirect !== "/"
+                ? `/login?redirect=${encodeURIComponent(redirect)}`
+                : "/login"
+        );
     };
 
     return (
@@ -59,10 +72,21 @@ export default function RegistroPage() {
                         </h1>
 
                         <p className="mt-2 text-sm text-stone-500">
-                            Regístrate para comenzar en SuMateCL
+                            {redirect.includes("confirmacion-pago")
+                                ? "Crea una cuenta para confirmar tu pedido"
+                                : "Regístrate para comenzar en SuMateCL"}
                         </p>
                     </Link>
                 </div>
+
+                {redirect.includes("confirmacion-pago") && (
+                    <div className="mb-5 p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-800 flex items-center gap-2.5">
+                        <svg className="w-4 h-4 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span>Crea tu cuenta para gestionar el despacho y confirmar el pago de tu pedido.</span>
+                    </div>
+                )}
 
                 <form onSubmit={handleRegistro} className="space-y-5">
                     <div>
@@ -141,7 +165,11 @@ export default function RegistroPage() {
                 <p className="mt-6 text-center text-sm text-stone-600">
                     ¿Ya tienes una cuenta?{" "}
                     <Link
-                        href="/login"
+                        href={
+                            redirect !== "/"
+                                ? `/login?redirect=${encodeURIComponent(redirect)}`
+                                : "/login"
+                        }
                         className="font-bold text-[#a75632] hover:underline"
                     >
                         Inicia sesión
@@ -158,5 +186,19 @@ export default function RegistroPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function RegistroPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-[#f8f3e9] flex items-center justify-center">
+                    <p className="text-stone-600 font-semibold text-sm">Cargando...</p>
+                </div>
+            }
+        >
+            <RegistroForm />
+        </Suspense>
     );
 }
