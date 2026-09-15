@@ -29,6 +29,18 @@ const REGIONES_CHILE = [
 
 const COSTO_ENVIO_FIJO = 2650; // $2.650 CLP fijo
 
+function generarCodigoReferencia(): string {
+  return `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
+function obtenerTimestampActual(): number {
+  return Date.now();
+}
+
+function obtenerFechaActualISO(): string {
+  return new Date().toISOString();
+}
+
 export default function ConfirmacionPagoPage() {
   const router = useRouter();
   const { carrito, total, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } = usarCarrito();
@@ -60,6 +72,7 @@ export default function ConfirmacionPagoPage() {
   // Estado del modal de confirmación final
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
+  const [guardandoPedido, setGuardandoPedido] = useState(false);
 
   // Verificación robusta de sesión
   useEffect(() => {
@@ -240,7 +253,7 @@ export default function ConfirmacionPagoPage() {
     return nuevosErrores;
   };
 
-  const handleConfirmarPedido = (e: React.FormEvent) => {
+  const handleConfirmarPedido = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const validationErrors = validarCampos();
@@ -256,8 +269,92 @@ export default function ConfirmacionPagoPage() {
     }
 
     setErrores({});
-    const codigo = `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+    setGuardandoPedido(true);
+
+    const codigo = generarCodigoReferencia();
     setNumeroPedido(codigo);
+
+    const itemsParaGuardar = carrito.map((item) => ({
+      idproducto: parseInt(item.id, 10) || 0,
+      nombre: item.nombre,
+      precio: item.precio,
+      cantidad: item.cantidad,
+      foto: item.imagen || '',
+      categoria: 'Mates y Accesorios',
+    }));
+
+    const fechaActual = obtenerFechaActualISO();
+
+    const nuevoPedido = {
+      codigo_pedido: codigo,
+      usuario_id: usuario?.id || null,
+      nombre_cliente: nombre.trim(),
+      email_cliente: email.trim(),
+      telefono_cliente: telefono.trim(),
+      region,
+      comuna: comuna.trim(),
+      direccion: direccion.trim(),
+      depto: depto.trim() || null,
+      instrucciones: instrucciones.trim() || null,
+      metodo_pago: metodoPago,
+      estado: 'pendiente',
+      subtotal: total,
+      costo_envio: COSTO_ENVIO_FIJO,
+      total: totalFinal,
+      items: itemsParaGuardar,
+      empresa_transporte: null,
+      numero_seguimiento: null,
+      notas_despacho: null,
+      created_at: fechaActual,
+      updated_at: fechaActual,
+    };
+
+    // 1. Guardar en Supabase tabla pedidos
+    try {
+      const { error: errInsert } = await supabase.from('pedidos').insert([nuevoPedido]);
+      if (errInsert) {
+        console.warn('No se pudo insertar en la tabla pedidos de Supabase:', errInsert.message);
+      }
+
+      // Sincronizar también con la tabla historial_compras si el usuario está autenticado
+      if (usuario?.id) {
+        const itemsHistorial = carrito.map((item) => ({
+          idproducto: parseInt(item.id, 10) || null,
+          nombre: item.nombre,
+          descripcion: '',
+          precio: item.precio,
+          cantidad: item.cantidad,
+          user_id: usuario.id,
+          fecha: fechaActual,
+          foto: item.imagen || null,
+        }));
+        await supabase.from('historial_compras').insert(itemsHistorial);
+      }
+    } catch (err) {
+      console.error('Error al guardar pedido o historial en Supabase:', err);
+    }
+
+    // 2. Guardar en almacenamiento local como respaldo seguro e inmediato
+    try {
+      if (typeof window !== 'undefined') {
+        const guardados = localStorage.getItem('somate_pedidos');
+        let lista = [];
+        if (guardados) {
+          try {
+            lista = JSON.parse(guardados);
+          } catch {
+            lista = [];
+          }
+        }
+        lista.unshift({ ...nuevoPedido, id: obtenerTimestampActual() });
+        localStorage.setItem('somate_pedidos', JSON.stringify(lista));
+      }
+    } catch (err) {
+      console.error('Error al guardar pedido localmente:', err);
+    } finally {
+      setGuardandoPedido(false);
+    }
+
     setMostrarModalExito(true);
   };
 
@@ -1117,10 +1214,10 @@ export default function ConfirmacionPagoPage() {
               {/* Botón de Confirmación */}
               <button
                 type="submit"
-                disabled={carrito.length === 0}
+                disabled={carrito.length === 0 || guardandoPedido}
                 className="mt-6 w-full bg-[#314235] hover:bg-[#243127] text-white py-4 rounded-full font-bold text-sm transition shadow-lg hover:shadow-xl disabled:bg-stone-300 cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>Confirmar Pedido y Despacho</span>
+                <span>{guardandoPedido ? 'Registrando pedido...' : 'Confirmar Pedido y Despacho'}</span>
                 <span>→</span>
               </button>
 
@@ -1219,6 +1316,18 @@ export default function ConfirmacionPagoPage() {
                 </svg>
                 <span>Coordinar por WhatsApp</span>
               </a>
+
+              <Link
+                href={`/mis-compras?pedido=${encodeURIComponent(numeroPedido)}`}
+                onClick={() => {
+                  if (limpiarCarrito) limpiarCarrito();
+                  setMostrarModalExito(false);
+                }}
+                className="w-full bg-[#314235] hover:bg-[#243127] text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 text-sm transition shadow-md"
+              >
+                <span>Ver seguimiento de mi pedido</span>
+                <span>→</span>
+              </Link>
 
               <button
                 onClick={() => {

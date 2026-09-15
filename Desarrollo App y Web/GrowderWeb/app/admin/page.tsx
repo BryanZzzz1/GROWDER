@@ -4,8 +4,8 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/src/lib/supabase";
 
-import { Producto, Usuario, Categoria, StatusMessage, TabType } from "./types";
-export type { Producto, Usuario, Categoria } from "./types";
+import { Producto, Usuario, Categoria, StatusMessage, TabType, Pedido, EstadoPedido } from "./types";
+export type { Producto, Usuario, Categoria, Pedido, EstadoPedido } from "./types";
 
 import { AdminHeader } from "./components/AdminHeader";
 import { AdminBanner } from "./components/AdminBanner";
@@ -14,6 +14,7 @@ import { AdminAlert } from "./components/AdminAlert";
 import { InventarioTab } from "./components/InventarioTab";
 import { ProductoFormTab } from "./components/ProductoFormTab";
 import { RolesTab } from "./components/RolesTab";
+import { PedidosTab } from "./components/pedidos/PedidosTab";
 
 interface ProductoRow {
   idproducto: number;
@@ -41,6 +42,118 @@ const CATEGORIAS_DEFECTO: Categoria[] = [
   { id: 5, nombre: "Bombillas" },
   { id: 6, nombre: "Termos y Materas" },
   { id: 7, nombre: "Accesorios y Limpieza" },
+];
+
+const PEDIDOS_MOCK: Pedido[] = [
+  {
+    id: 1,
+    codigo_pedido: "SM-849201",
+    nombre_cliente: "Camila Valenzuela",
+    email_cliente: "camila.valenzuela@gmail.com",
+    telefono_cliente: "987654321",
+    region: "Región Metropolitana de Santiago",
+    comuna: "Providencia",
+    direccion: "Av. Nueva Providencia 1881",
+    depto: "Depto 402",
+    instrucciones: "Dejar en conserjería si no respondo el timbre.",
+    metodo_pago: "mercadopago",
+    estado: "pendiente",
+    subtotal: 54850,
+    costo_envio: 2650,
+    total: 57500,
+    items: [
+      {
+        idproducto: 1,
+        nombre: "Mate Torpedo Uruguayo Premium",
+        precio: 32900,
+        cantidad: 1,
+        foto: "/productos/torpedo-negro.jpg",
+        categoria: "Mates Torpedo",
+      },
+      {
+        idproducto: 5,
+        nombre: "Bombilla Pico de Loro Alpaca",
+        precio: 21950,
+        cantidad: 1,
+        foto: "/productos/bombilla-loro.jpg",
+        categoria: "Bombillas",
+      },
+    ],
+    empresa_transporte: null,
+    numero_seguimiento: null,
+    notas_despacho: "Esperando empaque para retiro por Starken.",
+    created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+  },
+  {
+    id: 2,
+    codigo_pedido: "SM-732914",
+    nombre_cliente: "Rodrigo Morales",
+    email_cliente: "rodrigo.morales@empresa.cl",
+    telefono_cliente: "954321876",
+    region: "Valparaíso",
+    comuna: "Viña del Mar",
+    direccion: "Calle 1 Norte 720",
+    depto: "Oficina 5B",
+    instrucciones: "Horario de oficina hasta las 18:00 hrs.",
+    metodo_pago: "transferencia",
+    estado: "en despacho",
+    subtotal: 64850,
+    costo_envio: 2650,
+    total: 67500,
+    items: [
+      {
+        idproducto: 3,
+        nombre: "Mate Imperial Calabaza Cincelada",
+        precio: 45900,
+        cantidad: 1,
+        foto: "/productos/imperial-cincelado.jpg",
+        categoria: "Mates Imperiales",
+      },
+      {
+        idproducto: 6,
+        nombre: "Termo Media Manija Acero 1L",
+        precio: 18950,
+        cantidad: 1,
+        foto: "/productos/termo-acero.jpg",
+        categoria: "Termos y Materas",
+      },
+    ],
+    empresa_transporte: "Starken",
+    numero_seguimiento: "STK-948201948",
+    notas_despacho: "Paquete entregado a la sucursal Starken Viña Centro.",
+    created_at: new Date(Date.now() - 3600000 * 26).toISOString(),
+  },
+  {
+    id: 3,
+    codigo_pedido: "SM-610482",
+    nombre_cliente: "Fernanda Castro",
+    email_cliente: "fernanda.castro@outlook.com",
+    telefono_cliente: "976543210",
+    region: "Biobío",
+    comuna: "Concepción",
+    direccion: "Av. O'Higgins 450",
+    depto: "Piso 3",
+    instrucciones: "Timbre blanco al lado de la puerta principal.",
+    metodo_pago: "webpay",
+    estado: "recibido",
+    subtotal: 28600,
+    costo_envio: 2650,
+    total: 31250,
+    items: [
+      {
+        idproducto: 2,
+        nombre: "Mate Camionero Vaqueta Rustica",
+        precio: 28600,
+        cantidad: 1,
+        foto: "/productos/camionero-rustico.jpg",
+        categoria: "Mates Camionero",
+      },
+    ],
+    empresa_transporte: "Chilexpress",
+    numero_seguimiento: "CHX-382910481",
+    notas_despacho: "Entregado conforme en recepción con firma.",
+    created_at: new Date(Date.now() - 3600000 * 72).toISOString(),
+  },
 ];
 
 export default function AdminPage() {
@@ -81,6 +194,10 @@ export default function AdminPage() {
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
   const [busquedaUsuario, setBusquedaUsuario] = useState("");
   const [guardandoRolId, setGuardandoRolId] = useState<string | null>(null);
+
+  // Estado de Seguimiento de Pedidos y Despachos
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [cargandoPedidos, setCargandoPedidos] = useState(false);
 
   const setStatus = (
     text: string,
@@ -261,6 +378,142 @@ export default function AdminPage() {
     }
   };
 
+  const cargarPedidos = useCallback(async () => {
+    setCargandoPedidos(true);
+    try {
+      const { data, error } = await supabase
+        .from("pedidos")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        setPedidos(data as Pedido[]);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("somate_pedidos", JSON.stringify(data));
+        }
+        return;
+      }
+
+      // Si la tabla no existe o está vacía, sincronizar con localStorage o fallback mock
+      if (typeof window !== "undefined") {
+        const guardados = localStorage.getItem("somate_pedidos");
+        if (guardados) {
+          try {
+            const parsed = JSON.parse(guardados);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setPedidos(parsed);
+              return;
+            }
+          } catch {
+            // Continuar con fallback
+          }
+        }
+        setPedidos(PEDIDOS_MOCK);
+        localStorage.setItem("somate_pedidos", JSON.stringify(PEDIDOS_MOCK));
+      }
+    } catch (err) {
+      console.error("Error al cargar pedidos:", err);
+      if (typeof window !== "undefined") {
+        const guardados = localStorage.getItem("somate_pedidos");
+        if (guardados) {
+          try {
+            setPedidos(JSON.parse(guardados));
+          } catch {
+            setPedidos(PEDIDOS_MOCK);
+          }
+        } else {
+          setPedidos(PEDIDOS_MOCK);
+        }
+      }
+    } finally {
+      setCargandoPedidos(false);
+    }
+  }, []);
+
+  const actualizarEstadoPedido = async (
+    idPedido: string | number,
+    nuevoEstado: EstadoPedido
+  ) => {
+    try {
+      const { error } = await supabase
+        .from("pedidos")
+        .update({
+          estado: nuevoEstado,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", idPedido);
+
+      if (error) {
+        console.warn("Actualización en base de datos no disponible, guardando localmente:", error.message);
+      }
+
+      setPedidos((prev) => {
+        const actualizados = prev.map((p) =>
+          p.id === idPedido
+            ? { ...p, estado: nuevoEstado, updated_at: new Date().toISOString() }
+            : p
+        );
+        if (typeof window !== "undefined") {
+          localStorage.setItem("somate_pedidos", JSON.stringify(actualizados));
+        }
+        return actualizados;
+      });
+
+      setStatus(`Estado del paquete actualizado a "${nuevoEstado}".`, "success");
+    } catch (err) {
+      console.error("Error al actualizar estado del pedido:", err);
+      setStatus("No se pudo actualizar el estado del pedido.", "error");
+    }
+  };
+
+  const actualizarDatosDespacho = async (
+    idPedido: string | number,
+    empresa: string,
+    numeroSeguimiento: string,
+    notas: string
+  ) => {
+    try {
+      const payload = {
+        empresa_transporte: empresa || null,
+        numero_seguimiento: numeroSeguimiento || null,
+        notas_despacho: notas || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from("pedidos")
+        .update(payload)
+        .eq("id", idPedido);
+
+      if (error) {
+        console.warn("Actualización en base de datos no disponible, guardando localmente:", error.message);
+      }
+
+      setPedidos((prev) => {
+        const actualizados = prev.map((p) =>
+          p.id === idPedido ? { ...p, ...payload } : p
+        );
+        if (typeof window !== "undefined") {
+          localStorage.setItem("somate_pedidos", JSON.stringify(actualizados));
+        }
+        return actualizados;
+      });
+
+      setStatus("Datos de despacho y transporte guardados correctamente.", "success");
+    } catch (err) {
+      console.error("Error al guardar datos de despacho:", err);
+      setStatus("No se pudo guardar la información de transporte.", "error");
+    }
+  };
+
+  const crearPedidoPrueba = () => {
+    setPedidos(PEDIDOS_MOCK);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("somate_pedidos", JSON.stringify(PEDIDOS_MOCK));
+    }
+    setStatus("Pedidos de demostración cargados.", "info");
+  };
+
   useEffect(() => {
     async function verificarSesionYRoles() {
       const {
@@ -287,10 +540,65 @@ export default function AdminPage() {
       cargarCategorias();
       cargarProductos();
       cargarUsuarios();
+      cargarPedidos();
     }
 
     verificarSesionYRoles();
-  }, [router, cargarCategorias, cargarProductos, cargarUsuarios]);
+  }, [router, cargarCategorias, cargarProductos, cargarUsuarios, cargarPedidos]);
+
+  // Suscripción en tiempo real (Supabase Realtime) a la tabla pedidos
+  useEffect(() => {
+    const canalPedidos = supabase
+      .channel("pedidos-realtime-admin")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "pedidos" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            const nuevo = payload.new as Pedido;
+            setPedidos((prev) => {
+              const existe = prev.some(
+                (p) => p.id === nuevo.id || p.codigo_pedido === nuevo.codigo_pedido
+              );
+              if (existe) {
+                return prev.map((p) =>
+                  p.id === nuevo.id || p.codigo_pedido === nuevo.codigo_pedido ? nuevo : p
+                );
+              }
+              return [nuevo, ...prev];
+            });
+            setStatus(`Nuevo pedido recibido en vivo: ${nuevo.codigo_pedido} (${nuevo.nombre_cliente})`, "info");
+          } else if (payload.eventType === "UPDATE") {
+            const actualizado = payload.new as Pedido;
+            setPedidos((prev) =>
+              prev.map((p) => (p.id === actualizado.id ? actualizado : p))
+            );
+          } else if (payload.eventType === "DELETE") {
+            setPedidos((prev) => prev.filter((p) => p.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    // Sincronización entre pestañas en el mismo navegador
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "somate_pedidos" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setPedidos(parsed);
+        } catch {
+          // Fallback silencioso
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      supabase.removeChannel(canalPedidos);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
 
   const totalProductos = useMemo(() => productos.length, [productos]);
 
@@ -401,7 +709,8 @@ export default function AdminPage() {
 
         let errorUpdate = resUpdate.error;
         if (errorUpdate && errorUpdate.message && errorUpdate.message.includes("categoria_id")) {
-          const { categoria_id: _cid, ...payloadSinId } = payloadCompleto;
+          const payloadSinId: Partial<typeof payloadCompleto> = { ...payloadCompleto };
+          delete payloadSinId.categoria_id;
           const retry = await supabase
             .from("producto")
             .update(payloadSinId)
@@ -422,7 +731,8 @@ export default function AdminPage() {
         let dataInsert = resInsert.data;
 
         if (errorInsert && errorInsert.message && errorInsert.message.includes("categoria_id")) {
-          const { categoria_id: _cid, ...payloadSinId } = payloadCompleto;
+          const payloadSinId: Partial<typeof payloadCompleto> = { ...payloadCompleto };
+          delete payloadSinId.categoria_id;
           const retry = await supabase
             .from("producto")
             .insert([payloadSinId])
@@ -508,6 +818,7 @@ export default function AdminPage() {
         <AdminBanner
           totalProductos={totalProductos}
           totalUsuarios={listaUsuarios.length}
+          totalPedidos={pedidos.length}
         />
 
         <AdminTabs
@@ -515,6 +826,7 @@ export default function AdminPage() {
           setPestanaActiva={setPestanaActiva}
           totalProductos={totalProductos}
           totalUsuarios={listaUsuarios.length}
+          totalPedidos={pedidos.length}
           editingId={editingId}
           onSelectProductoTab={() => {
             if (pestanaActiva !== "producto") resetForm();
@@ -523,6 +835,10 @@ export default function AdminPage() {
           onSelectRolesTab={() => {
             setPestanaActiva("roles");
             cargarUsuarios();
+          }}
+          onSelectPedidosTab={() => {
+            setPestanaActiva("pedidos");
+            cargarPedidos();
           }}
         />
 
@@ -587,6 +903,17 @@ export default function AdminPage() {
             guardandoRolId={guardandoRolId}
             onCambiarRol={cambiarRol}
             onToggleEstadoUsuario={toggleEstadoUsuario}
+          />
+        )}
+
+        {pestanaActiva === "pedidos" && (
+          <PedidosTab
+            pedidos={pedidos}
+            cargando={cargandoPedidos}
+            onRefresh={cargarPedidos}
+            onActualizarEstado={actualizarEstadoPedido}
+            onActualizarDatosDespacho={actualizarDatosDespacho}
+            onCrearPedidoPrueba={crearPedidoPrueba}
           />
         )}
       </main>

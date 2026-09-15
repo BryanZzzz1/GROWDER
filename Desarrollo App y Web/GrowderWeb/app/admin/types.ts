@@ -31,4 +31,40 @@ export interface StatusMessage {
   type: "success" | "error" | "info";
 }
 
-export type TabType = "inventario" | "producto" | "roles";
+export type EstadoPedido = "pendiente" | "en despacho" | "recibido";
+
+export interface ItemPedido {
+  idproducto: number;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+  foto?: string;
+  categoria?: string;
+}
+
+export interface Pedido {
+  id: number | string;
+  codigo_pedido: string;
+  usuario_id?: string | null;
+  nombre_cliente: string;
+  email_cliente: string;
+  telefono_cliente: string;
+  region: string;
+  comuna: string;
+  direccion: string;
+  depto?: string | null;
+  instrucciones?: string | null;
+  metodo_pago: string;
+  estado: EstadoPedido;
+  subtotal: number;
+  costo_envio: number;
+  total: number;
+  items: ItemPedido[];
+  empresa_transporte?: string | null;
+  numero_seguimiento?: string | null;
+  notas_despacho?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type TabType = "inventario" | "producto" | "roles" | "pedidos";

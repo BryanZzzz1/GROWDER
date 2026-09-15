@@ -440,6 +440,16 @@ function ContenidoHome() {
             {usuario ? (
               <div className="flex items-center gap-2">
                 <Link
+                  href="/mis-compras"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-stone-300 text-stone-700 hover:bg-[#f8f3e9] text-xs font-semibold transition"
+                >
+                  <svg className="w-3.5 h-3.5 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <span>Mis compras</span>
+                </Link>
+
+                <Link
                   href="/cuenta"
                   className="hidden xl:flex items-center gap-2 bg-[#f8f3e9] border border-[#8C7762]/20 rounded-full pl-2.5 pr-3 py-1 hover:bg-[#efe7d8] transition"
                 >
