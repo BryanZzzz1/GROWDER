@@ -31,4 +31,43 @@ export interface StatusMessage {
   type: "success" | "error" | "info";
 }
 
-export type TabType = "inventario" | "producto" | "roles";
+export type TabType = "inventario" | "producto" | "roles" | "pedidos";
+
+// ==========================================
+// TIPOS DE PEDIDOS (Requerido por Vercel)
+// ==========================================
+
+export type EstadoPedido = 'pendiente' | 'en despacho' | 'recibido';
+
+export interface PedidoItem {
+  id: number | string;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+  imagen?: string;
+}
+
+export interface Pedido {
+  id: number;
+  codigo_pedido: string;
+  usuario_id?: string;
+  nombre_cliente: string;
+  email_cliente: string;
+  telefono_cliente: string;
+  region: string;
+  comuna: string;
+  direccion: string;
+  depto?: string;
+  instrucciones?: string;
+  metodo_pago: string;
+  estado: EstadoPedido;
+  subtotal: number;
+  costo_envio: number;
+  total: number;
+  items: PedidoItem[]; 
+  empresa_transporte?: string;
+  numero_seguimiento?: string;
+  notas_despacho?: string;
+  created_at: string;
+  updated_at: string;
+}
