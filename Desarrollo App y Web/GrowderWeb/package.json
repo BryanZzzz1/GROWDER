@@ -12,7 +12,8 @@
     "@supabase/supabase-js": "^2.115.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "transbank-sdk": "^6.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

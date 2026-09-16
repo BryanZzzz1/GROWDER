@@ -163,27 +163,6 @@ export default function CuentaPage() {
           </div>
 
           <div className="p-8 space-y-6">
-            {/* Acceso directo a Mis Compras y Seguimiento */}
-            <div className="rounded-2xl border border-[#8C7762]/20 bg-[#fdfbf7] p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-[#314235] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-stone-900 text-sm">Mis Compras & Despachos</h3>
-                  <p className="text-xs text-stone-500">Revisa el estado de tus paquetes y códigos de seguimiento.</p>
-                </div>
-              </div>
-              <Link
-                href="/mis-compras"
-                className="px-4 py-2 rounded-full bg-[#314235] hover:bg-[#243127] text-white text-xs font-bold transition shadow-xs whitespace-nowrap"
-              >
-                Ver mis compras →
-              </Link>
-            </div>
-
             <div>
               <p className="text-xs uppercase tracking-wider text-stone-400 font-bold">
                 Correo electrónico
