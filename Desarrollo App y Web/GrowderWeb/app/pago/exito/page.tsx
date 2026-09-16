@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
 import { usarCarrito } from '@/app/datoscarro/estadocarro';
 
 function ExitoContent() {
@@ -11,10 +11,14 @@ function ExitoContent() {
   const monto = searchParams.get('monto');
   const { limpiarCarrito } = usarCarrito();
 
-  // Limpiar el carrito automáticamente al llegar a la pantalla de éxito
+  // Creamos una referencia para saber si ya limpiamos el carrito
+  const carritoYaLimpiado = useRef(false);
+
+  // Limpiar el carrito SOLO una vez
   useEffect(() => {
-    if (limpiarCarrito) {
+    if (limpiarCarrito && !carritoYaLimpiado.current) {
       limpiarCarrito();
+      carritoYaLimpiado.current = true; // Marcamos como limpio para evitar el bucle
     }
   }, [limpiarCarrito]);
 
