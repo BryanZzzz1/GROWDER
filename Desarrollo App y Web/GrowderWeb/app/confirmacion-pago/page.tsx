@@ -54,11 +54,11 @@ export default function ConfirmacionPagoPage() {
   const [depto, setDepto] = useState('');
   const [instrucciones, setInstrucciones] = useState('');
 
-  // Método de pago seleccionado (ahora Webpay es el principal)
+  // Método de pago seleccionado
   const [metodoPago, setMetodoPago] = useState<'mercadopago' | 'webpay'>('webpay');
-  const [procesandoPago, setProcesandoPago] = useState(false); // NUEVO ESTADO PARA WEBPAY
+  const [procesandoPago, setProcesandoPago] = useState(false);
 
-  // Estado del modal de confirmación final (Para pagos manuales)
+  // Estado del modal de confirmación final (Para pagos manuales si llegaran a existir)
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
 
@@ -218,7 +218,7 @@ export default function ConfirmacionPagoPage() {
   };
 
   // ============================================================================
-  // INTEGRACIÓN WEBPAY AL CONFIRMAR
+  // INTEGRACIÓN WEBPAY & MERCADO PAGO AL CONFIRMAR
   // ============================================================================
   const handleConfirmarPedido = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,7 +257,6 @@ export default function ConfirmacionPagoPage() {
         const data = await response.json();
 
         if (data.url && data.token) {
-          // 2. Crear formulario oculto para ir a la pantalla de Transbank
           const form = document.createElement('form');
           form.action = data.url;
           form.method = 'POST';
@@ -279,9 +278,33 @@ export default function ConfirmacionPagoPage() {
         alert("Ocurrió un error al conectar con el servidor de pagos.");
         setProcesandoPago(false);
       }
-    } else {
-      // Flujo original (Simulado para Mercado Pago / Transferencia)
-      setMostrarModalExito(true);
+    } else if (metodoPago === 'mercadopago') {
+      // 2. INICIAR FLUJO DE MERCADO PAGO
+      setProcesandoPago(true);
+      try {
+        const response = await fetch('/api/mercadopago/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: totalFinal,
+            buyOrder: codigo,
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+          // Redirigir al cliente a la pasarela de Mercado Pago
+          window.location.href = data.url;
+        } else {
+          alert("Error al inicializar Mercado Pago. Intenta nuevamente.");
+          setProcesandoPago(false);
+        }
+      } catch (error) {
+        console.error("Error en Mercado Pago:", error);
+        alert("Ocurrió un error al conectar con Mercado Pago.");
+        setProcesandoPago(false);
+      }
     }
   };
 
@@ -490,7 +513,7 @@ export default function ConfirmacionPagoPage() {
               </div>
 
               <div className="space-y-4">
-                {/* WEBPAY (AHORA ES EL PRINCIPAL) */}
+                {/* WEBPAY */}
                 <div onClick={() => setMetodoPago('webpay')} className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${metodoPago === 'webpay' ? 'border-[#E31B23] bg-[#E31B23]/5 shadow-sm ring-2 ring-[#E31B23]/15' : 'border-stone-200 hover:border-stone-300'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -514,7 +537,7 @@ export default function ConfirmacionPagoPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm text-stone-900">Mercado Pago</span>
-                          <span className="text-[10px] font-bold bg-[#009EE3] text-white px-2 py-0.5 rounded-md uppercase">Próximamente</span>
+                          <span className="text-[10px] font-bold bg-[#009EE3] text-white px-2 py-0.5 rounded-md uppercase">Modo Prueba</span>
                         </div>
                         <p className="text-xs text-stone-500 mt-0.5">Tarjetas de crédito, débito y dinero en cuenta.</p>
                       </div>
@@ -566,31 +589,23 @@ export default function ConfirmacionPagoPage() {
                 <div className="mt-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5"><svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><div><span className="font-bold block">Faltan campos por completar</span><span>Revisa los campos destacados en rojo.</span></div></div>
               )}
 
-              {/* BOTON DE PAGO: CAMBIA SU TEXTO SI ESTÁ CARGANDO */}
+              {/* BOTON DE PAGO: CAMBIA SU TEXTO SI ESTÁ CARGANDO Y SEGÚN EL MÉTODO */}
               <button
                 type="submit"
                 disabled={carrito.length === 0 || procesandoPago}
                 className="mt-6 w-full bg-[#314235] hover:bg-[#243127] text-white py-4 rounded-full font-bold text-sm transition shadow-lg hover:shadow-xl disabled:bg-stone-400 cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>{procesandoPago ? 'Conectando con Webpay...' : metodoPago === 'webpay' ? 'Pagar con Webpay Plus' : 'Confirmar Pedido'}</span>
+                <span>
+                  {procesandoPago
+                    ? `Conectando con ${metodoPago === 'webpay' ? 'Webpay' : 'Mercado Pago'}...`
+                    : `Pagar con ${metodoPago === 'webpay' ? 'Webpay Plus' : 'Mercado Pago'}`}
+                </span>
                 {!procesandoPago && <span>→</span>}
               </button>
             </div>
           </div>
         </form>
       </main>
-
-      {/* MODAL DE CONFIRMACIÓN (SOLO SI ES MERCADO PAGO / MANUAL) */}
-      {mostrarModalExito && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl mx-auto mb-4">✓</div>
-            <h3 className="brand-serif text-2xl font-bold text-stone-900 text-center mb-1">¡Pedido Registrado con Éxito!</h3>
-            <p className="text-center text-xs text-stone-500 mb-6">Código de referencia: <span className="font-bold text-stone-800">{numeroPedido}</span></p>
-            <button onClick={() => { if (limpiarCarrito) limpiarCarrito(); setMostrarModalExito(false); router.push('/'); }} className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-3 rounded-full text-sm transition cursor-pointer">Volver a la tienda</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
