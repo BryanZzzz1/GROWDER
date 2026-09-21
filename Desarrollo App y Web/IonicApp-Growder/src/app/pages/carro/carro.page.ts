@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
-import { Productos } from 'src/app/services/productos';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
-import { ExchangeRateService } from 'src/app/services/exchange-rate.service';
+import { Productos } from '../../services/productos';
+import { ServicebdService } from '../../services/servicesbd.service';
+import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -116,23 +116,19 @@ export class CarroPage implements OnInit {
     await toast.present();
   }
 
-  async irAComprar() {
+async irAComprar() {
     const currentUser = await this.basededatosService.getCurrentUser();
     if (currentUser) {
-      try {
-        // Verificar que cada producto en el carrito tenga una cantidad definida
-        for (const producto of this.carrito) {
-          if (producto.cantidad === undefined || producto.cantidad <= 0) {
-            this.presentToast(`La cantidad para ${producto.nombre} no es válida.`);
-            return;
-          }
+      // Verificamos cantidades válidas antes de avanzar
+      for (const producto of this.carrito) {
+        if (producto.cantidad === undefined || producto.cantidad <= 0) {
+          this.presentToast(`La cantidad para ${producto.nombre} no es válida.`);
+          return;
         }
-        
-        await this.basededatosService.realizarCompra(currentUser.username);
-        this.router.navigate(['/tienda']);
-      } catch (error) {
-        // Mostrar el mensaje específico del error
       }
+      
+      // El salto hacia la nueva vista de pago
+      this.router.navigate(['/checkout']);
     } else {
       this.presentToast('Error: Usuario no encontrado');
     }

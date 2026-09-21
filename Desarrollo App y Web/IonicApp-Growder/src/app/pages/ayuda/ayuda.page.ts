@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExchangeRateService } from 'src/app/services/exchange-rate.service';
+import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { AlertController } from '@ionic/angular';
 import { NativeStorage } from '@awesome-cordova-plugins/native-storage/ngx';
 // Importa NativeStorage

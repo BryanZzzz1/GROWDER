@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { Productos } from 'src/app/services/productos';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
+import { Productos } from '../../services/productos';
+import { ServicebdService } from '../../services/servicesbd.service';
 
 @Component({
   selector: 'app-tienda',

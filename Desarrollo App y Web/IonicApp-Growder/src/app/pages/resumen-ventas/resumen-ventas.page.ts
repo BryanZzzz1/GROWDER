@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
+import { ServicebdService } from '../../services/servicesbd.service';
 
 @Component({
   selector: 'app-resumen-ventas',

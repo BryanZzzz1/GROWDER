@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
+import { ServicebdService } from '../services/servicesbd.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({

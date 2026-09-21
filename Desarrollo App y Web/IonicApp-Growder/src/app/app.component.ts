@@ -3,7 +3,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ServicebdService } from './services/servicesbd.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { StatusBar } from '@capacitor/status-bar'; 
+import { StatusBar } from '@capacitor/status-bar';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+import { NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +18,11 @@ export class AppComponent implements OnDestroy {
   private subscription: Subscription;
   public isLoggedIn: boolean = false; 
 
-  constructor(private router: Router, private service: ServicebdService) {
+  constructor(
+    private router: Router, 
+    private service: ServicebdService,
+    private zone: NgZone
+  ) {
     this.subscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.ocultarnavbar = !this.ocultabarrabaja(event.urlAfterRedirects);
@@ -23,22 +30,45 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    // Suscribirse al estado de inicio de sesión
     this.service.isUserLoggedIn.subscribe(isLoggedIn => {
-      this.isLoggedIn = isLoggedIn; // Actualizar el estado local
+      this.isLoggedIn = isLoggedIn;
     });
 
-    // Configuración inicial de la barra de estado
     this.setupStatusBar();
-
-    // Programar notificación
     this.scheduleNotification();
+    this.setupDeepLinks();
+  }
+
+  private setupDeepLinks() {
+    App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
+      this.zone.run(() => {
+        Browser.close().catch(() => {});
+
+        const urlString = event.url; 
+
+        if (urlString.includes('/pago/exito')) {
+          try {
+            const url = new URL(urlString);
+            const orden = url.searchParams.get('orden');
+            const monto = url.searchParams.get('monto');
+            const token_ws = url.searchParams.get('token_ws'); 
+            const metodo = url.searchParams.get('metodo');     
+            
+            this.router.navigate(['/pago-exito'], { queryParams: { orden, monto, token_ws, metodo } });
+          } catch (e) {
+            console.error('Error parseando la URL de pago:', e);
+          }
+        } 
+        else if (urlString.includes('/pago/fracaso')) {
+          this.router.navigate(['/carro']);
+        }
+      });
+    });
   }
 
   private async setupStatusBar() {
     await StatusBar.setBackgroundColor({ color: '#18342f' });
     await StatusBar.setOverlaysWebView({ overlay: false });
-    // Barra debajo de la app
   }
 
   private async updateStatusBar(url: string) {

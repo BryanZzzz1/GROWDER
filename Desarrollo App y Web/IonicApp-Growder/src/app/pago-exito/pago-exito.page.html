@@ -1,0 +1,45 @@
+<ion-content color="light" class="ion-padding ion-text-center">
+  <!-- Pantalla de Éxito -->
+  <div class="success-container" *ngIf="!procesando && !errorPago">
+    <ion-icon name="checkmark-circle" color="success" class="success-icon" style="font-size: 80px; margin-top: 30px;"></ion-icon>
+    <h1 class="title">¡Pago Exitoso!</h1>
+    <p class="subtitle">Tu compra ha sido procesada correctamente.</p>
+
+    <ion-card class="receipt-card" style="margin-top: 20px; border-radius: 15px;">
+      <ion-card-content>
+        <div class="row" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span class="label" style="font-weight: bold;">N° de Orden:</span>
+          <span class="value">{{ orden }}</span>
+        </div>
+        <div class="line" style="border-bottom: 1px dashed #ccc; margin: 15px 0;"></div>
+        <div class="row" style="display: flex; justify-content: space-between; margin-top: 10px;">
+          <span class="label" style="font-weight: bold;">Monto Pagado:</span>
+          <span class="value total" style="font-size: 1.2rem; font-weight: bold; color: #18342f;">
+            {{ monto | currency:'CLP':'symbol-narrow':'1.0-0' }}
+          </span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="block" shape="round" color="dark" (click)="volverATienda()" class="mt-4" style="margin-top: 30px;">
+      Volver a la tienda
+    </ion-button>
+  </div>
+
+  <!-- Pantalla de Error o Rechazo -->
+  <div class="error-container" *ngIf="errorPago && !procesando">
+    <ion-icon name="close-circle" color="danger" style="font-size: 80px; margin-top: 30px;"></ion-icon>
+    <h1 class="title" style="font-weight: bold;">Pago Rechazado</h1>
+    <p class="subtitle">{{ errorPago }}</p>
+
+    <ion-button expand="block" shape="round" color="dark" (click)="volverATienda()" class="mt-4" style="margin-top: 30px;">
+      Volver a la Tienda
+    </ion-button>
+  </div>
+
+  <!-- Pantalla de Carga -->
+  <div class="loading-container" *ngIf="procesando" style="margin-top: 50%;">
+    <ion-spinner name="crescent" color="success"></ion-spinner>
+    <p>Confirmando tu pedido...</p>
+  </div>
+</ion-content>

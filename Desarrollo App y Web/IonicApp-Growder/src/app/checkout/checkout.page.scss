@@ -1,0 +1,170 @@
+ion-content {
+  --background: #f8f3e9; // Fondo beige SuMateCL
+}
+
+.brand-title {
+  font-weight: bold;
+  font-family: serif;
+}
+
+.stepper-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 20px;
+  font-size: 0.75rem;
+  
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    &.completed { color: #2dd36f; }
+    &.active { color: #1f2937; }
+    &.pending { color: #9ca3af; }
+  }
+  
+  .line {
+    height: 1px;
+    width: 20px;
+    background: #d1d5db;
+    margin: 0 10px;
+  }
+}
+
+.page-title {
+  font-family: serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.custom-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  background: #ffffff;
+
+  .header-flex {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .header-icon {
+      font-size: 24px;
+      color: #314235;
+      background: rgba(49, 66, 53, 0.1);
+      padding: 8px;
+      border-radius: 8px;
+    }
+  }
+
+  ion-card-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #111827;
+  }
+
+  ion-card-subtitle {
+    text-transform: none;
+    font-size: 0.75rem;
+  }
+
+  .tarifa-badge {
+    margin-left: auto;
+    font-size: 0.65rem;
+  }
+}
+
+.custom-input {
+  --background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  
+  ion-label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #4b5563;
+  }
+  
+  .opcional {
+    font-weight: normal;
+    color: #9ca3af;
+  }
+}
+
+.payment-option {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  --padding-start: 10px;
+
+  &.selected {
+    border-color: #314235;
+    background: rgba(49, 66, 53, 0.05);
+  }
+
+  h2 { font-weight: bold; font-size: 0.9rem; }
+  p { font-size: 0.75rem; color: #6b7280; }
+  ion-badge { font-size: 0.6rem; margin-left: 5px; }
+}
+
+.summary-card {
+  .item-count {
+    font-size: 0.75rem;
+    background: #e5e7eb;
+    padding: 3px 8px;
+    border-radius: 12px;
+    float: right;
+  }
+
+  .summary-item {
+    --padding-start: 0;
+    h3 { font-weight: bold; font-size: 0.85rem; }
+    p { font-size: 0.75rem; color: #6b7280; margin: 2px 0; }
+    .item-total { font-weight: bold; font-size: 0.9rem; }
+  }
+
+  .totals-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 15px;
+    margin-top: 10px;
+    
+    .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      color: #4b5563;
+    }
+    
+    .text-success { color: #059669; }
+    
+    .grand-total {
+      margin-top: 15px;
+      border-top: 1px dashed #e5e7eb;
+      padding-top: 15px;
+      align-items: center;
+      
+      strong { color: #111827; font-size: 1rem; }
+      .iva { font-size: 0.7rem; color: #9ca3af; margin: 0; }
+      .total-price { font-size: 1.4rem; font-family: serif; color: #314235; }
+    }
+  }
+
+  .pay-button {
+    margin-top: 20px;
+    --background: #314235;
+    --background-hover: #243127;
+    font-weight: bold;
+  }
+}

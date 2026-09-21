@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
-import { Productos } from 'src/app/services/productos';
+import { ServicebdService } from '../../services/servicesbd.service';
+import { Productos } from '../../services/productos';
 import { take } from 'rxjs/operators';
 import { ToastController } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
+import { ServicebdService } from '../../services/servicesbd.service';
+
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { AlertController, IonModal } from '@ionic/angular';
 

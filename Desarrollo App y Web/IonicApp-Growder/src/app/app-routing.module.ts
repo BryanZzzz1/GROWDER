@@ -60,9 +60,19 @@ const routes: Routes = [
     loadChildren: () => import('./pages/resumen-ventas/resumen-ventas.module').then( m => m.ResumenVentasPageModule)
   },
   {
+    path: 'checkout',
+    loadChildren: () => import('./checkout/checkout.module').then( m => m.CheckoutPageModule)
+  },
+  {
+    path: 'pago-exito',
+    loadChildren: () => import('./pago-exito/pago-exito.module').then( m => m.PagoExitoPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import('./pages/notfound/notfound.module').then( m => m.NotfoundPageModule)
   },
+
+
 ];
 
 @NgModule({

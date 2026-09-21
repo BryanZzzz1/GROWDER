@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ServicebdService } from 'src/app/services/servicesbd.service';
+import { ServicebdService } from '../../services/servicesbd.service';
+
 
 @Component({
   selector: 'app-iniciotienda',
