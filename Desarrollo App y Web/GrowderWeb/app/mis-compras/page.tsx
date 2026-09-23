@@ -272,17 +272,17 @@ function MisComprasContent() {
   const handleVolverAComprar = (pedido: Pedido) => {
     if (!pedido.items || pedido.items.length === 0) return;
 
-    pedido.items.forEach((it) => {
-      agregarAlCarrito(
-        {
-          id: String(it.idproducto),
-          nombre: it.nombre,
-          precio: it.precio,
-          imagen: it.foto || "",
-        },
-        it.cantidad || 1
-      );
-    });
+  pedido.items.forEach((it) => {
+    agregarAlCarrito(
+      {
+        id: String(it.idproducto ?? it.id ?? ""),
+        nombre: it.nombre,
+        precio: it.precio,
+        imagen: it.foto || it.imagen || "",
+      },
+      it.cantidad || 1
+    );
+  });
 
     setMensajeRecompra(
       `¡Los artículos de tu compra ${pedido.codigo_pedido} fueron añadidos a tu carrito!`

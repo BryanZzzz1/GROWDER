@@ -6,22 +6,28 @@ export default function CarroDesplegable() {
   const router = useRouter()
   const { carrito, eliminarDelCarrito, carritoAbierto, setCarritoAbierto, total } = usarCarrito()
 
-  if (!carritoAbierto) return null
-
   const irAlPago = () => {
     setCarritoAbierto(false)
     router.push('/confirmacion-pago')
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs">
+    <div
+      onClick={() => setCarritoAbierto(false)}
+      className={`fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-in-out ${carritoAbierto ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+    >
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white p-6 shadow-2xl flex flex-col justify-between">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`w-screen max-w-md bg-white p-6 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-in-out ${carritoAbierto ? 'translate-x-0' : 'translate-x-full'
+            }`}
+        >
 
           <div>
             <div className="flex items-center justify-between border-b pb-4">
               <h2 className="text-lg font-bold text-[#1A1A1A]">Tu Carrito</h2>
-              <button 
+              <button
                 onClick={() => setCarritoAbierto(false)}
                 className="text-gray-500 hover:text-black font-bold p-1 cursor-pointer"
               >
@@ -42,7 +48,7 @@ export default function CarroDesplegable() {
                         {item.cantidad} x ${item.precio.toLocaleString('es-CL')}
                       </p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => eliminarDelCarrito(item.id)}
                       className="text-red-500 text-xs font-semibold hover:underline cursor-pointer"
                     >

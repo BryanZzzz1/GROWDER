@@ -458,15 +458,16 @@ function ContenidoHome() {
                   </div>
                 </Link>
 
-                <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    setUsuario(null);
-                  }}
-                  className="border border-[#8C7762] text-[#8C7762] text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[#8C7762] hover:text-white transition cursor-pointer"
+                <Link
+                  href="/mis-compras"
+                  className="flex items-center gap-1.5 border border-[#314235]/30 hover:border-[#314235] text-[#314235] hover:bg-[#314235]/5 rounded-full px-3 py-1.5 text-xs font-semibold transition cursor-pointer"
+                  title="Historial de compras y seguimiento de pedidos"
                 >
-                  Cerrar sesión
-                </button>
+                  <svg className="w-3.5 h-3.5 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <span className="hidden sm:inline">Mis compras</span>
+                </Link>
               </div>
             ) : (
               <div className="flex items-center gap-2">

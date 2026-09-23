@@ -5,9 +5,11 @@ interface AdminTabsProps {
   setPestanaActiva: (tab: TabType) => void;
   totalProductos: number;
   totalUsuarios: number;
+  totalPedidos?: number;
   editingId: number | null;
   onSelectProductoTab: () => void;
   onSelectRolesTab: () => void;
+  onSelectPedidosTab?: () => void;
 }
 
 export function AdminTabs({
@@ -15,9 +17,11 @@ export function AdminTabs({
   setPestanaActiva,
   totalProductos,
   totalUsuarios,
+  totalPedidos = 0,
   editingId,
   onSelectProductoTab,
   onSelectRolesTab,
+  onSelectPedidosTab,
 }: AdminTabsProps) {
   return (
     <div className="mt-8 flex flex-wrap items-center gap-3 border-b border-stone-200 pb-4">
@@ -83,6 +87,33 @@ export function AdminTabs({
             }`}
           >
             {totalUsuarios}
+          </span>
+        )}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          if (onSelectPedidosTab) onSelectPedidosTab();
+          else setPestanaActiva("pedidos");
+        }}
+        className={`inline-flex items-center gap-2.5 rounded-2xl px-5 py-3 text-sm font-bold transition-all cursor-pointer ${
+          pestanaActiva === "pedidos"
+            ? "bg-[#314235] text-white shadow-md shadow-[#314235]/20 scale-[1.02]"
+            : "bg-white text-stone-700 border border-stone-300/80 hover:bg-[#f3ede1]"
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <span>Gestión de Pedidos</span>
+        {totalPedidos > 0 && (
+          <span
+            className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${
+              pestanaActiva === "pedidos" ? "bg-white/20 text-white" : "bg-stone-100 text-stone-600"
+            }`}
+          >
+            {totalPedidos}
           </span>
         )}
       </button>
