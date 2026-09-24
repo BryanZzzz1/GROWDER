@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usarCarrito } from '@/app/datoscarro/estadocarro';
 import { useAuth } from '@/src/lib/context/AuthContext';
 import { supabase } from '@/src/lib/supabase';
+import { TimerReserva } from './components/TimerReserva';
+
+function generarCodigoPedidoUnico(): string {
+  return `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+}
 
 // Regiones oficiales de Chile
 const REGIONES_CHILE = [
@@ -61,6 +66,14 @@ export default function ConfirmacionPagoPage() {
   // Estado del modal de confirmación final (Para pagos manuales si llegaran a existir)
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
+
+  // Estados para el temporizador y reserva de stock de 2 minutos
+  const [codigoReserva, setCodigoReserva] = useState<string | null>(null);
+  const [segundosRestantes, setSegundosRestantes] = useState<number>(120);
+  const [reservaExpirada, setReservaExpirada] = useState<boolean>(false);
+  const [cargandoReserva, setCargandoReserva] = useState<boolean>(false);
+  const [reservaActiva, setReservaActiva] = useState<boolean>(false);
+  const [errorStock, setErrorStock] = useState<string | null>(null);
 
   // Verificación robusta de sesión
   useEffect(() => {
@@ -127,6 +140,174 @@ export default function ConfirmacionPagoPage() {
       subscription.unsubscribe();
     };
   }, [usuario, authCargando]);
+
+  // ============================================================================
+  // GESTIÓN DE RESERVA DE STOCK (6 MINUTOS)
+  // ============================================================================
+  const iniciarORestaurarReserva = useCallback(async () => {
+    if (carrito.length === 0) return;
+
+    setCargandoReserva(true);
+    setErrorStock(null);
+
+    try {
+      // 1. Revisar si existe una reserva previa en sessionStorage
+      const guardada =
+        typeof window !== 'undefined'
+          ? sessionStorage.getItem('somate_reserva_activa')
+          : null;
+
+      if (guardada) {
+        try {
+          const parsed = JSON.parse(guardada);
+          const expiraMs = new Date(parsed.expiraEn).getTime();
+          const ahoraMs = Date.now();
+          const restantes = Math.floor((expiraMs - ahoraMs) / 1000);
+
+          if (restantes > 0) {
+            setCodigoReserva(parsed.codigoReserva);
+            setNumeroPedido(parsed.codigoReserva);
+            setSegundosRestantes(restantes);
+            setReservaActiva(true);
+            setReservaExpirada(false);
+            setCargandoReserva(false);
+            return;
+          } else {
+            sessionStorage.removeItem('somate_reserva_activa');
+          }
+        } catch {
+          sessionStorage.removeItem('somate_reserva_activa');
+        }
+      }
+
+      // 2. Iniciar una nueva reserva de stock en el servidor
+      const nuevoCodigo = generarCodigoPedidoUnico();
+      setCodigoReserva(nuevoCodigo);
+      setNumeroPedido(nuevoCodigo);
+
+      const itemsParaReservar = carrito.map((item) => ({
+        idproducto: item.id,
+        nombre: item.nombre,
+        precio: item.precio,
+        cantidad: item.cantidad,
+      }));
+
+      const res = await fetch('/api/reserva/iniciar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          codigoReserva: nuevoCodigo,
+          items: itemsParaReservar,
+          usuarioId: usuario?.id || null,
+          email: email || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorStock(data.error || 'No fue posible apartar las unidades del pedido');
+        setCargandoReserva(false);
+        return;
+      }
+
+      // Guardar en sessionStorage para persistencia en recarga
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(
+          'somate_reserva_activa',
+          JSON.stringify({
+            codigoReserva: nuevoCodigo,
+            expiraEn: data.expiraEn,
+          })
+        );
+      }
+
+      setSegundosRestantes(120);
+      setReservaActiva(true);
+      setReservaExpirada(false);
+    } catch (err: any) {
+      console.error('Error al inicializar reserva:', err);
+    } finally {
+      setCargandoReserva(false);
+    }
+  }, [carrito, usuario?.id, email]);
+
+  // Disparar la reserva al entrar con productos
+  useEffect(() => {
+    if (carrito.length > 0 && !reservaActiva && !reservaExpirada && !codigoReserva) {
+      iniciarORestaurarReserva();
+    }
+  }, [carrito.length, reservaActiva, reservaExpirada, codigoReserva, iniciarORestaurarReserva]);
+
+  // Intervalo del temporizador de 2 minutos
+  useEffect(() => {
+    if (!reservaActiva || reservaExpirada) return;
+
+    const interval = setInterval(() => {
+      setSegundosRestantes((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setReservaExpirada(true);
+          setReservaActiva(false);
+
+          // Notificar al backend para devolver el stock al inventario
+          if (codigoReserva) {
+            fetch('/api/reserva/liberar', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                codigoReserva,
+                motivo: 'expirada',
+                items: carrito.map((it) => ({
+                  idproducto: it.id,
+                  cantidad: it.cantidad,
+                })),
+              }),
+            }).catch(console.error);
+          }
+
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('somate_reserva_activa');
+          }
+
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [reservaActiva, reservaExpirada, codigoReserva, carrito]);
+
+  const handleReintentarReserva = () => {
+    setReservaExpirada(false);
+    iniciarORestaurarReserva();
+  };
+
+  const handleVolverTienda = async () => {
+    if (codigoReserva && !reservaExpirada) {
+      try {
+        await fetch('/api/reserva/liberar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            codigoReserva,
+            motivo: 'cancelada',
+            items: carrito.map((it) => ({
+              idproducto: it.id,
+              cantidad: it.cantidad,
+            })),
+          }),
+        });
+      } catch {
+        // Ignorar
+      }
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('somate_reserva_activa');
+      }
+    }
+    router.push('/');
+  };
 
   const handleInlineLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,8 +416,13 @@ export default function ConfirmacionPagoPage() {
       return;
     }
 
+    if (reservaExpirada) {
+      alert("El tiempo de reserva de 2 minutos ha finalizado. Por favor presiona 'Volver a reservar' para continuar con la compra.");
+      return;
+    }
+
     setErrores({});
-    const codigo = `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+    const codigo = codigoReserva || numeroPedido || generarCodigoPedidoUnico();
     setNumeroPedido(codigo);
 
     if (metodoPago === 'webpay') {
@@ -420,7 +606,13 @@ export default function ConfirmacionPagoPage() {
               <svg className="w-3.5 h-3.5 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
               <span className="text-[#314235] font-bold">Compra Segura</span><span>·</span><span>Envío a todo Chile</span>
             </div>
-            <Link href="/" className="font-semibold text-stone-600 hover:text-[#314235] transition flex items-center gap-1">← <span className="hidden xs:inline">Volver a la</span> tienda</Link>
+            <button
+              type="button"
+              onClick={handleVolverTienda}
+              className="font-semibold text-stone-600 hover:text-[#314235] transition flex items-center gap-1 cursor-pointer"
+            >
+              ← <span className="hidden xs:inline">Volver a la</span> tienda
+            </button>
           </div>
         </div>
       </header>
@@ -434,10 +626,32 @@ export default function ConfirmacionPagoPage() {
       </section>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-12 flex-1 w-full">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="brand-serif text-2xl sm:text-3xl font-bold text-stone-900">Revisión y Confirmación de Pedido</h1>
           <p className="text-stone-600 text-sm mt-1">Verifica la ubicación de despacho, el detalle de tus productos y el método de pago seleccionado.</p>
         </div>
+
+        {errorStock && (
+          <div className="w-full bg-rose-50 border border-rose-300 text-rose-800 rounded-2xl p-4 mb-6 flex items-start gap-3">
+            <svg className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p className="font-bold text-sm">Disponibilidad de Inventario</p>
+              <p className="text-xs text-rose-700 mt-0.5">{errorStock}</p>
+            </div>
+          </div>
+        )}
+
+        <TimerReserva
+          segundosRestantes={segundosRestantes}
+          totalSegundos={120}
+          estaExpirado={reservaExpirada}
+          cargandoReserva={cargandoReserva}
+          codigoReserva={codigoReserva}
+          onReintentarReserva={handleReintentarReserva}
+          onVolverTienda={handleVolverTienda}
+        />
 
         <form noValidate onSubmit={handleConfirmarPedido} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
@@ -592,15 +806,21 @@ export default function ConfirmacionPagoPage() {
               {/* BOTON DE PAGO: CAMBIA SU TEXTO SI ESTÁ CARGANDO Y SEGÚN EL MÉTODO */}
               <button
                 type="submit"
-                disabled={carrito.length === 0 || procesandoPago}
+                disabled={carrito.length === 0 || procesandoPago || reservaExpirada || !!errorStock || cargandoReserva}
                 className="mt-6 w-full bg-[#314235] hover:bg-[#243127] text-white py-4 rounded-full font-bold text-sm transition shadow-lg hover:shadow-xl disabled:bg-stone-400 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>
                   {procesandoPago
                     ? `Conectando con ${metodoPago === 'webpay' ? 'Webpay' : 'Mercado Pago'}...`
+                    : cargandoReserva
+                    ? 'Apartando stock...'
+                    : reservaExpirada
+                    ? 'Reserva Expirada - Vuelve a Reservar'
+                    : errorStock
+                    ? 'Sin stock disponible'
                     : `Pagar con ${metodoPago === 'webpay' ? 'Webpay Plus' : 'Mercado Pago'}`}
                 </span>
-                {!procesandoPago && <span>→</span>}
+                {!procesandoPago && !reservaExpirada && !errorStock && !cargandoReserva && <span>→</span>}
               </button>
             </div>
           </div>

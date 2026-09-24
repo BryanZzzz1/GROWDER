@@ -14,13 +14,25 @@ function ExitoContent() {
   // Creamos una referencia para saber si ya limpiamos el carrito
   const carritoYaLimpiado = useRef(false);
 
-  // Limpiar el carrito SOLO una vez
+  // Limpiar el carrito y completar la reserva de stock
   useEffect(() => {
     if (limpiarCarrito && !carritoYaLimpiado.current) {
       limpiarCarrito();
-      carritoYaLimpiado.current = true; // Marcamos como limpio para evitar el bucle
+      carritoYaLimpiado.current = true;
     }
-  }, [limpiarCarrito]);
+
+    if (orden) {
+      fetch('/api/reserva/completar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigoReserva: orden }),
+      }).catch(console.error);
+
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('somate_reserva_activa');
+      }
+    }
+  }, [limpiarCarrito, orden]);
 
   const formatearPrecio = (valor: string | null) => {
     if (!valor) return '';

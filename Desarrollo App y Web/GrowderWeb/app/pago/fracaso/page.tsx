@@ -2,11 +2,39 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 function FracasoContent() {
   const searchParams = useSearchParams();
   const motivo = searchParams.get('motivo');
+
+  // Liberar el stock reservado al fracasar o cancelarse el pago
+  useEffect(() => {
+    let codigo = searchParams.get('orden');
+    if (!codigo && typeof window !== 'undefined') {
+      const guardada = sessionStorage.getItem('somate_reserva_activa');
+      if (guardada) {
+        try {
+          const parsed = JSON.parse(guardada);
+          codigo = parsed.codigoReserva;
+        } catch {
+          // Ignorar
+        }
+      }
+    }
+
+    if (codigo) {
+      fetch('/api/reserva/liberar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigoReserva: codigo, motivo: 'cancelada' }),
+      }).catch(console.error);
+
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('somate_reserva_activa');
+      }
+    }
+  }, [searchParams]);
 
   let mensajeError = "Ocurrió un problema al procesar tu pago con Webpay.";
   if (motivo === 'cancelado') mensajeError = "Cancelaste el proceso de pago en la pantalla de Transbank.";

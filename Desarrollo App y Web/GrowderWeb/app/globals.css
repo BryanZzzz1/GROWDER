@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  --font-serif: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+}
+
 :root {
+  --font-calibri: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
   --ink: #2d2a23;
   --cream: #f8f3e9;
   --olive: hwb(42 32% 55%);
@@ -18,16 +24,26 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
+html,
+body,
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif !important;
+}
+
 body {
   margin: 0;
   width: 100%;
-  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
   color: var(--ink);
   background-color: var(--cream);
 }
 
-.brand-serif {
-  font-family: var(--font-fraunces), "Fraunces", Georgia, serif;
+.brand-serif,
+.font-serif {
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif !important;
 }
 
 .site-shell {
