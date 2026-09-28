@@ -56,19 +56,25 @@ export class PagoExitoPage implements OnInit {
     }
   }
 
-  async registrarCompraExitosa() {
-    const user = await this.bd.getCurrentUser();
-    if (user) {
+async registrarCompraExitosa() {
+    // Asegúrate de importar SupabaseService en el constructor si no lo tienes
+    const session = await this.supabase.client.auth.getSession();
+    const userId = session.data.session?.user.id;
+
+    if (userId) {
       try {
-        await this.bd.realizarCompra(user.username);
+        // Ejecutamos la transacción irrompible en BD
+        const { error } = await this.supabase.client.rpc('procesar_compra_y_descontar_stock', {
+           p_user_id: userId,
+           p_codigo_pedido: this.orden // Ej: SM-491058
+        });
+
+        if (error) throw new Error(error.message);
+        
+        console.log('Stock descontado, historial guardado y carrito vaciado.');
       } catch (error) {
-        console.error('Error al registrar la compra en BD:', error);
+        console.error('Error procesando el stock:', error);
       }
     }
     this.procesando = false;
   }
-
-  volverATienda() {
-    this.router.navigate(['/tienda']);
-  }
-}

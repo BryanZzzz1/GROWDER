@@ -12,7 +12,6 @@ function generarCodigoPedidoUnico(): string {
   return `SM-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-// Regiones oficiales de Chile
 const REGIONES_CHILE = [
   'Región Metropolitana de Santiago',
   'Arica y Parinacota',
@@ -32,7 +31,7 @@ const REGIONES_CHILE = [
   'Magallanes y de la Antártica Chilena',
 ];
 
-const COSTO_ENVIO_FIJO = 2650; // $2.650 CLP fijo
+const COSTO_ENVIO_FIJO = 2650; 
 
 export default function ConfirmacionPagoPage() {
   const router = useRouter();
@@ -41,7 +40,6 @@ export default function ConfirmacionPagoPage() {
 
   const [estaAutenticado, setEstaAutenticado] = useState<boolean | null>(null);
 
-  // Estados para inicio de sesión o registro inline
   const [tabAuth, setTabAuth] = useState<'login' | 'registro'>('login');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -49,7 +47,6 @@ export default function ConfirmacionPagoPage() {
   const [authCargandoSubmit, setAuthCargandoSubmit] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  // Estados de Ubicación y Envío
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -59,15 +56,12 @@ export default function ConfirmacionPagoPage() {
   const [depto, setDepto] = useState('');
   const [instrucciones, setInstrucciones] = useState('');
 
-  // Método de pago seleccionado
   const [metodoPago, setMetodoPago] = useState<'mercadopago' | 'webpay'>('webpay');
   const [procesandoPago, setProcesandoPago] = useState(false);
 
-  // Estado del modal de confirmación final (Para pagos manuales si llegaran a existir)
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
 
-  // Estados para el temporizador y reserva de stock de 2 minutos
   const [codigoReserva, setCodigoReserva] = useState<string | null>(null);
   const [segundosRestantes, setSegundosRestantes] = useState<number>(120);
   const [reservaExpirada, setReservaExpirada] = useState<boolean>(false);
@@ -75,7 +69,6 @@ export default function ConfirmacionPagoPage() {
   const [reservaActiva, setReservaActiva] = useState<boolean>(false);
   const [errorStock, setErrorStock] = useState<string | null>(null);
 
-  // Verificación robusta de sesión
   useEffect(() => {
     let montado = true;
 
@@ -141,9 +134,6 @@ export default function ConfirmacionPagoPage() {
     };
   }, [usuario, authCargando]);
 
-  // ============================================================================
-  // GESTIÓN DE RESERVA DE STOCK (6 MINUTOS)
-  // ============================================================================
   const iniciarORestaurarReserva = useCallback(async () => {
     if (carrito.length === 0) return;
 
@@ -151,7 +141,6 @@ export default function ConfirmacionPagoPage() {
     setErrorStock(null);
 
     try {
-      // 1. Revisar si existe una reserva previa en sessionStorage
       const guardada =
         typeof window !== 'undefined'
           ? sessionStorage.getItem('somate_reserva_activa')
@@ -180,7 +169,6 @@ export default function ConfirmacionPagoPage() {
         }
       }
 
-      // 2. Iniciar una nueva reserva de stock en el servidor
       const nuevoCodigo = generarCodigoPedidoUnico();
       setCodigoReserva(nuevoCodigo);
       setNumeroPedido(nuevoCodigo);
@@ -211,7 +199,6 @@ export default function ConfirmacionPagoPage() {
         return;
       }
 
-      // Guardar en sessionStorage para persistencia en recarga
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(
           'somate_reserva_activa',
@@ -232,14 +219,12 @@ export default function ConfirmacionPagoPage() {
     }
   }, [carrito, usuario?.id, email]);
 
-  // Disparar la reserva al entrar con productos
   useEffect(() => {
     if (carrito.length > 0 && !reservaActiva && !reservaExpirada && !codigoReserva) {
       iniciarORestaurarReserva();
     }
   }, [carrito.length, reservaActiva, reservaExpirada, codigoReserva, iniciarORestaurarReserva]);
 
-  // Intervalo del temporizador de 2 minutos
   useEffect(() => {
     if (!reservaActiva || reservaExpirada) return;
 
@@ -250,7 +235,6 @@ export default function ConfirmacionPagoPage() {
           setReservaExpirada(true);
           setReservaActiva(false);
 
-          // Notificar al backend para devolver el stock al inventario
           if (codigoReserva) {
             fetch('/api/reserva/liberar', {
               method: 'POST',
@@ -300,7 +284,6 @@ export default function ConfirmacionPagoPage() {
           }),
         });
       } catch {
-        // Ignorar
       }
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('somate_reserva_activa');
@@ -398,9 +381,6 @@ export default function ConfirmacionPagoPage() {
     return nuevosErrores;
   };
 
-  // ============================================================================
-  // INTEGRACIÓN WEBPAY & MERCADO PAGO AL CONFIRMAR
-  // ============================================================================
   const handleConfirmarPedido = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -424,11 +404,37 @@ export default function ConfirmacionPagoPage() {
     setErrores({});
     const codigo = codigoReserva || numeroPedido || generarCodigoPedidoUnico();
     setNumeroPedido(codigo);
+    setProcesandoPago(true);
 
-    if (metodoPago === 'webpay') {
-      // 1. INICIAR FLUJO DE WEBPAY
-      setProcesandoPago(true);
-      try {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error: dbError } = await supabase
+        .from('pedidos')
+        .insert({
+          codigo_pedido: codigo,
+          usuario_id: session?.user?.id || null, 
+          email_cliente: session?.user?.email || email, 
+          nombre_cliente: nombre,
+          telefono_cliente: telefono,
+          region: region,
+          comuna: comuna,
+          direccion: direccion,
+          depto: depto || null,
+          instrucciones: instrucciones || null,
+          metodo_pago: metodoPago,
+          estado: 'pendiente', 
+          subtotal: total,
+          costo_envio: COSTO_ENVIO_FIJO,
+          total: totalFinal,
+          items: carrito
+        });
+
+      if (dbError && dbError.code !== '23505') { 
+        throw dbError;
+      }
+
+      if (metodoPago === 'webpay') {
         const response = await fetch('/api/webpay/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -459,15 +465,7 @@ export default function ConfirmacionPagoPage() {
           alert("Error al inicializar Webpay. Intenta nuevamente.");
           setProcesandoPago(false);
         }
-      } catch (error) {
-        console.error("Error en Webpay:", error);
-        alert("Ocurrió un error al conectar con el servidor de pagos.");
-        setProcesandoPago(false);
-      }
-    } else if (metodoPago === 'mercadopago') {
-      // 2. INICIAR FLUJO DE MERCADO PAGO
-      setProcesandoPago(true);
-      try {
+      } else if (metodoPago === 'mercadopago') {
         const response = await fetch('/api/mercadopago/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -480,17 +478,17 @@ export default function ConfirmacionPagoPage() {
         const data = await response.json();
 
         if (data.url) {
-          // Redirigir al cliente a la pasarela de Mercado Pago
           window.location.href = data.url;
         } else {
           alert("Error al inicializar Mercado Pago. Intenta nuevamente.");
           setProcesandoPago(false);
         }
-      } catch (error) {
-        console.error("Error en Mercado Pago:", error);
-        alert("Ocurrió un error al conectar con Mercado Pago.");
-        setProcesandoPago(false);
       }
+
+    } catch (error) {
+      console.error("Error al registrar o procesar el pedido:", error);
+      alert("Ocurrió un error al procesar tu orden. Por favor, intenta de nuevo.");
+      setProcesandoPago(false);
     }
   };
 
@@ -803,7 +801,6 @@ export default function ConfirmacionPagoPage() {
                 <div className="mt-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5"><svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><div><span className="font-bold block">Faltan campos por completar</span><span>Revisa los campos destacados en rojo.</span></div></div>
               )}
 
-              {/* BOTON DE PAGO: CAMBIA SU TEXTO SI ESTÁ CARGANDO Y SEGÚN EL MÉTODO */}
               <button
                 type="submit"
                 disabled={carrito.length === 0 || procesandoPago || reservaExpirada || !!errorStock || cargandoReserva}

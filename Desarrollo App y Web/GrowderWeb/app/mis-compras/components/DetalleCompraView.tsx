@@ -41,10 +41,6 @@ export function DetalleCompraView({
     }
   };
 
-  const textoWhatsapp = encodeURIComponent(
-    `Hola SuMateCL! Tengo una consulta sobre mi compra ${pedido.codigo_pedido} despachada a ${pedido.comuna}, ${pedido.region}.`
-  );
-
   return (
     <div className="space-y-6">
       {/* Navegación y Breadcrumb */}
@@ -65,11 +61,9 @@ export function DetalleCompraView({
         </span>
       </div>
 
-      {/* Grid de 2 columnas: Seguimiento (Izquierda) y Detalle de Compra (Derecha) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* COLUMNA IZQUIERDA (7 cols): Seguimiento y Logística */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Stepper vertical de seguimiento */}
           <SeguimientoStepper
             estado={pedido.estado}
             fechaCreacion={pedido.created_at}
@@ -81,7 +75,7 @@ export function DetalleCompraView({
             region={pedido.region}
           />
 
-          {/* Tarjeta de Guía de Transporte y Ayuda */}
+          {/* Tarjeta de Guía de Transporte (Adaptada a Reparto Interno) */}
           <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-xs space-y-4">
             <h4 className="text-sm font-bold text-stone-900">
               Datos de tu Despacho
@@ -89,15 +83,15 @@ export function DetalleCompraView({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded-2xl bg-[#fdfbf7] border border-stone-200">
-                <span className="text-stone-400 block text-[11px] font-medium">Empresa a cargo:</span>
+                <span className="text-stone-400 block text-[11px] font-medium">Repartidor Asignado:</span>
                 <strong className="text-stone-900 font-bold text-sm block mt-0.5">
-                  {pedido.empresa_transporte || "Transporte asignado por SuMate"}
+                  {pedido.empresa_transporte || "Logística interna SuMate"}
                 </strong>
               </div>
 
               <div className="p-3 rounded-2xl bg-[#fdfbf7] border border-stone-200 flex items-center justify-between">
                 <div>
-                  <span className="text-stone-400 block text-[11px] font-medium">N° de Guía / Rastreo:</span>
+                  <span className="text-stone-400 block text-[11px] font-medium">Identificador de Ruta:</span>
                   <strong className="font-mono text-stone-900 text-sm block mt-0.5">
                     {pedido.numero_seguimiento || "Por asignar en empaque"}
                   </strong>
@@ -114,36 +108,23 @@ export function DetalleCompraView({
               </div>
             </div>
 
-            {/* Acciones de Soporte y WhatsApp */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-              <a
-                href={`https://wa.me/56912345678?text=${textoWhatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-[#25D366] hover:bg-[#20b858] text-white font-bold text-xs transition shadow-xs"
-              >
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span>Consultar por WhatsApp</span>
-              </a>
-
-              {onVolverAComprar && (
+            {/* Acción de Volver a comprar */}
+            {onVolverAComprar && (
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
                 <button
                   type="button"
                   onClick={() => onVolverAComprar(pedido)}
-                  className="w-full sm:w-auto py-3 px-5 rounded-full border border-stone-300 hover:bg-[#f8f3e9] text-stone-700 font-bold text-xs transition cursor-pointer"
+                  className="w-full py-3 px-5 rounded-full border border-[#314235] text-[#314235] hover:bg-[#314235] hover:text-white font-bold text-xs transition cursor-pointer"
                 >
                   Volver a comprar
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* COLUMNA DERECHA (5 cols): Detalle de la Compra */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Tarjeta con los productos y desglose */}
           <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-xs space-y-5">
             <div>
               <span className="text-[11px] uppercase font-bold tracking-wider text-stone-400 block">
@@ -157,7 +138,6 @@ export function DetalleCompraView({
               </p>
             </div>
 
-            {/* Lista de productos comprados */}
             <div className="divide-y divide-stone-100 border-t border-b border-stone-100 py-2">
               {pedido.items?.map((item, idx) => (
                 <div key={idx} className="py-3 flex items-center justify-between gap-3">
@@ -192,7 +172,6 @@ export function DetalleCompraView({
               ))}
             </div>
 
-            {/* Desglose de Precios */}
             <div className="space-y-2 text-xs">
               <div className="flex justify-between text-stone-600">
                 <span>Subtotal productos:</span>
@@ -212,7 +191,6 @@ export function DetalleCompraView({
               </div>
             </div>
 
-            {/* Dirección de Destino */}
             <div className="pt-3 border-t border-stone-100 text-xs space-y-1 text-stone-600">
               <span className="font-bold text-stone-800 block text-[11px] uppercase tracking-wider">
                 Dirección de entrega

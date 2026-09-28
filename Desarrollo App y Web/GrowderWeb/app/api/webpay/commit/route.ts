@@ -1,13 +1,34 @@
 import { NextResponse } from 'next/server';
 import { WebpayPlus, Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes } from 'transbank-sdk';
+import { supabase } from '@/src/lib/supabase';
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const token_ws = searchParams.get('token_ws');
-  const TBK_TOKEN = searchParams.get('TBK_TOKEN');
-  const TBK_ORDEN_COMPRA = searchParams.get('TBK_ORDEN_COMPRA');
+// Función para obtener la URL pública real (Vital cuando usas Ngrok)
+function obtenerDominioReal(request: Request) {
+  const headers = request.headers;
+  const host = headers.get('x-forwarded-host') || headers.get('host');
+  const proto = headers.get('x-forwarded-proto') || 'http';
+  return `${proto}://${host}`;
+}
 
-  // Si el usuario canceló el pago en la pantalla de Webpay
+async function procesarRetornoTransbank(request: Request) {
+  const origin = obtenerDominioReal(request);
+  const url = new URL(request.url);
+  
+  let token_ws = url.searchParams.get('token_ws');
+  let TBK_TOKEN = url.searchParams.get('TBK_TOKEN');
+  
+  if (request.method === 'POST') {
+    try {
+      const bodyText = await request.text();
+      const params = new URLSearchParams(bodyText);
+      if (params.get('token_ws')) token_ws = params.get('token_ws');
+      if (params.get('TBK_TOKEN')) TBK_TOKEN = params.get('TBK_TOKEN');
+    } catch (e) {
+      console.warn("No se pudo leer el body del POST");
+    }
+  }
+
+  // Rutas actualizadas a tu estructura original (/pago/...)
   if (TBK_TOKEN && !token_ws) {
     return NextResponse.redirect(`${origin}/pago/fracaso?motivo=cancelado`);
   }
@@ -20,21 +41,42 @@ export async function GET(request: Request) {
     const tx = new WebpayPlus.Transaction(
       new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration)
     );
-
-    // Confirmar el pago con Transbank
+    
     const commitResponse = await tx.commit(token_ws);
 
     if (commitResponse.status === 'AUTHORIZED') {
-      // PAGO APROBADO: Aquí (en el futuro) actualizarás tu base de datos Supabase
-      // marcando el pedido como "Pagado"
       
-      return NextResponse.redirect(`${origin}/pago/exito?orden=${commitResponse.buy_order}&monto=${commitResponse.amount}`);
+      await supabase
+        .from('pedidos')
+        .update({ estado: 'pendiente', updated_at: new Date().toISOString() })
+        .eq('codigo_pedido', commitResponse.buy_order);
+      
+      try {
+        await fetch('http://127.0.0.1:3000/api/reserva/completar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigoReserva: commitResponse.buy_order }),
+        });
+      } catch (error) {
+        console.error('Error al ejecutar el descuento de stock interno:', error);
+      }
+
+      // Redirección a la carpeta anidada
+      return NextResponse.redirect(`${origin}/pago/exito?orden=${commitResponse.buy_order}&monto=${commitResponse.amount}&token_ws=${token_ws}`);
+    
     } else {
-      // PAGO RECHAZADO (Sin saldo, tarjeta bloqueada, etc.)
       return NextResponse.redirect(`${origin}/pago/fracaso?motivo=rechazado`);
     }
   } catch (error) {
-    console.error("Error al confirmar pago:", error);
+    console.error("Error al confirmar pago con Transbank:", error);
     return NextResponse.redirect(`${origin}/pago/fracaso?motivo=error_confirmacion`);
   }
+}
+
+export async function GET(request: Request) {
+  return procesarRetornoTransbank(request);
+}
+
+export async function POST(request: Request) {
+  return procesarRetornoTransbank(request);
 }

@@ -1,7 +1,11 @@
+"use client";
+
 import { Usuario } from "../types";
+import Link from "next/link";
 
 interface RolesTabProps {
-  usuarios: Usuario[];
+  usuariosEquipo: Usuario[];
+  usuariosClientes: Usuario[];
   cargandoUsuarios: boolean;
   busquedaUsuario: string;
   setBusquedaUsuario: (val: string) => void;
@@ -12,7 +16,8 @@ interface RolesTabProps {
 }
 
 export function RolesTab({
-  usuarios,
+  usuariosEquipo,
+  usuariosClientes,
   cargandoUsuarios,
   busquedaUsuario,
   setBusquedaUsuario,
@@ -21,6 +26,149 @@ export function RolesTab({
   onCambiarRol,
   onToggleEstadoUsuario,
 }: RolesTabProps) {
+  
+  // Función reutilizable para renderizar las tablas con tu diseño original
+  const renderTablaUsuarios = (usuarios: Usuario[], esSeccionClientes: boolean) => {
+    if (usuarios.length === 0) {
+      return (
+        <div className="my-6 rounded-2xl bg-[#f8f3e9] px-5 py-8 text-center">
+          <h3 className="brand-serif text-lg text-[#2d2a23]">
+            No se encontraron usuarios
+          </h3>
+          <p className="mt-1 text-sm text-stone-600">
+            {busquedaUsuario
+              ? `No hay coincidencias para "${busquedaUsuario}".`
+              : "No hay usuarios registrados en esta categoría."}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full text-left border-collapse whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-stone-200 text-xs font-bold text-stone-500 uppercase tracking-wider">
+              <th className="py-3 px-4">Usuario</th>
+              <th className="py-3 px-4">Teléfono</th>
+              <th className="py-3 px-4">Rol actual</th>
+              <th className="py-3 px-4 text-center">Estado</th>
+              <th className="py-3 px-4 text-right">Asignar Rol</th>
+              {esSeccionClientes && <th className="py-3 px-4 text-center">Acciones</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-100 text-sm">
+            {usuarios.map((u) => {
+              const rolActual = u.rol_id || 3;
+              const esGuardando = guardandoRolId === u.id;
+
+              return (
+                <tr
+                  key={u.id}
+                  className={`transition ${!u.activo ? "bg-stone-50/70" : "hover:bg-stone-50/60"}`}
+                >
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm uppercase shrink-0 ${
+                          u.activo ? "bg-[#314235]" : "bg-stone-400"
+                        }`}
+                      >
+                        {u.email?.charAt(0) || "U"}
+                      </div>
+                      <div className="min-w-0">
+                        <p
+                          className={`font-semibold truncate ${
+                            !u.activo ? "text-stone-500 line-through" : "text-[#2d2a23]"
+                          }`}
+                        >
+                          {u.email}
+                        </p>
+                        <span className="text-[11px] text-stone-400 font-mono">
+                          ID: {u.id.slice(0, 8)}...
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="py-4 px-4 text-stone-600 text-xs">
+                    {u.telefono || "No registrado"}
+                  </td>
+
+                  <td className="py-4 px-4">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                        !u.activo
+                          ? "bg-stone-100 text-stone-500"
+                          : rolActual === 1
+                            ? "bg-[#314235] text-white"
+                            : rolActual === 2
+                              ? "bg-[#e8d5c4] text-[#884326]"
+                              : "bg-stone-100 text-stone-700"
+                      }`}
+                    >
+                      {rolActual === 1 && "👑 Admin"}
+                      {rolActual === 2 && "✍️ Editor"}
+                      {rolActual === 3 && "👤 Cliente"}
+                    </span>
+                  </td>
+
+                  <td className="py-4 px-4 text-center">
+                    <button
+                      onClick={() => onToggleEstadoUsuario(u.id, !!u.activo)}
+                      disabled={esGuardando}
+                      className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold transition cursor-pointer disabled:opacity-50 ${
+                        u.activo
+                          ? "bg-emerald-100 text-emerald-800 hover:bg-red-100 hover:text-red-800"
+                          : "bg-red-100 text-red-800 hover:bg-emerald-100 hover:text-emerald-800"
+                      }`}
+                    >
+                      {u.activo ? "Activa" : "Suspendida"}
+                    </button>
+                  </td>
+
+                  <td className="py-4 px-4 text-right">
+                    <div className="inline-flex items-center gap-2 justify-end">
+                      {esGuardando && (
+                        <div className="w-4 h-4 border-2 border-[#314235] border-t-transparent rounded-full animate-spin" />
+                      )}
+                      <select
+                        value={rolActual}
+                        disabled={esGuardando || !u.activo}
+                        onChange={(e) => onCambiarRol(u.id, parseInt(e.target.value))}
+                        className="rounded-xl border border-stone-300 bg-[#fdfbf7] px-3 py-1.5 text-xs font-semibold text-[#2d2a23] focus:outline-none focus:ring-2 focus:ring-[#314235] cursor-pointer disabled:opacity-50"
+                      >
+                        <option value={3}>3 - Cliente</option>
+                        <option value={2}>2 - Editor</option>
+                        <option value={1}>1 - Administrador</option>
+                      </select>
+                    </div>
+                  </td>
+
+                  {esSeccionClientes && (
+                    <td className="py-4 px-4 text-center">
+                      <Link
+                        href={`/admin/clientes/${u.id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#8C7762] hover:bg-[#725F4C] text-white text-[10px] font-bold rounded-lg transition shadow-sm"
+                        title="Visualizar compras e información personal"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver Info
+                      </Link>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <section className="mt-8 rounded-[1.75rem] border border-stone-800/10 bg-white p-6 sm:p-8 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-200">
@@ -93,7 +241,6 @@ export function RolesTab({
         </div>
       </div>
 
-      {/* Listado de Usuarios */}
       {cargandoUsuarios ? (
         <div className="my-12 py-12 text-center">
           <div className="w-8 h-8 border-4 border-[#314235] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -101,124 +248,37 @@ export function RolesTab({
             Cargando usuarios registrados...
           </p>
         </div>
-      ) : usuarios.length === 0 ? (
-        <div className="my-10 rounded-2xl bg-[#f8f3e9] px-5 py-10 text-center">
-          <h3 className="brand-serif text-lg text-[#2d2a23]">
-            No se encontraron usuarios
-          </h3>
-          <p className="mt-1 text-sm text-stone-600">
-            {busquedaUsuario
-              ? `No hay usuarios con el criterio "${busquedaUsuario}".`
-              : "No hay usuarios registrados en la base de datos."}
-          </p>
-        </div>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-stone-200 text-xs font-bold text-stone-500 uppercase tracking-wider">
-                <th className="py-3 px-4">Usuario</th>
-                <th className="py-3 px-4">Teléfono</th>
-                <th className="py-3 px-4">Rol actual</th>
-                <th className="py-3 px-4 text-center">Estado</th>
-                <th className="py-3 px-4 text-right">Asignar Rol</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100 text-sm">
-              {usuarios.map((u) => {
-                const rolActual = u.rol_id || 3;
-                const esGuardando = guardandoRolId === u.id;
+        <div className="space-y-10 mt-10">
+          {/* SECCIÓN 1: EQUIPO DE TRABAJO */}
+          <div>
+            <div className="mb-2 pb-2 border-b border-stone-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[#314235] flex items-center gap-2">
+                Equipo de Trabajo
+                <span className="text-xs font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full ml-2">
+                  {usuariosEquipo.length}
+                </span>
+              </h3>
+              <p className="text-xs text-stone-400">Administradores y Editores</p>
+            </div>
+            {renderTablaUsuarios(usuariosEquipo, false)}
+          </div>
 
-                return (
-                  <tr
-                    key={u.id}
-                    className={`transition ${!u.activo ? "bg-stone-50/70" : "hover:bg-stone-50/60"}`}
-                  >
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm uppercase shrink-0 ${
-                            u.activo ? "bg-[#314235]" : "bg-stone-400"
-                          }`}
-                        >
-                          {u.email?.charAt(0) || "U"}
-                        </div>
-                        <div className="min-w-0">
-                          <p
-                            className={`font-semibold truncate ${
-                              !u.activo ? "text-stone-500 line-through" : "text-[#2d2a23]"
-                            }`}
-                          >
-                            {u.email}
-                          </p>
-                          <span className="text-[11px] text-stone-400 font-mono">
-                            ID: {u.id.slice(0, 8)}...
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="py-4 px-4 text-stone-600 text-xs">
-                      {u.telefono || "No registrado"}
-                    </td>
-
-                    <td className="py-4 px-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                          !u.activo
-                            ? "bg-stone-100 text-stone-500"
-                            : rolActual === 1
-                              ? "bg-[#314235] text-white"
-                              : rolActual === 2
-                                ? "bg-[#e8d5c4] text-[#884326]"
-                                : "bg-stone-100 text-stone-700"
-                        }`}
-                      >
-                        {rolActual === 1 && "👑 Admin"}
-                        {rolActual === 2 && "✍️ Editor"}
-                        {rolActual === 3 && "👤 Cliente"}
-                      </span>
-                    </td>
-
-                    <td className="py-4 px-4 text-center">
-                      <button
-                        onClick={() => onToggleEstadoUsuario(u.id, !!u.activo)}
-                        disabled={esGuardando}
-                        className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold transition cursor-pointer disabled:opacity-50 ${
-                          u.activo
-                            ? "bg-emerald-100 text-emerald-800 hover:bg-red-100 hover:text-red-800"
-                            : "bg-red-100 text-red-800 hover:bg-emerald-100 hover:text-emerald-800"
-                        }`}
-                      >
-                        {u.activo ? "Activa" : "Suspendida"}
-                      </button>
-                    </td>
-
-                    <td className="py-4 px-4 text-right">
-                      <div className="inline-flex items-center gap-2 justify-end">
-                        {esGuardando && (
-                          <div className="w-4 h-4 border-2 border-[#314235] border-t-transparent rounded-full animate-spin" />
-                        )}
-                        <select
-                          value={rolActual}
-                          disabled={esGuardando || !u.activo}
-                          onChange={(e) => onCambiarRol(u.id, parseInt(e.target.value))}
-                          className="rounded-xl border border-stone-300 bg-[#fdfbf7] px-3 py-1.5 text-xs font-semibold text-[#2d2a23] focus:outline-none focus:ring-2 focus:ring-[#314235] cursor-pointer disabled:opacity-50"
-                        >
-                          <option value={3}>3 - Cliente</option>
-                          <option value={2}>2 - Editor</option>
-                          <option value={1}>1 - Administrador</option>
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* SECCIÓN 2: CLIENTES REGISTRADOS */}
+          <div>
+            <div className="mb-2 pb-2 border-b border-stone-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[#8C7762] flex items-center gap-2">
+                Clientes Registrados
+                <span className="text-xs font-normal text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full ml-2">
+                  {usuariosClientes.length}
+                </span>
+              </h3>
+              <p className="text-xs text-stone-400">Usuarios estándar</p>
+            </div>
+            {renderTablaUsuarios(usuariosClientes, true)}
+          </div>
         </div>
       )}
     </section>
   );
 }
-
