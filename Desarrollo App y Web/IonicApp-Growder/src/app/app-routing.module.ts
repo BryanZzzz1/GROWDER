@@ -53,24 +53,29 @@ const routes: Routes = [
   },
   {
     path: 'historial-compras',
-    loadChildren: () => import('./pages/historial-compras/historial-compras.module').then( m => m.HistorialComprasPageModule)
+    loadChildren: () => import('./pages/historial-compras/historial-compras.module').then(m => m.HistorialComprasPageModule)
   },
   {
     path: 'resumen-ventas',
-    loadChildren: () => import('./pages/resumen-ventas/resumen-ventas.module').then( m => m.ResumenVentasPageModule)
+    loadChildren: () => import('./pages/resumen-ventas/resumen-ventas.module').then(m => m.ResumenVentasPageModule)
   },
   {
     path: 'checkout',
-    loadChildren: () => import('./checkout/checkout.module').then( m => m.CheckoutPageModule)
+    loadChildren: () => import('./checkout/checkout.module').then(m => m.CheckoutPageModule)
   },
   {
     path: 'pago-exito',
-    loadChildren: () => import('./pago-exito/pago-exito.module').then( m => m.PagoExitoPageModule)
+    loadChildren: () => import('./pago-exito/pago-exito.module').then(m => m.PagoExitoPageModule)
   },
   {
-    path: '**',
-    loadChildren: () => import('./pages/notfound/notfound.module').then( m => m.NotfoundPageModule)
+    path: 'buscar',
+    loadChildren: () => import('./pages/buscar/buscar.module').then(m => m.BuscarPageModule)
   },
+  {
+    path: 'detalle-pedido/:id',
+    loadChildren: () => import('./pages/detalle-pedido/detalle-pedido.module').then(m => m.DetallePedidoPageModule)
+  },
+  { path: 'recuperar-password', loadChildren: () => import('./pages/recuperar-password/recuperar-password.module').then( m => m.RecuperarPasswordPageModule) }, { path: '**', loadChildren: () => import('./pages/notfound/notfound.module').then(m => m.NotfoundPageModule) }
 
 
 ];

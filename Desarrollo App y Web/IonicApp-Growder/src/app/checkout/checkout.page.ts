@@ -82,37 +82,122 @@ export class CheckoutPage implements OnInit {
       return;
     }
 
-    if (this.carrito.length === 0) {
+    if (!this.carrito || this.carrito.length === 0) {
       this.presentToast('Tu carrito está vacío.', 'warning');
       return;
     }
 
     this.procesando = true;
-    const datosEnvio = this.checkoutForm.value;
-    const orderId = `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+    const formValues = this.checkoutForm.value;
 
     try {
-      // AQUÍ ESTÁ EL GATILLO HACIA TU EDGE FUNCTION
-      const { data, error } = await this.supabase.client.functions.invoke('procesar-pago', {
+      // 1. Obtener sesión de usuario activa
+      const { data: { session } } = await this.supabase.client.auth.getSession();
+      const usuarioId = session?.user?.id || null;
+      const emailCliente = formValues.email?.trim() || session?.user?.email || '';
+
+      // 2. Generar código único de orden
+      const codigoOrden = `SM-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      // 3. Estructurar snapshot JSONB de items idéntico a la versión Web
+      const itemsPayload = this.carrito.map(p => ({
+        idproducto: p.idproducto,
+        nombre: p.nombre,
+        precio: p.precio,
+        cantidad: p.cantidad || 1,
+        imagen: p.foto || 'assets/placeholder-mate.png'
+      }));
+
+      // 4. Pre-persistencia en la tabla 'pedidos'
+      const { data: pedidoData, error: dbError } = await this.supabase.client
+        .from('pedidos')
+        .insert({
+          codigo_pedido: codigoOrden,
+          usuario_id: usuarioId,
+          nombre_cliente: formValues.nombre.trim(),
+          email_cliente: emailCliente,
+          telefono_cliente: formValues.telefono.trim(),
+          region: formValues.region,
+          comuna: formValues.comuna.trim(),
+          direccion: formValues.direccion.trim(),
+          depto: formValues.depto?.trim() || null,
+          instrucciones: formValues.instrucciones?.trim() || null,
+          metodo_pago: this.metodoPagoSeleccionado,
+          estado: 'pendiente',
+          subtotal: this.totalProductos,
+          costo_envio: this.costoEnvioFijo,
+          total: this.totalFinal,
+          items: itemsPayload
+        })
+        .select()
+        .single();
+
+      if (dbError && dbError.code !== '23505') {
+        throw new Error(`Error BD (${dbError.code}): ${dbError.message}`);
+      }
+
+      // 4.5. Inserción obligatoria en historial_compras
+      const itemsHistorial = this.carrito.map(p => ({
+        idproducto: p.idproducto,
+        nombre: p.nombre,
+        descripcion: p.descripcion || '',
+        precio: p.precio,
+        cantidad: p.cantidad || 1,
+        user_id: usuarioId,
+        foto: p.foto || 'assets/placeholder-mate.png',
+        fecha: new Date().toISOString()
+      }));
+
+      const { error: errorHistorial } = await this.supabase.client
+        .from('historial_compras')
+        .insert(itemsHistorial);
+
+      if (errorHistorial) {
+        console.error('[CHECKOUT] Error al insertar en historial_compras:', errorHistorial);
+      }
+
+      // 5. Invocación de Reserva / Descuento atómico de stock (si existe RPC)
+      try {
+        await this.supabase.client.rpc('crear_reserva_stock', {
+          p_codigo_reserva: codigoOrden,
+          p_items: itemsPayload,
+          p_duracion_segundos: 120,
+          p_usuario_id: usuarioId,
+          p_email: emailCliente
+        });
+      } catch (stockEx) {
+        console.warn('RPC crear_reserva_stock omitida o en fallback:', stockEx);
+      }
+
+      // 6. Invocación de Pasarela (Edge Function para Webpay o Mercado Pago)
+      const { data: gatewayData, error: gatewayError } = await this.supabase.client.functions.invoke('procesar-pago', {
         body: {
           metodo: this.metodoPagoSeleccionado,
           monto: this.totalFinal,
-          orden: orderId,
-          comprador: datosEnvio
+          orden: codigoOrden,
+          comprador: formValues
         }
       });
 
-      if (error) throw error;
-
-      if (data && data.url) {
-        // Redirige al usuario a la URL de pago de la pasarela generada por la Edge Function
-        window.location.href = data.url; 
-        // Nota: En móvil, usaremos un plugin InAppBrowser o Capacitor Browser para abrir esto sin salir de la app.
+      if (gatewayError) {
+        console.warn('Fallo en pasarela, pero pedido quedó registrado:', gatewayError);
       }
 
-    } catch (err) {
-      console.error('Error al procesar pago:', err);
-      this.presentToast('Ocurrió un error al conectar con el servidor de pagos.', 'danger');
+      // 7. Vaciar carrito y feedback al usuario
+      await this.bd.vaciarCarrito();
+      this.presentToast('¡Pedido registrado con éxito!', 'success');
+
+      if (gatewayData?.url) {
+        // Redirigir a pasarela en navegador / Capacitor Browser
+        window.location.href = gatewayData.url;
+      } else {
+        // Si no retorna URL inmediata, redirigir al historial
+        this.router.navigate(['/historial-compras']);
+      }
+
+    } catch (err: any) {
+      console.error('[CHECKOUT ERROR]:', err);
+      this.presentToast(err.message || 'Error al procesar el pedido', 'danger');
     } finally {
       this.procesando = false;
     }

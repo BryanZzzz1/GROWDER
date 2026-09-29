@@ -1,179 +1,166 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="light">
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/carro" text="Carrito"></ion-back-button>
+      <ion-button routerLink="/carro" class="back-btn-clean">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title class="ion-text-center brand-title">SuMateCL</ion-title>
+    <ion-title class="brand-serif">Finalizar Compra</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content color="light" class="ion-padding">
-  
-  <!-- Stepper Visual -->
-  <div class="stepper-container">
-    <div class="step completed">✓ Carrito</div>
-    <div class="line"></div>
-    <div class="step active">2 Despacho & Ubicación</div>
-    <div class="line"></div>
-    <div class="step pending">3 Método de Pago</div>
-  </div>
+<ion-content [fullscreen]="true" class="checkout-content">
+  <main class="checkout-shell">
+    
+    <!-- Visual Stepper -->
+    <div class="stepper">
+      <div class="step completed">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        <span>Carrito</span>
+      </div>
+      <div class="step-line active"></div>
+      <div class="step active">
+        <ion-icon name="location"></ion-icon>
+        <span>Despacho</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step pending">
+        <ion-icon name="card"></ion-icon>
+        <span>Pago</span>
+      </div>
+    </div>
 
-  <h1 class="page-title">Revisión y Confirmación de Pedido</h1>
-  <p class="page-subtitle">Verifica la ubicación de despacho, el detalle de tus productos y el método de pago seleccionado.</p>
-
-  <form [formGroup]="checkoutForm">
-    <!-- Tarjeta: Datos de Envío -->
-    <ion-card class="custom-card">
-      <ion-card-header>
-        <div class="header-flex">
-          <ion-icon name="location-outline" class="header-icon"></ion-icon>
-          <div>
-            <ion-card-title>Ubicación a donde se enviará</ion-card-title>
-            <ion-card-subtitle>Despacho a domicilio en todo el territorio nacional</ion-card-subtitle>
+    <form [formGroup]="checkoutForm" class="checkout-form">
+      
+      <!-- Shipping Card -->
+      <section class="checkout-section">
+        <h2 class="section-title">Datos de Envío</h2>
+        <div class="checkout-card">
+          <div class="input-row">
+            <div class="input-group">
+              <label>Nombre y Apellido *</label>
+              <input formControlName="nombre" placeholder="Ej: Matías González" type="text" />
+            </div>
           </div>
-          <ion-badge color="success" class="tarifa-badge">Tarifa Fija: $2.650 CLP</ion-badge>
-        </div>
-      </ion-card-header>
-
-      <ion-card-content>
-        <ion-row>
-          <ion-col size="12" size-md="6">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">NOMBRE Y APELLIDO *</ion-label>
-              <ion-input formControlName="nombre" placeholder="Ej: Matías González"></ion-input>
-            </ion-item>
-          </ion-col>
-          <ion-col size="12" size-md="6">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">TELÉFONO DE CONTACTO *</ion-label>
-              <ion-input formControlName="telefono" type="tel" placeholder="987213141"></ion-input>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-
-        <ion-item class="custom-input">
-          <ion-label position="stacked">CORREO ELECTRÓNICO *</ion-label>
-          <ion-input formControlName="email" type="email" placeholder="correo@gmail.com"></ion-input>
-        </ion-item>
-
-        <ion-row>
-          <ion-col size="12" size-md="6">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">REGIÓN *</ion-label>
-              <ion-select formControlName="region" interface="popover">
+          
+          <div class="input-row split">
+            <div class="input-group">
+              <label>Teléfono *</label>
+              <input formControlName="telefono" placeholder="+56 9 1234 5678" type="tel" />
+            </div>
+            <div class="input-group full-width-select">
+              <label>Región *</label>
+              <ion-select interface="action-sheet" formControlName="region" placeholder="Selecciona tu región" cancelText="Cancelar">
                 <ion-select-option *ngFor="let reg of regiones" [value]="reg">{{reg}}</ion-select-option>
               </ion-select>
-            </ion-item>
-          </ion-col>
-          <ion-col size="12" size-md="6">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">COMUNA / CIUDAD *</ion-label>
-              <ion-input formControlName="comuna" placeholder="Ej: Providencia"></ion-input>
-            </ion-item>
-          </ion-col>
-        </ion-row>
+            </div>
+          </div>
 
-        <ion-row>
-          <ion-col size="8">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">CALLE Y NÚMERO *</ion-label>
-              <ion-input formControlName="direccion" placeholder="Ej: Av. Providencia 1234"></ion-input>
-            </ion-item>
-          </ion-col>
-          <ion-col size="4">
-            <ion-item class="custom-input">
-              <ion-label position="stacked">DEPTO <span class="opcional">(Opcional)</span></ion-label>
-              <ion-input formControlName="depto" placeholder="Ej: 502"></ion-input>
-            </ion-item>
-          </ion-col>
-        </ion-row>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Comuna / Ciudad *</label>
+              <input formControlName="comuna" placeholder="Ej: Providencia" type="text" />
+            </div>
+          </div>
 
-        <ion-item class="custom-input">
-          <ion-label position="stacked">INSTRUCCIONES DE ENTREGA <span class="opcional">(Opcional)</span></ion-label>
-          <ion-textarea formControlName="instrucciones" placeholder="Ej: Dejar en conserjería..."></ion-textarea>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+          <div class="input-row split">
+            <div class="input-group flex-2">
+              <label>Calle y Número *</label>
+              <input formControlName="direccion" placeholder="Ej: Av. Principal 123" type="text" />
+            </div>
+            <div class="input-group flex-1">
+              <label>Depto/Casa</label>
+              <input formControlName="depto" placeholder="Opcional" type="text" />
+            </div>
+          </div>
 
-    <!-- Tarjeta: Método de Pago -->
-    <ion-card class="custom-card">
-      <ion-card-header>
-        <div class="header-flex">
-          <ion-icon name="card-outline" class="header-icon"></ion-icon>
-          <div>
-            <ion-card-title>Método de Pago</ion-card-title>
-            <ion-card-subtitle>Selecciona cómo deseas pagar tu compra</ion-card-subtitle>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Instrucciones de Entrega</label>
+              <textarea formControlName="instrucciones" rows="2" placeholder="Ej: Dejar en conserjería..."></textarea>
+            </div>
           </div>
         </div>
-      </ion-card-header>
+      </section>
 
-      <ion-card-content>
-        <ion-radio-group [(ngModel)]="metodoPagoSeleccionado" [ngModelOptions]="{standalone: true}">
-          <ion-item class="payment-option" [class.selected]="metodoPagoSeleccionado === 'webpay'" lines="none">
-            <ion-radio value="webpay" slot="start"></ion-radio>
-            <ion-label>
-              <h2>Webpay Plus (Transbank) <ion-badge color="danger">MODO PRUEBA</ion-badge></h2>
-              <p>Redcompra, débito y crédito a través de Transbank.</p>
-            </ion-label>
-          </ion-item>
+      <!-- Payment Method -->
+      <section class="checkout-section">
+        <h2 class="section-title">Método de Pago</h2>
+        <div class="checkout-card p-0">
+          <ion-radio-group [(ngModel)]="metodoPagoSeleccionado" [ngModelOptions]="{standalone: true}">
+            <div class="payment-option" [class.selected]="metodoPagoSeleccionado === 'webpay'">
+              <ion-radio value="webpay"></ion-radio>
+              <div class="payment-info">
+                <div class="payment-title">
+                  <span>Webpay Plus (Transbank)</span>
+                  <span class="badge badge-test">TEST</span>
+                </div>
+                <p>Paga con tarjeta de débito o crédito</p>
+              </div>
+            </div>
 
-          <ion-item class="payment-option" [class.selected]="metodoPagoSeleccionado === 'mercadopago'" lines="none">
-            <ion-radio value="mercadopago" slot="start"></ion-radio>
-            <ion-label>
-              <h2>Mercado Pago <ion-badge color="primary">MODO PRUEBA</ion-badge></h2>
-              <p>Tarjetas de crédito, débito y dinero en cuenta.</p>
-            </ion-label>
-          </ion-item>
-        </ion-radio-group>
-      </ion-card-content>
-    </ion-card>
+            <div class="payment-option" [class.selected]="metodoPagoSeleccionado === 'mercadopago'">
+              <ion-radio value="mercadopago"></ion-radio>
+              <div class="payment-info">
+                <div class="payment-title">
+                  <span>Mercado Pago</span>
+                  <span class="badge badge-test">TEST</span>
+                </div>
+                <p>Tarjetas de crédito, débito o saldo en cuenta</p>
+              </div>
+            </div>
+          </ion-radio-group>
+        </div>
+      </section>
 
-    <!-- Tarjeta: Detalle del Pedido -->
-    <ion-card class="custom-card summary-card">
-      <ion-card-header>
-        <ion-card-title>Detalle del Pedido <span class="item-count">{{carrito.length}} producto(s)</span></ion-card-title>
-      </ion-card-header>
+      <!-- Order Details -->
+      <section class="checkout-section">
+        <h2 class="section-title">Resumen del Pedido</h2>
+        <div class="checkout-card order-summary-card">
+          <div class="summary-items">
+            <div class="s-item" *ngFor="let item of carrito">
+              <div class="s-item-img">
+                <img [src]="item.foto || 'assets/placeholder.png'" />
+                <span class="s-item-qty">{{item.cantidad}}</span>
+              </div>
+              <div class="s-item-info">
+                <h4>{{item.nombre}}</h4>
+                <span>{{item.precio | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-totals">
+            <div class="totals-row">
+              <span>Subtotal</span>
+              <span>{{totalProductos | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
+            </div>
+            <div class="totals-row">
+              <span>Despacho a domicilio</span>
+              <span>{{costoEnvioFijo | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="totals-row grand-total">
+              <div class="total-label">
+                <strong>Total</strong>
+                <small>IVA incluido</small>
+              </div>
+              <strong>{{totalFinal | currency:'CLP':'symbol-narrow':'1.0-0'}}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
       
-      <ion-card-content>
-        <ion-list lines="none">
-          <ion-item *ngFor="let item of carrito" class="summary-item">
-            <ion-thumbnail slot="start">
-              <img [src]="item.foto || 'assets/placeholder.png'" />
-            </ion-thumbnail>
-            <ion-label>
-              <h3>{{item.nombre}}</h3>
-              <p>{{item.precio | currency:'CLP':'symbol-narrow':'1.0-0'}} c/u</p>
-              <p class="qty">Cant: {{item.cantidad}}</p>
-            </ion-label>
-            <div slot="end" class="item-total">
-              {{(item.precio * (item.cantidad || 1)) | currency:'CLP':'symbol-narrow':'1.0-0'}}
-            </div>
-          </ion-item>
-        </ion-list>
+      <div class="spacing-bottom"></div>
+    </form>
 
-        <div class="totals-section">
-          <div class="row">
-            <span>Subtotal productos:</span>
-            <span>{{totalProductos | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
-          </div>
-          <div class="row text-success">
-            <span>Despacho a domicilio: <ion-badge color="success">Fijo</ion-badge></span>
-            <span>{{costoEnvioFijo | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
-          </div>
-          <div class="row grand-total">
-            <div>
-              <strong>Total a Pagar</strong>
-              <p class="iva">IVA y despacho incluidos</p>
-            </div>
-            <strong class="total-price">{{totalFinal | currency:'CLP':'symbol-narrow':'1.0-0'}}</strong>
-          </div>
-        </div>
-
-        <ion-button expand="block" shape="round" color="dark" class="pay-button" (click)="procesarPago()" [disabled]="procesando">
-          {{ procesando ? 'Conectando...' : (metodoPagoSeleccionado === 'webpay' ? 'Pagar con Webpay Plus →' : 'Pagar con Mercado Pago →') }}
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-
-  </form>
+  </main>
 </ion-content>
+
+<!-- Fixed Bottom CTA -->
+<div class="bottom-cta-bar">
+  <button class="btn-primary" (click)="procesarPago()" [disabled]="procesando">
+    <span *ngIf="!procesando">Pagar {{totalFinal | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
+    <span *ngIf="procesando"><ion-spinner name="crescent"></ion-spinner> Procesando...</span>
+  </button>
+</div>

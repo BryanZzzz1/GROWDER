@@ -56,7 +56,7 @@ export class PagoExitoPage implements OnInit {
     }
   }
 
-async registrarCompraExitosa() {
+  async registrarCompraExitosa() {
     // Asegúrate de importar SupabaseService en el constructor si no lo tienes
     const session = await this.supabase.client.auth.getSession();
     const userId = session.data.session?.user.id;
@@ -78,3 +78,8 @@ async registrarCompraExitosa() {
     }
     this.procesando = false;
   }
+
+  volverATienda() {
+    this.router.navigate(['/tienda']);
+  }
+}

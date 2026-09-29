@@ -1,0 +1,84 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title class="brand-serif">Búsqueda</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="search-content">
+  <main class="search-shell">
+    
+    <!-- Search Bar -->
+    <div class="search-bar-container">
+      <ion-searchbar 
+        placeholder="Buscar mates, bombillas, termos..." 
+        [(ngModel)]="terminoBusqueda" 
+        (ionInput)="filtrarProductos()"
+        class="custom-searchbar">
+      </ion-searchbar>
+    </div>
+
+    <!-- Chips / Categories -->
+    <div class="chips-container">
+      <button class="chip" [class.active]="categoriaSeleccionada === 'Todos'" (click)="seleccionarCategoria('Todos')">Todos</button>
+      <button class="chip" [class.active]="categoriaSeleccionada === 'Torpedo'" (click)="seleccionarCategoria('Torpedo')">Torpedo</button>
+      <button class="chip" [class.active]="categoriaSeleccionada === 'Camionero'" (click)="seleccionarCategoria('Camionero')">Camionero</button>
+      <button class="chip" [class.active]="categoriaSeleccionada === 'Bombilla'" (click)="seleccionarCategoria('Bombilla')">Bombillas</button>
+      <button class="chip" [class.active]="categoriaSeleccionada === 'Termo'" (click)="seleccionarCategoria('Termo')">Termos</button>
+    </div>
+
+    <!-- State: Empty Search / Suggestions -->
+    <section *ngIf="(!terminoBusqueda || terminoBusqueda.trim() === '') && categoriaSeleccionada === 'Todos'" class="suggestions-section">
+      <h3 class="section-title brand-serif">Más Populares</h3>
+      
+      <div class="product-grid">
+        <article class="product-card" *ngFor="let producto of productosSugeridos" (click)="verDetalles(producto.idproducto)">
+          <div class="image-wrapper">
+            <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre" (error)="$any($event.target).src = 'assets/placeholder.png'" />
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">{{ producto.nombre }}</h4>
+            <div class="price-row">
+              <span class="price">${{ producto.precio | number:'1.0-0' }}</span>
+              <button class="add-btn" (click)="$event.stopPropagation(); agregarAlCarrito(producto)">
+                <ion-icon name="add"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- State: Active Search Results -->
+    <section *ngIf="(terminoBusqueda && terminoBusqueda.trim() !== '') || categoriaSeleccionada !== 'Todos'" class="results-section">
+      <div class="results-header">
+        <h3 class="section-title brand-serif">Resultados</h3>
+        <span class="results-count">{{ productosMostrados.length }} encontrados</span>
+      </div>
+
+      <div class="product-grid" *ngIf="productosMostrados.length > 0; else noResults">
+        <article class="product-card" *ngFor="let producto of productosMostrados" (click)="verDetalles(producto.idproducto)">
+          <div class="image-wrapper">
+            <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre" (error)="$any($event.target).src = 'assets/placeholder.png'" />
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">{{ producto.nombre }}</h4>
+            <div class="price-row">
+              <span class="price">${{ producto.precio | number:'1.0-0' }}</span>
+              <button class="add-btn" (click)="$event.stopPropagation(); agregarAlCarrito(producto)">
+                <ion-icon name="add"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #noResults>
+        <div class="empty-state">
+          <ion-icon name="search-outline"></ion-icon>
+          <p>No encontramos productos que coincidan con tu búsqueda.</p>
+        </div>
+      </ng-template>
+    </section>
+
+  </main>
+</ion-content>

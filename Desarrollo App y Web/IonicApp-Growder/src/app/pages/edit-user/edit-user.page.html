@@ -1,1 +1,61 @@
-<ion-content [fullscreen]="true" class="edit-content"><main class="edit-shell"><ion-button fill="clear" class="view-back" routerLink="/user-profile" aria-label="Volver al perfil"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button><section class="edit-intro"><span class="edit-kicker">TU INFORMACIÓN</span><h1>Hazlo más tuyo.</h1><p>Actualiza tus datos y mantén tu cuenta al día.</p></section><section class="edit-card"><div class="photo-row"><ion-avatar><img [src]="user.foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="Foto de perfil" /></ion-avatar><div><strong>Foto de perfil</strong><small>Una imagen ayuda a reconocerte</small><ion-button fill="clear" (click)="takePhoto()"><ion-icon name="camera-outline" slot="start"></ion-icon>Cambiar foto</ion-button></div></div><div class="field-group"><label>Nombre de usuario</label><div class="editable-field"><ion-input type="text" [(ngModel)]="user.username" [readonly]="!editState.username"></ion-input><button type="button" *ngIf="!editState.username" (click)="toggleEdit('username')" aria-label="Editar usuario"><ion-icon name="pencil-outline"></ion-icon></button><button type="button" class="confirm" *ngIf="editState.username" (click)="applyChange('username')" aria-label="Confirmar usuario"><ion-icon name="checkmark-outline"></ion-icon></button><button type="button" class="cancel" *ngIf="editState.username" (click)="cancelEdit('username')" aria-label="Cancelar usuario"><ion-icon name="close-outline"></ion-icon></button></div></div><div class="field-group"><label>Teléfono</label><div class="editable-field"><ion-input type="tel" [(ngModel)]="user.telefono" [readonly]="!editState.telefono"></ion-input><button type="button" *ngIf="!editState.telefono" (click)="toggleEdit('telefono')" aria-label="Editar teléfono"><ion-icon name="pencil-outline"></ion-icon></button><button type="button" class="confirm" *ngIf="editState.telefono" (click)="applyChange('telefono')" aria-label="Confirmar teléfono"><ion-icon name="checkmark-outline"></ion-icon></button><button type="button" class="cancel" *ngIf="editState.telefono" (click)="cancelEdit('telefono')" aria-label="Cancelar teléfono"><ion-icon name="close-outline"></ion-icon></button></div></div><div class="field-group"><label>Fecha de nacimiento</label><div class="editable-field"><ion-input type="date" [(ngModel)]="user.fecha_nacimiento" [readonly]="!editState.fecha_nacimiento"></ion-input><button type="button" *ngIf="!editState.fecha_nacimiento" (click)="toggleEdit('fecha_nacimiento')" aria-label="Editar fecha"><ion-icon name="pencil-outline"></ion-icon></button><button type="button" class="confirm" *ngIf="editState.fecha_nacimiento" (click)="applyChange('fecha_nacimiento')" aria-label="Confirmar fecha"><ion-icon name="checkmark-outline"></ion-icon></button><button type="button" class="cancel" *ngIf="editState.fecha_nacimiento" (click)="cancelEdit('fecha_nacimiento')" aria-label="Cancelar fecha"><ion-icon name="close-outline"></ion-icon></button></div></div><ion-button expand="block" class="password-button" (click)="togglePasswordChange()"><ion-icon name="lock-closed-outline" slot="start"></ion-icon>Cambiar contraseña</ion-button></section><ion-modal [isOpen]="showPasswordChange" (willDismiss)="togglePasswordChange()"><ng-template><ion-content class="modal-content"><button type="button" class="modal-close" (click)="cancel()" aria-label="Cerrar"><ion-icon name="close-outline"></ion-icon></button><h2>Nueva contraseña</h2><p>Confirma tu contraseña actual y define una nueva para mantener la sesión activa.</p><ion-input label="Contraseña actual" label-placement="stacked" fill="outline" type="password" [(ngModel)]="contrasenaActual"></ion-input><ion-input label="Nueva contraseña" label-placement="stacked" fill="outline" type="password" [(ngModel)]="nuevaContrasena"></ion-input><ion-button expand="block" class="modal-primary" (click)="changePassword()">Actualizar contraseña</ion-button><ion-button expand="block" fill="clear" (click)="cancel()">Cancelar</ion-button></ion-content></ng-template></ion-modal><div class="footer-spacing"></div></main></ion-content>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/user-profile" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="brand-serif">Editar Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="edit-content">
+  <main class="edit-shell">
+    
+    <section class="edit-intro">
+      <span class="edit-kicker">TU INFORMACIÓN</span>
+      <h1 class="brand-serif">Hazlo más tuyo.</h1>
+      <p>Actualiza tus datos y mantén tu cuenta al día.</p>
+    </section>
+
+    <section class="edit-card">
+      <div class="photo-row">
+        <ion-avatar>
+          <img [src]="user.foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="Foto de perfil" />
+        </ion-avatar>
+        <div>
+          <strong>Foto de perfil</strong>
+          <small>Una imagen ayuda a reconocerte</small>
+          <ion-button fill="clear" (click)="takePhoto()">
+            <ion-icon name="camera-outline" slot="start"></ion-icon>
+            Cambiar foto
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre de usuario</label>
+        <div class="input-wrapper">
+          <input class="custom-input" type="text" [(ngModel)]="user.username" placeholder="Nombre completo o apodo" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono</label>
+        <div class="input-wrapper">
+          <input class="custom-input" type="tel" [(ngModel)]="user.telefono" placeholder="+56 9 1234 5678" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de nacimiento</label>
+        <div class="input-wrapper">
+          <input class="custom-input" type="date" [(ngModel)]="user.fecha_nacimiento" />
+        </div>
+      </div>
+
+      <ion-button expand="block" (click)="guardarCambiosPerfil()" class="btn-guardar-perfil btn-primary">
+        Guardar Cambios
+      </ion-button>
+    </section>
+
+  </main>
+</ion-content>

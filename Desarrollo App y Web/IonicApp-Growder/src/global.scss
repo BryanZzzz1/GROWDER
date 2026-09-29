@@ -1,13 +1,9 @@
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
@@ -25,48 +21,101 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-/*@import "@ionic/angular/css/palettes/dark.system.css";*/
-
 :root {
-  --ion-font-family: Arial, sans-serif;
-  --ion-color-primary: #18342f;
-  --ion-color-primary-rgb: 24, 52, 47;
-  --ion-color-secondary: #e1785b;
-  --ion-color-secondary-rgb: 225, 120, 91;
-  --ion-color-medium: #718078;
-  --ion-color-light: #f7f8f4;
-  --app-ink: #18342f;
-  --app-muted: #718078;
-  --app-bg: #f7f8f4;
-  --app-surface: #ffffff;
-  --app-line: #e2e8df;
-  --app-accent: #e1785b;
+  --ion-font-family: 'Inter', system-ui, sans-serif;
+  --brand-serif: 'Playfair Display', serif;
+  
+  /* Verde Principal */
+  --ion-color-primary: #314235;
+  --ion-color-primary-rgb: 49, 66, 53;
+  --ion-color-primary-shade: #243127;
+  
+  /* Tono Acento / Cuero */
+  --ion-color-secondary: #8C7762;
+  --ion-color-secondary-rgb: 140, 119, 98;
+  --ion-color-secondary-shade: #a75632;
+
+  --ion-color-medium: #8C7762;
+  --ion-color-light: #F8F3E9;
+
+  --app-ink: #314235;
+  --app-muted: #8C7762;
+  --app-bg: #F8F3E9;
+  --app-bg-alt: #FDFBF7;
+  --app-surface: #FFFFFF;
+  --app-line: rgba(214, 211, 209, 0.7); /* stone-200/70 */
+  --app-accent: #8C7762;
 }
 
-html, body { background: var(--app-bg); color: var(--app-ink); }
-ion-content { --background: var(--app-bg); }
-ion-toolbar { --background: var(--app-surface); --border-width: 0; }
-ion-button { --border-radius: 10px; font-weight: 700; }
-ion-item { --background: transparent; --border-color: var(--app-line); }
-.view-back { --color: var(--app-ink); margin: 2px 0 8px -8px; }
+html, body { 
+  background: var(--app-bg); 
+  color: var(--app-ink); 
+  font-family: var(--ion-font-family);
+}
+ion-content { 
+  --background: var(--app-bg); 
+}
+ion-toolbar { 
+  --background: var(--app-surface); 
+  --border-width: 0; 
+}
+
+/* Custom rounded cards and buttons */
+ion-card {
+  --background: var(--app-surface);
+  border-radius: 1.5rem !important; /* rounded-3xl */
+  border: 1px solid var(--app-line);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; /* shadow-sm */
+}
+
+ion-button { 
+  --border-radius: 100px; 
+  font-weight: 600; 
+  font-family: var(--ion-font-family);
+}
+
+ion-item { 
+  --background: transparent; 
+  --border-color: var(--app-line); 
+}
+
+.view-back { 
+  --color: var(--app-ink); 
+  margin: 2px 0 8px -8px; 
+}
+
+h1, h2, h3, h4, .brand-serif {
+  font-family: var(--brand-serif);
+}
 
 ion-toast.app-toast {
-  --background: #18342f;
+  --background: #314235;
   --color: #ffffff;
-  --border-radius: 14px;
-  --box-shadow: 0 14px 32px rgba(24, 52, 47, .2);
+  --border-radius: 1rem;
+  --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 ion-alert.app-alert {
   --backdrop-opacity: .35;
   --width: min(360px, calc(100% - 32px));
+  --border-radius: 1.5rem;
 }
+
+/* Order states */
+.state-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.state-shipping {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+.state-delivered {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* Global Tab Bar padding to prevent content being hidden */
+.content-with-tabs {
+  --padding-bottom: 80px;
+}

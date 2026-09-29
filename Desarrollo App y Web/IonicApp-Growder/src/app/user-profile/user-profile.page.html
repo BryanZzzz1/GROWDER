@@ -1,1 +1,179 @@
-<ion-content [fullscreen]="true" class="profile-content"><main class="profile-shell"><ion-button fill="clear" class="view-back" routerLink="/tienda" aria-label="Volver a la tienda"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button><section class="profile-hero"><ion-avatar class="profile-avatar"><img [src]="foto || 'https://docs-demo.ionic.io/assets/madison.jpg'" alt="Foto de perfil" /></ion-avatar><div><span class="profile-kicker">CUENTA GROWDER</span><h1>{{ email }}</h1><p>Administra tus datos, compras y preferencias.</p></div></section><section class="profile-grid"><article class="profile-card"><span class="profile-kicker">INFORMACIÓN PERSONAL</span><div class="profile-data"><div><small>Teléfono</small><strong>{{ telefono || 'No especificado' }}</strong></div><div><small>Fecha de nacimiento</small><strong>{{ fechaNacimiento }}</strong></div></div><ion-button expand="block" class="profile-primary" (click)="editarperfil()"><ion-icon name="create-outline" slot="start"></ion-icon>Editar perfil</ion-button></article><article class="profile-card profile-actions"><span class="profile-kicker">ACCIONES RÁPIDAS</span><button type="button" (click)="cambiarContrasena()"><ion-icon name="lock-closed-outline"></ion-icon><span><strong>Cambiar contraseña</strong><small>Protege el acceso a tu cuenta</small></span><ion-icon name="chevron-forward-outline"></ion-icon></button><button type="button" (click)="irHistorialCompras()"><ion-icon name="receipt-outline"></ion-icon><span><strong>Historial de compras</strong><small>Revisa tus pedidos anteriores</small></span><ion-icon name="chevron-forward-outline"></ion-icon></button><button type="button" class="logout-action" (click)="logout()"><ion-icon name="log-out-outline"></ion-icon><span><strong>Cerrar sesión</strong><small>Salir de esta cuenta</small></span><ion-icon name="chevron-forward-outline"></ion-icon></button></article></section><div class="footer-spacing"></div></main></ion-content>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tienda" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="brand-serif">Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="profile-content">
+  <main class="profile-shell">
+    
+    <!-- Profile Hero -->
+    <section class="profile-hero">
+      <div class="avatar-wrapper">
+        <img *ngIf="foto" [src]="foto" alt="Foto de perfil" />
+        <div class="initial-avatar" *ngIf="!foto">
+          {{ email ? email.charAt(0).toUpperCase() : 'U' }}
+        </div>
+        <button class="edit-avatar-btn" (click)="editarperfil()">
+          <ion-icon name="pencil"></ion-icon>
+        </button>
+      </div>
+      <h2 class="brand-serif">{{ email }}</h2>
+      <span class="user-badge">Cliente Growder</span>
+    </section>
+
+    <!-- Personal Info Card -->
+    <section class="profile-section">
+      <div class="section-header">
+        <h3>Información Personal</h3>
+        <button class="text-btn" (click)="editarperfil()">Editar</button>
+      </div>
+      <div class="profile-card">
+        <div class="info-row">
+          <div class="info-icon"><ion-icon name="call"></ion-icon></div>
+          <div class="info-text">
+            <small>Teléfono</small>
+            <strong>{{ telefono || 'No especificado' }}</strong>
+          </div>
+        </div>
+        <div class="info-divider"></div>
+        <div class="info-row">
+          <div class="info-icon"><ion-icon name="calendar"></ion-icon></div>
+          <div class="info-text">
+            <small>Fecha de nacimiento</small>
+            <strong>{{ fechaNacimiento }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Actions -->
+    <section class="profile-section">
+      <h3 class="section-title">Mi Cuenta</h3>
+      <div class="profile-menu">
+        <button class="menu-item" (click)="irHistorialCompras()">
+          <div class="item-icon bg-primary-light">
+            <ion-icon name="cube" color="primary"></ion-icon>
+          </div>
+          <div class="item-content">
+            <strong>Mis Pedidos</strong>
+            <small>Historial y seguimiento</small>
+          </div>
+          <ion-icon name="chevron-forward" class="arrow"></ion-icon>
+        </button>
+
+        <button class="menu-item" (click)="abrirModalCambiarPassword()">
+          <div class="item-icon bg-secondary-light">
+            <ion-icon name="lock-closed" color="secondary"></ion-icon>
+          </div>
+          <div class="item-content">
+            <strong>Seguridad</strong>
+            <small>Cambiar contraseña</small>
+          </div>
+          <ion-icon name="chevron-forward" class="arrow"></ion-icon>
+        </button>
+
+        <!-- FAQ Toggle Button -->
+        <button class="menu-item" (click)="mostrarFaq = !mostrarFaq">
+          <div class="item-icon" style="background: rgba(140, 119, 98, 0.1);">
+            <ion-icon name="help-circle-outline" style="color: #8C7762;"></ion-icon>
+          </div>
+          <div class="item-content">
+            <strong>Centro de Ayuda</strong>
+            <small>Envíos, cuidados y compras</small>
+          </div>
+          <ion-icon [name]="mostrarFaq ? 'chevron-down' : 'chevron-forward'" class="arrow"></ion-icon>
+        </button>
+      </div>
+
+      <!-- FAQ Accordion (Conditionally rendered) -->
+      <div *ngIf="mostrarFaq" class="faq-container" style="margin-top: 1rem;">
+        <ion-accordion-group expand="inset" class="custom-accordion">
+          <ion-accordion value="faq1">
+            <ion-item slot="header" color="light">
+              <ion-label class="faq-question">¿Cuánto tarda el despacho?</ion-label>
+            </ion-item>
+            <div class="ion-padding faq-answer" slot="content">
+              El tiempo de despacho es de 24 a 48 horas hábiles. Nuestro reparto propio asegura que tus productos lleguen en perfectas condiciones.
+            </div>
+          </ion-accordion>
+
+          <ion-accordion value="faq2">
+            <ion-item slot="header" color="light">
+              <ion-label class="faq-question">¿Cómo curar mi mate?</ion-label>
+            </ion-item>
+            <div class="ion-padding faq-answer" slot="content">
+              Lávalo con agua tibia, llénalo con yerba húmeda usada y déjalo reposar por 24 horas. Repite el proceso una vez más y estará listo para usar.
+            </div>
+          </ion-accordion>
+
+          <ion-accordion value="faq3">
+            <ion-item slot="header" color="light">
+              <ion-label class="faq-question">¿Qué medios de pago aceptan?</ion-label>
+            </ion-item>
+            <div class="ion-padding faq-answer" slot="content">
+              Aceptamos Webpay Plus (Tarjetas de crédito y débito) y Mercado Pago.
+            </div>
+          </ion-accordion>
+
+          <ion-accordion value="faq4">
+            <ion-item slot="header" color="light">
+              <ion-label class="faq-question">¿Qué hago si hay retraso?</ion-label>
+            </ion-item>
+            <div class="ion-padding faq-answer" slot="content">
+              Por favor, contáctanos a través de nuestro soporte o redes sociales con tu número de pedido y lo resolveremos a la brevedad.
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+      </div>
+    </section>
+
+    <section class="profile-section logout-section">
+      <button class="btn-logout" (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+      </button>
+    </section>
+    
+  </main>
+
+  <!-- Modal Cambio de Contraseña -->
+  <ion-modal [isOpen]="isPasswordModalOpen" (didDismiss)="isPasswordModalOpen = false" initialBreakpoint="1" [breakpoints]="[0, 1]" cssClass="bottom-sheet-modal">
+    <ng-template>
+      <div class="modal-content-wrapper">
+        <div class="modal-header">
+          <div class="modal-text">
+            <h2 class="brand-serif">Cambiar Contraseña</h2>
+            <p>Ingresa tu nueva contraseña para actualizar tu seguridad.</p>
+          </div>
+          <button class="close-btn" (click)="isPasswordModalOpen = false">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nueva contraseña</label>
+            <div class="input-wrapper">
+              <input class="custom-input" [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="newPassword" placeholder="Escribe tu nueva contraseña" />
+              <button class="eye-btn" (click)="mostrarPassword = !mostrarPassword">
+                <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-primary update-btn" (click)="actualizarPassword()">
+            Actualizar Contraseña
+          </button>
+          
+          <button class="btn-outline cancel-btn" (click)="isPasswordModalOpen = false">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/historial-compras" text="" icon="arrow-back" class="circular-btn"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="brand-serif">Pedido #SM-{{ pedidoId }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="tracking-content">
+  <main class="tracking-shell" *ngIf="pedido">
+    
+    <!-- Tracking Stepper -->
+    <section class="tracking-stepper">
+      <div class="step" [class.active]="estadoIndex >= 0">
+        <div class="step-icon">
+          <ion-icon name="hammer-outline"></ion-icon>
+        </div>
+        <div class="step-content">
+          <h4>En preparación artesanal</h4>
+          <p>Tu orden fue registrada y nuestro equipo está empaquetando minuciosamente cada calabaza y bombilla.</p>
+        </div>
+      </div>
+      
+      <div class="step-line" [class.active]="estadoIndex >= 1"></div>
+      
+      <div class="step" [class.active]="estadoIndex >= 1">
+        <div class="step-icon">
+          <ion-icon name="car-outline"></ion-icon>
+        </div>
+        <div class="step-content">
+          <h4>En camino al destino</h4>
+          <p>El paquete fue entregado a la flota interna de SoMateCL.</p>
+        </div>
+      </div>
+      
+      <div class="step-line" [class.active]="estadoIndex >= 2"></div>
+      
+      <div class="step" [class.active]="estadoIndex >= 2">
+        <div class="step-icon">
+          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+        </div>
+        <div class="step-content">
+          <h4>Entrega completada</h4>
+          <p>El repartidor confirmó la recepción en tu domicilio.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logistics Info Card -->
+    <section class="info-card logistics-card">
+      <h3 class="card-title">Información del Reparto</h3>
+      <div class="info-row">
+        <ion-icon name="person-outline"></ion-icon>
+        <div>
+          <strong>Repartidor Asignado</strong>
+          <span>{{ pedido.empresa_transporte || 'Logística Interna Growder' }}</span>
+        </div>
+      </div>
+      <div class="info-row">
+        <ion-icon name="navigate-outline"></ion-icon>
+        <div>
+          <strong>Identificador de Ruta</strong>
+          <span>{{ pedido.numero_seguimiento || 'Ruta Local - RM90' }}</span>
+        </div>
+      </div>
+      <div class="info-row">
+        <ion-icon name="location-outline"></ion-icon>
+        <div>
+          <strong>Dirección de Entrega</strong>
+          <span>{{ pedido.direccion || 'Dirección no disponible' }}</span>
+          <small *ngIf="pedido.instrucciones">Notas: {{ pedido.instrucciones }}</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order Summary -->
+    <section class="info-card receipt-card">
+      <h3 class="card-title">Comprobante de Compra</h3>
+      
+      <ion-list lines="none" class="receipt-list">
+        <ion-item *ngFor="let item of pedido?.items">
+          <ion-thumbnail slot="start">
+            <img [src]="item.imagen || item.foto || 'assets/placeholder-mate.png'" alt="Producto" />
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ item.nombre }}</h2>
+            <p>Cantidad: {{ item.cantidad }}</p>
+            <p>Precio unitario: {{ item.precio | currency:'CLP':'symbol-narrow':'1.0-0' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <div class="receipt-totals">
+        <div class="tot-row">
+          <span>Subtotal</span>
+          <span>{{ pedido.subtotal | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="tot-row">
+          <span>Costo de envío</span>
+          <span>{{ pedido.costo_envio | currency:'CLP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="tot-row grand-total">
+          <span>Total Pagado</span>
+          <strong>{{ pedido.total | currency:'CLP':'symbol-narrow':'1.0-0' }}</strong>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</ion-content>

@@ -1,3 +1,32 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-router-outlet class="content-with-tabs"></ion-router-outlet>
+  
+  <!-- Global Bottom Navigation Bar -->
+  <ion-tab-bar *ngIf="!ocultarnavbar" slot="bottom" class="global-tab-bar">
+    <ion-tab-button (click)="irTienda()">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Inicio</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="irBuscar()">
+      <ion-icon name="search-outline"></ion-icon>
+      <ion-label>Buscar</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="irCarro()">
+      <ion-icon name="cart-outline"></ion-icon>
+      <ion-label>Carrito</ion-label>
+      <ion-badge *ngIf="cartCount > 0" color="danger" class="cart-badge">{{ cartCount }}</ion-badge>
+    </ion-tab-button>
+
+    <ion-tab-button *ngIf="isLoggedIn" (click)="irPerfil()">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Mi Cuenta</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button *ngIf="!isLoggedIn" (click)="irLogin()">
+      <ion-icon name="log-in-outline"></ion-icon>
+      <ion-label>Ingresar</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
 </ion-app>

@@ -1,1 +1,128 @@
-:host { --ink: #18342f; --muted: #718078; --line: #e2e8df; display: block; }.edit-content { --background: #f7f8f4; }.edit-header ion-toolbar { --background: #fff; }.edit-shell { width: min(760px, calc(100% - 28px)); margin: auto; padding: 28px 0 100px; }.edit-intro { padding: 35px clamp(24px, 6vw, 62px); background: #e6efe3; }.edit-kicker { color: #77917e; font: 700 .62rem Arial, sans-serif; letter-spacing: .16em; }.edit-intro h1 { margin: 13px 0 8px; color: var(--ink); font: 400 clamp(2.3rem, 5vw, 4rem) Georgia, serif; }.edit-intro p { margin: 0; color: var(--muted); }.edit-card { margin-top: 18px; padding: 25px; border: 1px solid var(--line); background: #fff; }.photo-row { display: flex; gap: 16px; align-items: center; padding-bottom: 24px; border-bottom: 1px solid var(--line); }.photo-row ion-avatar { width: 76px; height: 76px; }.photo-row div { display: grid; gap: 4px; }.photo-row strong { color: var(--ink); }.photo-row small { color: var(--muted); }.photo-row ion-button { --color: var(--ink); justify-content: start; margin: 3px 0 0 -8px; }.field-group { margin-top: 21px; }.field-group > label { display: block; margin-bottom: 7px; color: var(--muted); font-size: .72rem; font-weight: 700; }.editable-field { display: flex; align-items: center; border: 1px solid var(--line); background: #f7f8f4; }.editable-field ion-input { --padding-start: 12px; --background: transparent; }.editable-field button { display: grid; place-items: center; width: 42px; height: 42px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }.editable-field button.confirm { color: #568361; }.editable-field button.cancel { color: #b35f50; }.password-button { --background: var(--ink); margin-top: 27px; min-height: 48px; }.modal-content { --background: #f7f8f4; padding: 25px; }.modal-close { display: grid; place-items: center; width: 38px; height: 38px; margin-left: auto; border: 0; border-radius: 50%; background: #e6efe3; color: var(--ink); }.modal-content h2 { color: var(--ink); font: 400 1.8rem Georgia, serif; }.modal-content p { color: var(--muted); line-height: 1.6; }.modal-content ion-input { --background: #fff; margin: 14px 0; }.modal-primary { --background: var(--ink); }.footer-spacing { height: 40px; }
+.edit-content {
+  --background: var(--app-bg);
+}
+
+.edit-shell {
+  padding: 1.25rem 1.25rem 6rem;
+}
+
+.edit-intro {
+  margin-bottom: 2rem;
+  
+  .edit-kicker {
+    display: block;
+    color: var(--app-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+  
+  h1 {
+    margin: 0 0 0.5rem;
+    color: var(--app-ink);
+    font-size: 2.25rem;
+  }
+  
+  p {
+    margin: 0;
+    color: var(--app-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+.edit-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--app-line);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+
+  .photo-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+
+    ion-avatar {
+      width: 80px;
+      height: 80px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      
+      img {
+        object-fit: cover;
+      }
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      strong {
+        color: var(--app-ink);
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      small {
+        color: var(--app-muted);
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      ion-button {
+        --color: var(--ion-color-primary);
+        --padding-start: 0;
+        --padding-end: 0;
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        height: auto;
+        text-transform: none;
+      }
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--app-ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      .custom-input {
+        width: 100%;
+        padding: 1rem;
+        background: #fdfbf7;
+        border: 1px solid #d6d3d1;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--app-ink);
+        font-family: inherit;
+
+        &:focus {
+          outline: none;
+          border-color: var(--ion-color-primary);
+          box-shadow: 0 0 0 3px rgba(49, 66, 53, 0.1);
+        }
+      }
+    }
+  }
+
+  .btn-guardar-perfil {
+    margin-top: 2rem;
+    --border-radius: 0.75rem;
+    --background: var(--ion-color-primary);
+    --color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    height: 52px;
+  }
+}

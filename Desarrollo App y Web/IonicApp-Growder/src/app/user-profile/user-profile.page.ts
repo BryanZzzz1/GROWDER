@@ -13,6 +13,7 @@ export class UserProfilePage implements OnInit {
   telefono: string = '';
   fechaNacimiento: string = '';
   foto: string = '';
+  mostrarFaq: boolean = false;
 
   constructor(
     private serviceBD: ServicebdService,
@@ -57,8 +58,40 @@ export class UserProfilePage implements OnInit {
     this.router.navigate(['./edit-user', this.email]);
   }
 
-  cambiarContrasena() {
-    this.router.navigate(['/change-password']);
+  isPasswordModalOpen: boolean = false;
+  mostrarPassword: boolean = false;
+  newPassword: string = '';
+
+  abrirModalCambiarPassword() {
+    this.newPassword = '';
+    this.mostrarPassword = false;
+    this.isPasswordModalOpen = true;
+  }
+
+  async actualizarPassword() {
+    if (!this.newPassword || this.newPassword.length < 6) {
+      this.presentAlert('Error', 'La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+    
+    try {
+      const success = await this.serviceBD.cambiarContrasenaBase(this.newPassword);
+      if (success) {
+        this.isPasswordModalOpen = false;
+        const toast = await this.toastController.create({
+          message: 'Contraseña actualizada con éxito.',
+          duration: 2500,
+          position: 'bottom',
+          icon: 'checkmark-circle-outline',
+          cssClass: 'app-toast'
+        });
+        await toast.present();
+      } else {
+        this.presentAlert('Error', 'No se pudo actualizar la contraseña.');
+      }
+    } catch (e) {
+      this.presentAlert('Error', 'Ocurrió un error al intentar cambiar la contraseña.');
+    }
   }
 
   irHistorialCompras() {

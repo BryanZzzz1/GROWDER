@@ -7,6 +7,7 @@ import { CartService } from './cart.service';
 import { ProductService } from './product.service';
 import { Productos } from './productos';
 import { ReviewService } from './review.service';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class ServicebdService {
@@ -16,7 +17,8 @@ export class ServicebdService {
     private productService: ProductService,
     private cartService: CartService,
     private reviewService: ReviewService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private supabaseService: SupabaseService
   ) {}
 
   registrarUsuario(email: string, password: string, telefono: string, fechaNacimiento: string, foto: string) {
@@ -72,9 +74,26 @@ export class ServicebdService {
   getProductosObservable(): Observable<Productos[]> {
     return this.productService.getAllObservable();
   }
+  
+  getProductById(id: number): Promise<Productos | null> {
+    return this.productService.getById(id);
+  }
 
   obtenerImagenes(productoId: number): Promise<string[]> {
     return this.productService.getImages(productoId);
+  }
+
+  async obtenerCategorias(): Promise<any[]> {
+    const { data, error } = await this.supabaseService.client
+      .from('categorias')
+      .select('*')
+      .eq('activo', true)
+      .order('id', { ascending: true });
+    if (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+    return data || [];
   }
 
   obtenerCarritoBase(): Promise<Productos[]> {
@@ -135,6 +154,36 @@ export class ServicebdService {
 
   obtenerHistorialCompras(_username?: string) {
     return this.obtenerHistorialComprasBase();
+  }
+
+  getPurchaseById(id: number) {
+    return this.cartService.getPurchaseById(id);
+  }
+
+  async uploadAvatar(userId: string, base64: string): Promise<string | null> {
+    try {
+      const response = await fetch(base64);
+      const blob = await response.blob();
+      const filePath = `${userId}/${Date.now()}.jpg`;
+      
+      const { error } = await this.supabaseService.client.storage
+        .from('perfiles')
+        .upload(filePath, blob, { upsert: true });
+        
+      if (error) {
+        console.error('Storage error:', error);
+        return null;
+      }
+      
+      const { data: publicUrlData } = this.supabaseService.client.storage
+        .from('perfiles')
+        .getPublicUrl(filePath);
+        
+      return publicUrlData.publicUrl;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      return null;
+    }
   }
 
   cambiarContrasena(usernameOrNewPass: string, optionalNewPass?: string) {

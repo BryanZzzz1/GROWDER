@@ -1,0 +1,57 @@
+<div class="filtro-container">
+  <div class="modal-header">
+    <h2 class="brand-serif">Filtros</h2>
+    <ion-button fill="clear" color="dark" (click)="cerrar()">
+      <ion-icon slot="icon-only" name="close"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Sección 1: Categorías -->
+    <div class="filter-section">
+      <h3>Categorías</h3>
+      <div class="chips-container">
+        <ion-chip 
+          [class.chip-active]="categoriaSeleccionada === 'Todos'"
+          (click)="seleccionarCategoria('Todos')">
+          <ion-label>Todos</ion-label>
+        </ion-chip>
+        <ion-chip 
+          *ngFor="let cat of categorias" 
+          [class.chip-active]="categoriaSeleccionada === cat.nombre"
+          (click)="seleccionarCategoria(cat.nombre)">
+          <ion-label>{{ cat.nombre }}</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    <!-- Sección 2: Rango de Precio -->
+    <div class="filter-section">
+      <h3>Rango de Precio</h3>
+      <div class="price-labels">
+        <span>${{ rangoPrecio.lower | number:'1.0-0' }}</span>
+        <span>${{ rangoPrecio.upper | number:'1.0-0' }}</span>
+      </div>
+      <ion-range 
+        [dualKnobs]="true" 
+        [min]="0" 
+        [max]="100000" 
+        [step]="1000" 
+        [(ngModel)]="rangoPrecio"
+        color="dark">
+      </ion-range>
+    </div>
+
+    <!-- Sección 3: Stock -->
+    <div class="filter-section stock-section">
+      <ion-item lines="none" class="stock-item">
+        <ion-label>Mostrar solo artículos con stock</ion-label>
+        <ion-toggle slot="end" color="success" [(ngModel)]="soloStock"></ion-toggle>
+      </ion-item>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-primary" (click)="aplicarFiltros()">Aplicar Filtros</button>
+  </div>
+</div>

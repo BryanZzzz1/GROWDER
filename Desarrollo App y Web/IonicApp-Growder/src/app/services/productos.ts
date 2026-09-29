@@ -5,6 +5,8 @@ export class Productos {
     precio!: number;
     foto!: string;
     cantidad?: number;
-    activo!: boolean; // Agregar esta línea
+    activo!: boolean;
+    categoria?: string;
+    categoria_id?: number;
   }
   

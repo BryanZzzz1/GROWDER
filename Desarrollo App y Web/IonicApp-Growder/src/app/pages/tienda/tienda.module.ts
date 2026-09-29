@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { TiendaPageRoutingModule } from './tienda-routing.module';
 
 import { TiendaPage } from './tienda.page';
+import { FiltroModalComponent } from '../../components/filtro-modal/filtro-modal.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { TiendaPage } from './tienda.page';
     IonicModule,
     TiendaPageRoutingModule
   ],
-  declarations: [TiendaPage]
+  declarations: [TiendaPage, FiltroModalComponent]
 })
 export class TiendaPageModule {}

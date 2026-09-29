@@ -1,0 +1,213 @@
+.tracking-content {
+  --background: #fdfbf7;
+}
+
+.tracking-shell {
+  padding: 1rem 1.25rem 3rem;
+}
+
+.circular-btn {
+  --border-radius: 50%;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+/* Tracking Stepper */
+.tracking-stepper {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(49, 66, 53, 0.05);
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+
+    &.active {
+      opacity: 1;
+      
+      .step-icon {
+        background: #314235;
+        color: white;
+        border-color: #314235;
+      }
+    }
+  }
+
+  .step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: white;
+    color: #a3a3a3;
+    flex-shrink: 0;
+    z-index: 2;
+  }
+
+  .step-content {
+    padding-bottom: 1rem;
+
+    h4 {
+      margin: 0 0 0.25rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.4;
+    }
+  }
+
+  .step-line {
+    width: 2px;
+    height: 30px;
+    background: #e5e5e5;
+    margin: -0.5rem 0 0.5rem 19px;
+    
+    &.active {
+      background: #314235;
+    }
+  }
+}
+
+/* Info Cards */
+.info-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(49, 66, 53, 0.05);
+
+  .card-title {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #314235;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.75rem;
+  }
+}
+
+.logistics-card {
+  .info-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    ion-icon {
+      font-size: 1.25rem;
+      color: #8C7762;
+      margin-top: 2px;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      
+      strong {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.2rem;
+      }
+      
+      span {
+        font-size: 0.95rem;
+        color: #1a1a1a;
+        font-weight: 500;
+      }
+
+      small {
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+        color: #888;
+      }
+    }
+  }
+}
+
+.receipt-card {
+  .receipt-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.5rem;
+      object-fit: cover;
+    }
+
+    .item-meta {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      strong {
+        font-size: 0.95rem;
+        color: #1a1a1a;
+      }
+
+      .qty {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.2rem;
+      }
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: #314235;
+    }
+  }
+
+  .receipt-totals {
+    background: #fdfbf7;
+    padding: 1rem;
+    border-radius: 0.75rem;
+
+    .tot-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+
+      &.grand-total {
+        margin-bottom: 0;
+        margin-top: 0.5rem;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        
+        strong {
+          color: #314235;
+          font-weight: 700;
+        }
+      }
+    }
+
+    .divider {
+      height: 1px;
+      background: #e5e5e5;
+      margin: 0.75rem 0;
+    }
+  }
+}

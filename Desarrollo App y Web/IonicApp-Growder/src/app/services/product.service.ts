@@ -15,12 +15,23 @@ export class ProductService {
 
   async getActive(): Promise<Productos[]> {
     try {
+      // Pedimos las imágenes asociadas para el fallback
       const { data, error } = await this.supabaseService.client
         .from('producto')
-        .select('*')
+        .select(`
+          *,
+          imagenes (
+            url
+          )
+        `)
         .eq('activo', true);
       if (error) throw error;
-      const products = data || [];
+      
+      const products = (data || []).map((p: any) => {
+        p.foto = p.foto || (p.imagenes && p.imagenes.length > 0 ? p.imagenes[0].url : 'assets/placeholder-mate.png');
+        return p as Productos;
+      });
+      
       this.productsSubject.next(products);
       return products;
     } catch (error) {

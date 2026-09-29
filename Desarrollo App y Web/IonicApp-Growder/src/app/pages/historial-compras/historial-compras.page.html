@@ -1,1 +1,83 @@
-<ion-content [fullscreen]="true" class="history-content"><main class="history-shell"><ion-button fill="clear" class="view-back" routerLink="/user-profile" aria-label="Volver al perfil"><ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon></ion-button><section class="history-intro"><span class="history-kicker">TU ACTIVIDAD</span><h1>Todo lo que has elegido.</h1><p>Revisa tus compras anteriores y vuelve a encontrar tus favoritos.</p></section><section *ngIf="historialCompras.length; else noCompras" class="purchase-list"><article *ngFor="let compra of historialCompras" class="purchase-card"><img [src]="compra.foto || 'https://ionicframework.com/docs/img/demos/card-media.png'" [alt]="compra.nombre" /><div class="purchase-info"><span class="purchase-kicker">COMPRA REALIZADA</span><h2>{{ compra.nombre }}</h2><div><span>{{ compra.cantidad }} {{ compra.cantidad === 1 ? 'unidad' : 'unidades' }}</span><strong>{{ compra.precio | currency:'USD':'symbol':'1.0-0' }}</strong></div></div><ion-icon name="checkmark-circle-outline"></ion-icon></article></section><ng-template #noCompras><section class="empty-history"><ion-icon name="receipt-outline"></ion-icon><h2>Aún no tienes compras</h2><p>Cuando realices tu primer pedido aparecerá aquí.</p><ion-button routerLink="/tienda">Explorar catálogo</ion-button></section></ng-template><div class="footer-spacing"></div></main></ion-content>
+<ion-content [fullscreen]="true" class="compras-content">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="header-container">
+    <button class="btn-back" routerLink="/user-profile">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <span>VOLVER</span>
+    </button>
+    <h1 class="page-title">Mis Compras</h1>
+  </div>
+
+  <div class="content-body">
+    <div class="intro-section">
+      <h2 class="section-title">Tu Actividad</h2>
+      <p class="section-desc">Revisa el estado de tus pedidos y tus compras anteriores.</p>
+    </div>
+
+    <!-- ESTADO: CARGANDO -->
+    <div *ngIf="cargando" class="empty-state text-center" style="padding: 2rem;">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p style="margin-top: 1rem; color: #666;">Consultando servidor...</p>
+    </div>
+
+    <!-- Lista de Pedidos -->
+    <div class="pedidos-list" *ngIf="!cargando && historialCompras && historialCompras.length > 0">
+      <div class="pedido-card" *ngFor="let item of historialCompras">
+        
+        <!-- Cabecera de la orden -->
+        <div class="card-header">
+          <span class="order-id">Pedido #{{ item.id }}</span>
+          <span class="order-badge" [ngClass]="item.estado?.toLowerCase() || 'recibido'">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            {{ item.estado || 'Recibido' }}
+          </span>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Detalle de Producto -->
+        <div class="card-body">
+          <div class="product-thumb">
+            <img [src]="item.foto || 'assets/placeholder.png'" [alt]="item.nombre" />
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ item.nombre }}</h3>
+            <span class="product-qty">Cant: {{ item.cantidad }}</span>
+          </div>
+          <div class="product-price">
+            ${{ item.precio | number:'1.0-0' }}
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="card-actions">
+          <button class="btn-detail" (click)="verDetalle(item)">
+            Ver detalle
+          </button>
+          <button class="btn-reorder" (click)="volverAComprar(item.idproducto)">
+            Volver a comprar
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Estado Vacío -->
+    <div class="empty-state" *ngIf="!cargando && (!historialCompras || historialCompras.length === 0)">
+      <div class="empty-icon-box" style="font-size: 3rem; color: #8C7762; text-align: center; margin-bottom: 1rem;">
+        <ion-icon name="bag-handle-outline"></ion-icon>
+      </div>
+      <h3 style="text-align: center; font-family: 'Playfair Display', serif; color: #314235; font-weight: 700;">Sin compras aún</h3>
+      <p style="text-align: center; color: #666; font-size: 0.9rem;">Cuando realices tu primer pedido aparecerá aquí.</p>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem;">
+        <button class="btn-reorder" style="width: 100%; padding: 12px; border-radius: 20px; background: #314235; color: white; border: none; font-weight: 600;" routerLink="/tienda">Explorar Catálogo</button>
+        <button class="btn-detail" style="width: 100%; padding: 12px; border-radius: 20px; background: white; color: #374151; border: 1px solid #D1D5DB; font-weight: 600;" (click)="cargarHistorial()">
+          <ion-icon name="refresh-outline" style="margin-right: 5px;"></ion-icon> Actualizar
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -4,7 +4,6 @@ import { ServicebdService } from '../../services/servicesbd.service';
 import { Productos } from '../../services/productos';
 import { take } from 'rxjs/operators';
 import { ToastController } from '@ionic/angular';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-dtproducto',
@@ -20,11 +19,11 @@ export class DtproductoPage implements OnInit {
   username: string = '';
   foto!: string;
   imagenes: string[] = [];
-  nuevaImagenUrl: string = '';
-  isAdmin: boolean = false;
   currentImageIndex = 0;
 
   mostrarComentarios: boolean = false;
+  isFavorite: boolean = false;
+  selectedVariant: string = 'Normal';
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -46,6 +45,8 @@ export class DtproductoPage implements OnInit {
       message: msj,
       duration: 2000,
       position: 'bottom',
+      color: 'dark',
+      cssClass: 'app-toast'
     });
     await toast.present();
   }
@@ -71,14 +72,16 @@ export class DtproductoPage implements OnInit {
     if (user) {
       this.username = user.username;
       this.foto = user.foto;
-      this.isAdmin = user.isAdmin || false;
     }
   }
   
-  async agregarAlCarrito(producto: Productos) {
+  async agregarAlCarrito() {
     const currentUser = await this.bd.getCurrentUser();
     if (currentUser) {
-      await this.bd.agregarAlCarrito(producto, currentUser.username);
+      const added = await this.bd.agregarAlCarrito(this.producto, currentUser.username);
+      if (added) {
+        this.presentToast(`${this.producto.nombre} añadido al carrito`);
+      }
     } else {
       const toast = await this.toastController.create({
         message: 'Inicia sesión para guardar este producto.',
@@ -140,59 +143,6 @@ export class DtproductoPage implements OnInit {
     }
   }
 
-  async agregarImagen(imagenUrl: string) {
-    if (this.producto) {
-      await this.bd.agregarImagen(this.producto.idproducto, imagenUrl);
-      this.imagenes.push(imagenUrl);
-    } else {
-      this.bd.presentAlert('Error', 'No se pudo agregar la imagen.');
-    }
-  }
-
-  async takePhoto() {
-    const actionSheet = document.createElement('ion-action-sheet');
-    actionSheet.header = 'Selecciona una opción';
-    actionSheet.buttons = [
-      {
-        text: 'Tomar Foto',
-        handler: async () => {
-          try {
-            const image = await Camera.getPhoto({
-              quality: 100,
-              resultType: CameraResultType.Base64,
-              source: CameraSource.Camera,
-            });
-            this.agregarImagen(`data:image/jpeg;base64,${image.base64String}`);
-          } catch (error) {
-            console.error('Error al tomar la foto:', error);
-          }
-        }
-      },
-      {
-        text: 'Seleccionar de la Galería',
-        handler: async () => {
-          try {
-            const image = await Camera.getPhoto({
-              quality: 100,
-              resultType: CameraResultType.Base64,
-              source: CameraSource.Photos,
-            });
-            this.agregarImagen(`data:image/jpeg;base64,${image.base64String}`);
-          } catch (error) {
-            console.error('Error al seleccionar la foto:', error);
-          }
-        }
-      },
-      {
-        text: 'Cancelar',
-        role: 'cancel',
-      }
-    ];
-
-    document.body.appendChild(actionSheet);
-    await actionSheet.present();
-  }
-
   toggleComentarios() {
     this.mostrarComentarios = !this.mostrarComentarios;
   }
@@ -215,5 +165,18 @@ export class DtproductoPage implements OnInit {
 
   setRating(rating: number) {
     this.nuevaCalificacion = rating;
+  }
+
+  toggleFavorite() {
+    this.isFavorite = !this.isFavorite;
+    this.presentToast(this.isFavorite ? 'Agregado a favoritos' : 'Eliminado de favoritos');
+  }
+
+  selectVariant(variant: string) {
+    this.selectedVariant = variant;
+  }
+
+  goBack() {
+    this.router.navigate(['/tienda']);
   }
 }
