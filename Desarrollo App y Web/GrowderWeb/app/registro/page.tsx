@@ -176,6 +176,16 @@ function RegistroForm() {
                     </Link>
                 </p>
 
+                <p className="mt-2 text-center text-xs text-stone-500">
+                    ¿Olvidaste tu contraseña?{" "}
+                    <Link
+                        href="/recuperar-password"
+                        className="font-semibold text-[#8C7762] hover:underline"
+                    >
+                        Recuperar cuenta
+                    </Link>
+                </p>
+
                 <div className="mt-6 text-center">
                     <Link
                         href="/"

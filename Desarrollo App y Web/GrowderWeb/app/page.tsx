@@ -236,17 +236,45 @@ function ContenidoHome() {
 
   return (
     <div className="site-shell flex flex-col min-h-screen">
-      <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
-          <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
-            <img src="/logocircular.png" alt="SuMate Logo" className="h-11 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
-            <div className="hidden lg:block">
-              <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">SuMateCL</span>
-              <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">Más que un mate, una experiencia</span>
-            </div>
-          </Link>
+      <header className="w-full border-b border-[#8C7762]/20 bg-white/95 backdrop-blur-md sticky top-0 z-30">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-8 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-5">
+          {/* Fila superior: Logo y accesos móviles */}
+          <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
+            <Link href="/" className="flex items-center gap-2.5 text-left group shrink-0">
+              <img src="/logocircular.png" alt="SuMate Logo" className="h-10 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+              <div>
+                <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">SuMateCL</span>
+                <span className="hidden lg:block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">Más que un mate, una experiencia</span>
+              </div>
+            </Link>
 
-          <div className="flex-1 min-w-[200px] sm:min-w-[280px] max-w-lg mx-2 sm:mx-4">
+            {/* Accesos rápidos visibles en móvil */}
+            <div className="flex items-center gap-2 sm:hidden shrink-0">
+              <button
+                onClick={() => setCarritoAbierto(!carritoAbierto)}
+                className="relative flex items-center justify-center w-9 h-9 border border-[#8C7762] rounded-full text-[#8C7762] hover:bg-[#8C7762]/10 transition cursor-pointer"
+                aria-label="Abrir carrito"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                </svg>
+                {totalProductos > 0 && <span className="absolute -top-1 -right-1 bg-[#8C7762] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{totalProductos}</span>}
+              </button>
+
+              {usuario ? (
+                <Link href="/mis-compras" className="flex items-center justify-center w-9 h-9 border border-[#314235]/30 text-[#314235] hover:bg-[#314235]/5 rounded-full" title="Mis compras">
+                  <svg className="w-4 h-4 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                </Link>
+              ) : (
+                <Link href="/login" className="text-xs font-semibold text-white bg-[#314235] hover:bg-[#243127] px-3.5 py-1.5 rounded-full transition">
+                  Ingresar
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Barra de búsqueda */}
+          <div className="w-full sm:flex-1 sm:max-w-lg sm:mx-4">
             <BarraBusquedaNav
               valorInicial={busquedaNav}
               alCambiarTexto={(val) => setBusquedaNav(val)}
@@ -259,14 +287,15 @@ function ContenidoHome() {
             />
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Acciones de escritorio */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3 shrink-0">
             <div className="relative group">
               <button
                 onClick={() => setCarritoAbierto(!carritoAbierto)}
                 className="flex items-center gap-2 border border-[#8C7762] rounded-full px-3 py-1.5 text-[#8C7762] font-bold hover:bg-[#8C7762]/10 transition cursor-pointer text-xs"
                 aria-label="Abrir carrito"
               >
-                <span className="hidden sm:inline">${(total || 0).toLocaleString("es-CL")}</span>
+                <span>${(total || 0).toLocaleString("es-CL")}</span>
                 <div className="relative flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
@@ -332,33 +361,33 @@ function ContenidoHome() {
       </header>
 
       <main className="flex-1">
-        <section className="w-full max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-16 lg:pt-16">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16 lg:pt-16">
           <div className="grid lg:grid-cols-[1.05fr_.95fr] gap-8 lg:gap-14 items-center">
             <div className="order-2 lg:order-1">
               <p className="uppercase tracking-[0.25em] text-xs font-bold text-[#a75632]">Tradición & Calidad Artesanal</p>
-              <h1 className="brand-serif mt-4 max-w-2xl text-5xl sm:text-6xl leading-[0.98] tracking-tight text-[#2d2a23]">
+              <h1 className="brand-serif mt-3 sm:mt-4 max-w-2xl text-3xl sm:text-5xl lg:text-6xl leading-[1.08] sm:leading-[0.98] tracking-tight text-[#2d2a23]">
                 El ritual del buen mate, en cada detalle.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-stone-600">
+              <p className="mt-4 sm:mt-6 max-w-xl text-base sm:text-lg leading-7 sm:leading-8 text-stone-600">
                 Descubre nuestra selección exclusiva de mates artesanales, calabazas uruguayas, bombillas cinceladas y accesorios diseñados para perdurar.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button type="button" onClick={scrollAlCatalogo} className="inline-flex items-center gap-2 rounded-full bg-[#a75632] px-6 py-3.5 font-bold text-white shadow-lg shadow-[#a75632]/20 transition hover:-translate-y-0.5 hover:bg-[#884326] cursor-pointer">
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
+                <button type="button" onClick={scrollAlCatalogo} className="w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-full bg-[#a75632] px-6 py-3.5 font-bold text-white shadow-lg shadow-[#a75632]/20 transition hover:-translate-y-0.5 hover:bg-[#884326] cursor-pointer">
                   <span>Explorar catálogo</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                 </button>
               </div>
-              <div className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-stone-600">
+              <div className="mt-8 sm:mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-stone-600">
                 <span className="inline-flex items-center gap-2"><svg className="w-4 h-4 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>Mates 100% artesanales</span></span>
                 <span className="inline-flex items-center gap-2"><svg className="w-4 h-4 text-[#314235]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg><span>Control de stock en tiempo real</span></span>
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
-              <div className="absolute -inset-4 rounded-[2.5rem] bg-[#ddd1ba] rotate-3"></div>
-              <div className="relative overflow-hidden rounded-[2rem] border-8 border-white shadow-2xl bg-[#314235]">
-                <img src="https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=800&q=80" alt="Mates artesanales SoMate" className="h-[26rem] w-full object-cover sm:h-[32rem]" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/75 to-transparent">
-                  <p className="max-w-xs text-sm font-medium text-white">Mates artesanales elaborados con calabaza seleccionada y virola cincelada.</p>
+              <div className="absolute -inset-3 sm:-inset-4 rounded-[2rem] sm:rounded-[2.5rem] bg-[#ddd1ba] rotate-2 sm:rotate-3"></div>
+              <div className="relative overflow-hidden rounded-[1.8rem] sm:rounded-[2rem] border-4 sm:border-8 border-white shadow-2xl bg-[#314235]">
+                <img src="https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=800&q=80" alt="Mates artesanales SoMate" className="h-64 sm:h-80 md:h-[28rem] lg:h-[32rem] w-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/75 to-transparent">
+                  <p className="max-w-xs text-xs sm:text-sm font-medium text-white">Mates artesanales elaborados con calabaza seleccionada y virola cincelada.</p>
                 </div>
               </div>
             </div>
@@ -373,7 +402,7 @@ function ContenidoHome() {
           </div>
         </section>
 
-        <section id="seccion-catalogo" className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-16 scroll-mt-28">
+        <section id="seccion-catalogo" className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 sm:py-16 scroll-mt-28">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -385,17 +414,17 @@ function ContenidoHome() {
                   <><span className="text-xs text-stone-400">·</span><span className="text-xs font-bold text-[#314235] bg-[#314235]/10 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5"><span>{nombreCategoriaActiva}</span><button type="button" onClick={() => handleSeleccionarCategoria("todos")} className="hover:text-red-500 cursor-pointer text-xs ml-0.5" title="Quitar filtro">✕</button></span></>
                 )}
               </div>
-              <h2 className="brand-serif mt-2 text-4xl text-[#2d2a23]">{busquedaNav.trim() ? `Resultados para "${busquedaNav}"` : String(categoriaActiva) === "todos" ? "Catálogo general" : nombreCategoriaActiva}</h2>
+              <h2 className="brand-serif mt-2 text-2xl sm:text-4xl text-[#2d2a23]">{busquedaNav.trim() ? `Resultados para "${busquedaNav}"` : String(categoriaActiva) === "todos" ? "Catálogo general" : nombreCategoriaActiva}</h2>
             </div>
-            <p className="text-sm font-semibold text-stone-500">{cargando ? "Cargando catálogo..." : productosFiltrados.length === 1 ? "1 producto disponible" : `${productosFiltrados.length} productos disponibles`}</p>
+            <p className="text-xs sm:text-sm font-semibold text-stone-500">{cargando ? "Cargando catálogo..." : productosFiltrados.length === 1 ? "1 producto disponible" : `${productosFiltrados.length} productos disponibles`}</p>
           </div>
 
           {cargando ? (
             <div className="mt-12 py-20 text-center"><p className="text-stone-600 font-medium">Cargando inventario de SuMateCL...</p></div>
           ) : productosFiltrados.length === 0 ? (
             <div className="mt-9 rounded-3xl border border-dashed border-[#746a52]/45 bg-white/45 px-6 py-14 text-center">
-              <h3 className="brand-serif mt-4 text-2xl text-[#2d2a23]">{busquedaNav.trim() ? "No se encontraron productos coincidentes" : "No hay productos en esta categoría"}</h3>
-              <p className="mt-2 text-stone-600">{busquedaNav.trim() ? `No encontramos artículos que coincidan con "${busquedaNav}". Prueba con otra palabra clave o quita los filtros.` : `Aún no disponemos de artículos bajo la categoría "${nombreCategoriaActiva}".`}</p>
+              <h3 className="brand-serif mt-4 text-xl sm:text-2xl text-[#2d2a23]">{busquedaNav.trim() ? "No se encontraron productos coincidentes" : "No hay productos en esta categoría"}</h3>
+              <p className="mt-2 text-sm text-stone-600">{busquedaNav.trim() ? `No encontramos artículos que coincidan con "${busquedaNav}". Prueba con otra palabra clave o quita los filtros.` : `Aún no disponemos de artículos bajo la categoría "${nombreCategoriaActiva}".`}</p>
               <div className="mt-5 flex items-center justify-center gap-3">
                 {busquedaNav.trim() && (
                   <button type="button" onClick={() => setBusquedaNav("")} className="inline-flex items-center gap-2 rounded-full border border-[#314235] px-5 py-2 text-xs font-bold text-[#314235] hover:bg-[#314235]/10 transition cursor-pointer">Quitar búsqueda</button>
@@ -404,11 +433,11 @@ function ContenidoHome() {
               </div>
             </div>
           ) : (
-            <div id="product-grid" className="mt-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <div id="product-grid" className="mt-6 sm:mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {productosFiltrados.map((product) => {
                 const sinStock = product.cantidad <= 0;
                 return (
-                  <article key={product.idproducto} className="relative group cursor-pointer rounded-[1.6rem] border border-stone-800/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                  <article key={product.idproducto} className="relative group cursor-pointer rounded-2xl sm:rounded-[1.6rem] border border-stone-800/10 bg-white p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                     <Link href={`/product/${product.idproducto}`} className="absolute inset-0 z-10" />
                     <div>
                       <div className="image-frame flex h-48 sm:h-56 items-center justify-center rounded-2xl overflow-hidden text-[#f8f3e9]">

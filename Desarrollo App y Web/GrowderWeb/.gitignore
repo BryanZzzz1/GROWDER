@@ -43,3 +43,7 @@ next-env.d.ts
 
 #database
 supabase_categorias.sql
+
+# agent rules and context
+AGENTS.md
+MEMORY.md

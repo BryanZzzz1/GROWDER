@@ -549,7 +549,15 @@ export default function ConfirmacionPagoPage() {
             {tabAuth === 'login' ? (
               <form onSubmit={handleInlineLogin} className="space-y-4">
                 <div><label className="block text-xs font-bold text-stone-700 mb-1">Correo electrónico</label><input type="email" required placeholder="correo@ejemplo.cl" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" /></div>
-                <div><label className="block text-xs font-bold text-stone-700 mb-1">Contraseña</label><input type="password" required placeholder="Tu contraseña" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" /></div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-stone-700">Contraseña</label>
+                    <Link href="/recuperar-password" className="text-[11px] font-bold text-[#8C7762] hover:underline">
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+                  <input type="password" required placeholder="Tu contraseña" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" />
+                </div>
                 <button type="submit" disabled={authCargandoSubmit} className="w-full bg-[#314235] hover:bg-[#243127] disabled:opacity-60 text-white font-bold py-3 rounded-full text-xs transition shadow-md cursor-pointer">{authCargandoSubmit ? 'Iniciando sesión...' : 'Ingresar y Continuar al Pago'}</button>
               </form>
             ) : (
@@ -654,13 +662,13 @@ export default function ConfirmacionPagoPage() {
         <form noValidate onSubmit={handleConfirmarPedido} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-200">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-6">
+            <div className="bg-white rounded-3xl p-4 sm:p-8 shadow-sm border border-stone-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-100 mb-6 gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-[#314235]/10 text-[#314235] flex items-center justify-center"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+                  <div className="w-9 h-9 rounded-2xl bg-[#314235]/10 text-[#314235] flex items-center justify-center shrink-0"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
                   <div><h2 className="font-bold text-stone-900 text-base sm:text-lg">Ubicación a donde se enviará</h2><p className="text-xs text-stone-500">Despacho a domicilio en todo el territorio nacional</p></div>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Tarifa Fija: $2.650 CLP</span>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full self-start sm:self-auto">Tarifa Fija: $2.650 CLP</span>
               </div>
 
               <div className="space-y-4">
