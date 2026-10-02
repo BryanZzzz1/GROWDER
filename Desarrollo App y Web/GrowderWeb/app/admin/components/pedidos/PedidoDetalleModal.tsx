@@ -119,6 +119,17 @@ export function PedidoDetalleModal({
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
+          {estadoLocal === "pendiente" && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl flex items-start gap-3">
+              <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p className="font-bold text-sm">Pendiente de Pago</p>
+                <p className="text-xs mt-0.5">Este pedido está pendiente de pago. Si el cliente no completa la transacción, será devuelto a su stock principal (puedes cancelarlo manualmente o esperar a que el cliente lo realice).</p>
+              </div>
+            </div>
+          )}
           <div className="rounded-2xl border border-stone-200 bg-white p-5">
             <div className="space-y-2 text-xs text-stone-600">
               <div className="flex justify-between items-center">
@@ -204,8 +215,8 @@ export function PedidoDetalleModal({
                 </p>
               </div>
 
-              <div className="inline-flex rounded-xl p-1 bg-stone-200/80 gap-1">
-                {(["pendiente", "en despacho", "recibido"] as EstadoPedido[]).map((est) => {
+              <div className="flex flex-wrap rounded-xl p-1 bg-stone-200/80 gap-1">
+                {(["pendiente", "pagado", "preparando", "en despacho", "recibido", "cancelado"] as EstadoPedido[]).map((est) => {
                   {/* Evaluamos contra el estadoLocal */}
                   const esActivo = estadoLocal === est;
                   return (

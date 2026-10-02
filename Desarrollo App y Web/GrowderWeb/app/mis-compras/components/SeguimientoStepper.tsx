@@ -13,7 +13,7 @@ interface SeguimientoStepperProps {
 }
 
 const pasos = [
-  { estado: "pendiente", titulo: "Pedido recibido", desc: "Tu orden fue registrada correctamente en nuestro sistema." },
+  { estado: "pagado", titulo: "Pedido recibido", desc: "Tu orden fue registrada correctamente en nuestro sistema." },
   { estado: "preparando", titulo: "Preparación", desc: "Nuestro equipo está seleccionando y empaquetando minuciosamente tu pedido." },
   { estado: "en transporte", titulo: "Distribución", desc: "El paquete ingresó al proceso de distribución general." },
   { estado: "en despacho", titulo: "En reparto", desc: "El pedido salió a reparto hacia tu dirección." },
@@ -33,20 +33,23 @@ export function SeguimientoStepper({
 
   const indiceNormal = (e: EstadoPedido) => {
     switch (e) {
-      case "pendiente": return 0;
+      case "pendiente": return -1;
+      case "pagado": return 0;
       case "preparando": case "problema stock": return 1;
       case "en transporte": return 2;
       case "en despacho": return 3;
       case "entrega fallida": return 4;
       case "recibido": return 4;
-      default: return 0;
+      default: return -1;
     }
   };
 
-  const pasoActual = indiceNormal(estado);
-  const esProblemaStock = estado === "problema stock";
-  const esEntregaFallida = estado === "entrega fallida";
-  const esEntregado = estado === "recibido";
+  const estadoLocal = estado?.toLowerCase() as EstadoPedido || "pendiente";
+
+  const pasoActual = indiceNormal(estadoLocal);
+  const esProblemaStock = estadoLocal === "problema stock";
+  const esEntregaFallida = estadoLocal === "entrega fallida";
+  const esEntregado = estadoLocal === "recibido";
 
   const formatearFecha = (fechaStr?: string) => {
     if (!fechaStr) return "";
@@ -73,13 +76,17 @@ export function SeguimientoStepper({
               ? "Problema con el stock"
               : esEntregaFallida
               ? "No pudimos realizar la entrega"
-              : estado === "en despacho"
+              : estadoLocal === "en despacho"
               ? "Paquete en camino a tu domicilio"
-              : estado === "en transporte"
+              : estadoLocal === "en transporte"
               ? "Ingresado a distribución"
-              : estado === "preparando"
+              : estadoLocal === "preparando"
               ? "En preparación artesanal"
-              : "Pedido recibido"}
+              : estadoLocal === "pagado"
+              ? "Pedido recibido"
+              : estadoLocal === "pendiente"
+              ? "Pendiente de pago"
+              : "Pedido Cancelado"}
           </h3>
         </div>
 
@@ -94,20 +101,30 @@ export function SeguimientoStepper({
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
               Requiere atención
             </span>
-          ) : estado === "en despacho" || estado === "en transporte" ? (
+          ) : estadoLocal === "en despacho" || estadoLocal === "en transporte" ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800">
               <span className="w-2 h-2 rounded-full bg-sky-600 animate-pulse" />
               En tránsito
             </span>
-          ) : estado === "preparando" ? (
+          ) : estadoLocal === "preparando" ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
               <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
               Preparando
             </span>
-          ) : (
+          ) : estadoLocal === "pagado" ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-stone-100 text-stone-600 border border-stone-200">
               <span className="w-2 h-2 rounded-full bg-stone-500" />
               Recibido
+            </span>
+          ) : estadoLocal === "pendiente" ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+              <span className="w-2 h-2 rounded-full bg-gray-500" />
+              Pendiente
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              Cancelado
             </span>
           )}
         </div>

@@ -46,12 +46,15 @@ export type TabType =
 
 export type EstadoPedido =
   | "pendiente"
+  | "pagado"
   | "preparando"
   | "en transporte"
   | "en despacho"
   | "recibido"
   | "problema stock"
-  | "entrega fallida";
+  | "entrega fallida"
+  | "cancelado"
+  | "rechazado";
 
 export interface PedidoItem {
   id?: number | string;

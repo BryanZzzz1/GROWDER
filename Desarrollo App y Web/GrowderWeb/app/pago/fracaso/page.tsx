@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+import { supabase } from '@/src/lib/supabase';
 
 function FracasoContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const motivo = searchParams.get('motivo');
 
   // Liberar el stock reservado al fracasar o cancelarse el pago
@@ -24,11 +26,14 @@ function FracasoContent() {
     }
 
     if (codigo) {
-      fetch('/api/reserva/liberar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigoReserva: codigo, motivo: 'cancelada' }),
-      }).catch(console.error);
+      supabase.rpc('cancelar_pedido', { p_codigo_pedido: codigo, p_motivo: motivo || 'rechazado' })
+        .then(({ error }) => {
+          if (error) {
+            console.error('Error al cancelar pedido:', error);
+          } else {
+            router.refresh();
+          }
+        });
 
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('sumate_reserva_activa');

@@ -16,6 +16,7 @@ async function procesarRetornoTransbank(request: Request) {
   
   let token_ws = url.searchParams.get('token_ws');
   let TBK_TOKEN = url.searchParams.get('TBK_TOKEN');
+  let TBK_ORDEN_COMPRA = url.searchParams.get('TBK_ORDEN_COMPRA');
   
   if (request.method === 'POST') {
     try {
@@ -23,6 +24,7 @@ async function procesarRetornoTransbank(request: Request) {
       const params = new URLSearchParams(bodyText);
       if (params.get('token_ws')) token_ws = params.get('token_ws');
       if (params.get('TBK_TOKEN')) TBK_TOKEN = params.get('TBK_TOKEN');
+      if (params.get('TBK_ORDEN_COMPRA')) TBK_ORDEN_COMPRA = params.get('TBK_ORDEN_COMPRA');
     } catch (e) {
       console.warn("No se pudo leer el body del POST");
     }
@@ -30,7 +32,13 @@ async function procesarRetornoTransbank(request: Request) {
 
   // Rutas actualizadas a tu estructura original (/pago/...)
   if (TBK_TOKEN && !token_ws) {
-    return NextResponse.redirect(`${origin}/pago/fracaso?motivo=cancelado`);
+    if (TBK_ORDEN_COMPRA) {
+      await supabase.rpc('cancelar_pedido', {
+        p_codigo_pedido: TBK_ORDEN_COMPRA,
+        p_motivo: 'cancelado'
+      });
+    }
+    return NextResponse.redirect(`${origin}/pago/fracaso?motivo=cancelado&orden=${TBK_ORDEN_COMPRA || ''}`);
   }
 
   if (!token_ws) {
@@ -46,29 +54,27 @@ async function procesarRetornoTransbank(request: Request) {
 
     if (commitResponse.status === 'AUTHORIZED') {
       
-      await supabase
-        .from('pedidos')
-        .update({ estado: 'pendiente', updated_at: new Date().toISOString() })
-        .eq('codigo_pedido', commitResponse.buy_order);
-      
-      try {
-        await fetch('http://127.0.0.1:3000/api/reserva/completar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ codigoReserva: commitResponse.buy_order }),
-        });
-      } catch (error) {
-        console.error('Error al ejecutar el descuento de stock interno:', error);
+      const { error } = await supabase.rpc('confirmar_pago_pedido', {
+        p_codigo_pedido: commitResponse.buy_order
+      });
+
+      if (error) {
+        console.error('Error en RPC confirmar_pago_pedido:', error);
       }
 
       // Redirección a la carpeta anidada
       return NextResponse.redirect(`${origin}/pago/exito?orden=${commitResponse.buy_order}&monto=${commitResponse.amount}&token_ws=${token_ws}`);
     
     } else {
-      return NextResponse.redirect(`${origin}/pago/fracaso?motivo=rechazado`);
+      await supabase.rpc('cancelar_pedido', {
+        p_codigo_pedido: commitResponse.buy_order,
+        p_motivo: 'rechazado'
+      });
+      return NextResponse.redirect(`${origin}/pago/fracaso?motivo=rechazado&orden=${commitResponse.buy_order}`);
     }
   } catch (error) {
     console.error("Error al confirmar pago con Transbank:", error);
+    // Intentaremos cancelar el pedido si hay algún buy_order en el request
     return NextResponse.redirect(`${origin}/pago/fracaso?motivo=error_confirmacion`);
   }
 }

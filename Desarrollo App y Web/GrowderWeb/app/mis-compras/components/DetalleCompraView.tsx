@@ -1,19 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pedido } from "@/app/admin/types";
 import { SeguimientoStepper } from "./SeguimientoStepper";
+import { supabase } from "@/src/lib/supabase";
 
 interface DetalleCompraViewProps {
   pedido: Pedido;
   onVolver: () => void;
   onVolverAComprar?: (pedido: Pedido) => void;
+  onCancelarPedido?: (pedido: Pedido) => void;
 }
 
 export function DetalleCompraView({
   pedido,
   onVolver,
   onVolverAComprar,
+  onCancelarPedido,
 }: DetalleCompraViewProps) {
   const [copiado, setCopiado] = useState(false);
+
+  const [tiempoRestante, setTiempoRestante] = useState<number | null>(null);
+  const [tiempoAgotado, setTiempoAgotado] = useState(false);
+  const estadoLocal = pedido.estado?.toLowerCase() || "";
+
+  useEffect(() => {
+    if (estadoLocal !== 'pendiente') return;
+
+    const fechaCreacion = new Date(pedido.created_at).getTime();
+    const expiracion = fechaCreacion + 5 * 60 * 1000;
+
+    const interval = setInterval(() => {
+      const ahora = Date.now();
+      const dif = expiracion - ahora;
+      
+      if (dif <= 0) {
+        clearInterval(interval);
+        setTiempoRestante(0);
+        setTiempoAgotado(true);
+        // Autocancelación silenciosa
+        supabase.rpc('cancelar_pedido', {
+          p_codigo_pedido: pedido.codigo_pedido,
+          p_motivo: 'cancelado'
+        });
+      } else {
+        setTiempoRestante(Math.floor(dif / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [estadoLocal, pedido]);
 
   const formatearPrecio = (valor: number) => {
     return new Intl.NumberFormat("es-CL", {
@@ -65,7 +99,7 @@ export function DetalleCompraView({
         {/* COLUMNA IZQUIERDA (7 cols): Seguimiento y Logística */}
         <div className="lg:col-span-7 space-y-6">
           <SeguimientoStepper
-            estado={pedido.estado}
+            estado={tiempoAgotado ? "cancelado" : pedido.estado}
             fechaCreacion={pedido.created_at}
             fechaActualizacion={pedido.updated_at}
             empresaTransporte={pedido.empresa_transporte}
@@ -108,18 +142,53 @@ export function DetalleCompraView({
               </div>
             </div>
 
-            {/* Acción de Volver a comprar */}
-            {onVolverAComprar && (
-              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => onVolverAComprar(pedido)}
-                  className="w-full py-3 px-5 rounded-full border border-[#314235] text-[#314235] hover:bg-[#314235] hover:text-white font-bold text-xs transition cursor-pointer"
-                >
-                  Volver a comprar
-                </button>
-              </div>
-            )}
+            {/* Acciones del Pedido */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+              {estadoLocal === "pendiente" && !tiempoAgotado ? (
+                <>
+                  {tiempoRestante !== null && (
+                    <div className="text-center bg-amber-50 rounded-full px-4 py-3 border border-amber-200">
+                      <span className="text-amber-800 text-xs font-bold">
+                        Expira en {Math.floor(tiempoRestante / 60).toString().padStart(2, '0')}:{(tiempoRestante % 60).toString().padStart(2, '0')}
+                      </span>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = `/confirmacion-pago?codigo=${pedido.codigo_pedido}`;
+                    }}
+                    className="w-full py-3 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shadow-sm"
+                  >
+                    Completar Pago
+                  </button>
+                  {onCancelarPedido && (
+                    <button
+                      type="button"
+                      onClick={() => onCancelarPedido(pedido)}
+                      className="w-full py-3 px-5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition cursor-pointer"
+                    >
+                      Cancelar Pedido
+                    </button>
+                  )}
+                </>
+              ) : estadoLocal === "pendiente" && tiempoAgotado ? (
+                <div className="w-full flex flex-col items-center p-3 rounded-xl bg-red-50 border border-red-200">
+                  <span className="text-red-800 font-bold text-sm">Tiempo Agotado</span>
+                  <span className="text-red-600 text-xs">La reserva de stock fue liberada.</span>
+                </div>
+              ) : (
+                onVolverAComprar && (
+                  <button
+                    type="button"
+                    onClick={() => onVolverAComprar(pedido)}
+                    className="w-full py-3 px-5 rounded-full border border-[#314235] text-[#314235] hover:bg-[#314235] hover:text-white font-bold text-xs transition cursor-pointer"
+                  >
+                    Volver a comprar
+                  </button>
+                )
+              )}
+            </div>
           </div>
         </div>
 

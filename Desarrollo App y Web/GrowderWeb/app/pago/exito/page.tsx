@@ -4,6 +4,7 @@ import { useEffect, Suspense, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { usarCarrito } from '@/app/datoscarro/estadocarro';
+import { supabase } from '@/src/lib/supabase';
 
 function ExitoContent() {
   const searchParams = useSearchParams();
@@ -23,11 +24,13 @@ function ExitoContent() {
     }
 
     if (orden) {
-      fetch('/api/reserva/completar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigoReserva: orden }),
-      }).catch(console.error);
+      if (paymentId && !tokenWs) {
+        // Retorno de Mercado Pago: confirmamos el pedido con el RPC
+        supabase.rpc('confirmar_pago_pedido', { p_codigo_pedido: orden })
+          .then(({ error }) => {
+            if (error) console.error('Error al confirmar pedido MP:', error);
+          });
+      }
 
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('sumate_reserva_activa');

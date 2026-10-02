@@ -28,8 +28,8 @@ export async function POST(request: Request) {
         ],
         back_urls: {
           success: `${baseUrl}/pago/exito?orden=${body.buyOrder}&monto=${body.amount}`,
-          failure: `${baseUrl}/pago/fracaso?motivo=rechazado`,
-          pending: `${baseUrl}/pago/fracaso?motivo=pendiente`
+          failure: `${baseUrl}/pago/fracaso?motivo=rechazado&orden=${body.buyOrder}`,
+          pending: `${baseUrl}/pago/fracaso?motivo=pendiente&orden=${body.buyOrder}`
         },
         auto_return: 'approved',
       }

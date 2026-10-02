@@ -9,7 +9,7 @@ import SubNavbar from '@/app/components/SubNavbar';
 import BarraBusquedaNav from '@/app/components/BarraBusquedaNav';
 
 export default function DetalleProductoPage() {
-  const { carrito, carritoAbierto, setCarritoAbierto, eliminarDelCarrito, total, agregarAlCarrito } = usarCarrito();
+  const { carrito, carritoAbierto, setCarritoAbierto, eliminarDelCarrito, total, agregarAlCarrito } = usarCarrito(); 
   const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
 
   const params = useParams();
@@ -21,7 +21,7 @@ export default function DetalleProductoPage() {
   const [cantidadCompra, setCantidadCompra] = useState(1);
 
   const [enviosAbierto, setEnviosAbierto] = useState<boolean>(true);
-
+  
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function DetalleProductoPage() {
       try {
         // Consultamos el producto
         const { data: prodData, error: errProd } = await supabase.from('producto').select('*').eq('idproducto', id).single();
-
+        
         // Si Supabase no encuentra el producto, lanzamos el error para ir al catch
         if (errProd) throw errProd;
 
@@ -220,7 +220,7 @@ export default function DetalleProductoPage() {
             </div>
 
             {isAdmin && (
-              <Link href="/admin" className="rounded-full bg-[#8C7762] hover:bg-[#725F4C] px-5 py-2 text-xs font-bold text-white transition shadow-sm">
+              <Link href="/admin" className="hidden lg:flex rounded-full bg-[#8C7762] hover:bg-[#725F4C] px-5 py-2 text-xs font-bold text-white transition shadow-sm">
                 Panel Admin
               </Link>
             )}
@@ -234,14 +234,14 @@ export default function DetalleProductoPage() {
       {/* SECCIÓN PRINCIPAL DE PRODUCTO */}
       <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-
+          
           {/* GALERÍA DE IMÁGENES (CARRUSEL FUNCIONAL) */}
           <div className="flex flex-col gap-4">
-
+            
             <div className="relative w-full h-[450px] bg-white rounded-3xl border border-[#8C7762]/15 shadow-sm flex items-center justify-center p-6 overflow-hidden group">
-              <img
-                src={imagenSeleccionada}
-                alt={producto.nombre}
+              <img 
+                src={imagenSeleccionada} 
+                alt={producto.nombre} 
                 className="max-h-full max-w-full object-contain transition-transform duration-300"
                 onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80"; }}
               />
@@ -266,9 +266,9 @@ export default function DetalleProductoPage() {
             {producto.imagenes.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2 justify-center scrollbar-hide py-1">
                 {producto.imagenes.map((url: string, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => setImagenSeleccionada(url)}
+                  <button 
+                    key={idx} 
+                    onClick={() => setImagenSeleccionada(url)} 
                     className={`w-[72px] h-[72px] rounded-2xl border-2 overflow-hidden bg-white transition-all shrink-0 cursor-pointer ${imagenSeleccionada === url ? 'border-[#527953] shadow-md ring-2 ring-[#527953]/20 scale-105' : 'border-[#8C7762]/20 opacity-60 hover:opacity-100 hover:scale-105'}`}
                   >
                     <img src={url} alt={`Vista ${idx}`} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />

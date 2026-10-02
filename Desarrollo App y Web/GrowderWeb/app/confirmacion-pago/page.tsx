@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usarCarrito } from '@/app/datoscarro/estadocarro';
 import { useAuth } from '@/src/lib/context/AuthContext';
 import { supabase } from '@/src/lib/supabase';
-import { TimerReserva } from './components/TimerReserva';
 
 function generarCodigoPedidoUnico(): string {
   return `SM-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -31,10 +30,12 @@ const REGIONES_CHILE = [
   'Magallanes y de la Antártica Chilena',
 ];
 
-const COSTO_ENVIO_FIJO = 2650; 
+const COSTO_ENVIO_FIJO = 2650;
 
-export default function ConfirmacionPagoPage() {
+function ConfirmacionPagoContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const codigoURL = searchParams.get('codigo');
   const { carrito, total, actualizarCantidad, eliminarDelCarrito, limpiarCarrito } = usarCarrito();
   const { usuario, cargando: authCargando } = useAuth();
 
@@ -61,14 +62,77 @@ export default function ConfirmacionPagoPage() {
 
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
+  
+  // Timer state
+  const [pedidoExistente, setPedidoExistente] = useState<any>(null);
+  const [tiempoRestante, setTiempoRestante] = useState<number | null>(null);
+  const [tiempoAgotado, setTiempoAgotado] = useState(false);
 
-  const [codigoReserva, setCodigoReserva] = useState<string | null>(null);
-  const [segundosRestantes, setSegundosRestantes] = useState<number>(120);
-  const [reservaExpirada, setReservaExpirada] = useState<boolean>(false);
-  const [cargandoReserva, setCargandoReserva] = useState<boolean>(false);
-  const [reservaActiva, setReservaActiva] = useState<boolean>(false);
-  const [errorStock, setErrorStock] = useState<string | null>(null);
+  useEffect(() => {
+    if (!codigoURL) return;
+    
+    let montado = true;
+    const fetchPedido = async () => {
+      const { data, error } = await supabase
+        .from('pedidos')
+        .select('*')
+        .eq('codigo_pedido', codigoURL)
+        .single();
+        
+      if (!montado) return;
+      if (error || !data) {
+        console.error("Pedido no encontrado", error);
+        return;
+      }
+      
+      setPedidoExistente(data);
+      setNombre(data.nombre_cliente || '');
+      setTelefono(data.telefono_cliente || '');
+      setEmail(data.email_cliente || '');
+      setRegion(data.region || '');
+      setComuna(data.comuna || '');
+      setDireccion(data.direccion || '');
+      setDepto(data.depto || '');
+      setInstrucciones(data.instrucciones || '');
+      setNumeroPedido(data.codigo_pedido);
+      
+      if (data.estado !== 'pendiente') {
+        // Si no está pendiente, podría ya estar pagado o cancelado.
+        // Lo dejamos caer en la expiración automática o UI deshabilitada.
+        setTiempoAgotado(true);
+      }
+    };
+    
+    fetchPedido();
+    return () => { montado = false; };
+  }, [codigoURL]);
 
+  useEffect(() => {
+    if (!pedidoExistente || pedidoExistente.estado !== 'pendiente') return;
+
+    const fechaCreacion = new Date(pedidoExistente.created_at).getTime();
+    const expiracion = fechaCreacion + 5 * 60 * 1000;
+
+    const interval = setInterval(() => {
+      const ahora = Date.now();
+      const dif = expiracion - ahora;
+      
+      if (dif <= 0) {
+        clearInterval(interval);
+        setTiempoRestante(0);
+        setTiempoAgotado(true);
+        // Cancelar automáticamente en la DB si el tiempo expiró
+        supabase.rpc('cancelar_pedido', {
+          p_codigo_pedido: pedidoExistente.codigo_pedido,
+          p_motivo: 'cancelado'
+        });
+      } else {
+        setTiempoRestante(Math.floor(dif / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [pedidoExistente]);
   useEffect(() => {
     let montado = true;
 
@@ -134,161 +198,7 @@ export default function ConfirmacionPagoPage() {
     };
   }, [usuario, authCargando]);
 
-  const iniciarORestaurarReserva = useCallback(async () => {
-    if (carrito.length === 0) return;
-
-    setCargandoReserva(true);
-    setErrorStock(null);
-
-    try {
-      const guardada =
-        typeof window !== 'undefined'
-          ? sessionStorage.getItem('sumate_reserva_activa')
-          : null;
-
-      if (guardada) {
-        try {
-          const parsed = JSON.parse(guardada);
-          const expiraMs = new Date(parsed.expiraEn).getTime();
-          const ahoraMs = Date.now();
-          const restantes = Math.floor((expiraMs - ahoraMs) / 1000);
-
-          if (restantes > 0) {
-            setCodigoReserva(parsed.codigoReserva);
-            setNumeroPedido(parsed.codigoReserva);
-            setSegundosRestantes(restantes);
-            setReservaActiva(true);
-            setReservaExpirada(false);
-            setCargandoReserva(false);
-            return;
-          } else {
-            sessionStorage.removeItem('sumate_reserva_activa');
-          }
-        } catch {
-          sessionStorage.removeItem('sumate_reserva_activa');
-        }
-      }
-
-      const nuevoCodigo = generarCodigoPedidoUnico();
-      setCodigoReserva(nuevoCodigo);
-      setNumeroPedido(nuevoCodigo);
-
-      const itemsParaReservar = carrito.map((item) => ({
-        idproducto: item.id,
-        nombre: item.nombre,
-        precio: item.precio,
-        cantidad: item.cantidad,
-      }));
-
-      const res = await fetch('/api/reserva/iniciar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          codigoReserva: nuevoCodigo,
-          items: itemsParaReservar,
-          usuarioId: usuario?.id || null,
-          email: email || null,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setErrorStock(data.error || 'No fue posible apartar las unidades del pedido');
-        setCargandoReserva(false);
-        return;
-      }
-
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem(
-          'sumate_reserva_activa',
-          JSON.stringify({
-            codigoReserva: nuevoCodigo,
-            expiraEn: data.expiraEn,
-          })
-        );
-      }
-
-      setSegundosRestantes(120);
-      setReservaActiva(true);
-      setReservaExpirada(false);
-    } catch (err: any) {
-      console.error('Error al inicializar reserva:', err);
-    } finally {
-      setCargandoReserva(false);
-    }
-  }, [carrito, usuario?.id, email]);
-
-  useEffect(() => {
-    if (carrito.length > 0 && !reservaActiva && !reservaExpirada && !codigoReserva) {
-      iniciarORestaurarReserva();
-    }
-  }, [carrito.length, reservaActiva, reservaExpirada, codigoReserva, iniciarORestaurarReserva]);
-
-  useEffect(() => {
-    if (!reservaActiva || reservaExpirada) return;
-
-    const interval = setInterval(() => {
-      setSegundosRestantes((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setReservaExpirada(true);
-          setReservaActiva(false);
-
-          if (codigoReserva) {
-            fetch('/api/reserva/liberar', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                codigoReserva,
-                motivo: 'expirada',
-                items: carrito.map((it) => ({
-                  idproducto: it.id,
-                  cantidad: it.cantidad,
-                })),
-              }),
-            }).catch(console.error);
-          }
-
-          if (typeof window !== 'undefined') {
-            sessionStorage.removeItem('sumate_reserva_activa');
-          }
-
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [reservaActiva, reservaExpirada, codigoReserva, carrito]);
-
-  const handleReintentarReserva = () => {
-    setReservaExpirada(false);
-    iniciarORestaurarReserva();
-  };
-
   const handleVolverTienda = async () => {
-    if (codigoReserva && !reservaExpirada) {
-      try {
-        await fetch('/api/reserva/liberar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            codigoReserva,
-            motivo: 'cancelada',
-            items: carrito.map((it) => ({
-              idproducto: it.id,
-              cantidad: it.cantidad,
-            })),
-          }),
-        });
-      } catch {
-      }
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('sumate_reserva_activa');
-      }
-    }
     router.push('/');
   };
 
@@ -397,50 +307,64 @@ export default function ConfirmacionPagoPage() {
       return;
     }
 
-    if (reservaExpirada) {
-      alert("El tiempo de reserva de 2 minutos ha finalizado. Por favor presiona 'Volver a reservar' para continuar con la compra.");
-      return;
-    }
-
     setErrores({});
-    const codigo = codigoReserva || numeroPedido || generarCodigoPedidoUnico();
+    const codigo = numeroPedido || generarCodigoPedidoUnico();
     setNumeroPedido(codigo);
     setProcesandoPago(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
-      const { error: dbError } = await supabase
-        .from('pedidos')
-        .insert({
-          codigo_pedido: codigo,
-          usuario_id: session?.user?.id || null, 
-          email_cliente: session?.user?.email || email, 
-          nombre_cliente: nombre,
-          telefono_cliente: telefono,
-          region: region,
-          comuna: comuna,
-          direccion: direccion,
-          depto: depto || null,
-          instrucciones: instrucciones || null,
-          metodo_pago: metodoPago,
-          estado: 'pendiente', 
-          subtotal: total,
-          costo_envio: COSTO_ENVIO_FIJO,
-          total: totalFinal,
-          items: carrito
-        });
 
-      if (dbError && dbError.code !== '23505') { 
-        throw dbError;
+      if (pedidoExistente) {
+        // Doble verificación: comprobar que Date.now() < fechaExpiracion
+        const fechaCreacion = new Date(pedidoExistente.created_at).getTime();
+        const expiracion = fechaCreacion + 5 * 60 * 1000;
+        if (Date.now() >= expiracion) {
+          alert('El tiempo límite para completar el pago ha expirado. Tu reserva fue liberada.');
+          setTiempoAgotado(true);
+          setProcesandoPago(false);
+          supabase.rpc('cancelar_pedido', {
+            p_codigo_pedido: pedidoExistente.codigo_pedido,
+            p_motivo: 'cancelado'
+          });
+          return;
+        }
+      } else {
+        const { error: dbError } = await supabase
+          .from('pedidos')
+          .insert({
+            codigo_pedido: codigo,
+            usuario_id: session?.user?.id || null,
+            email_cliente: session?.user?.email || email,
+            nombre_cliente: nombre,
+            telefono_cliente: telefono,
+            region: region,
+            comuna: comuna,
+            direccion: direccion,
+            depto: depto || null,
+            instrucciones: instrucciones || null,
+            metodo_pago: metodoPago,
+            estado: 'pendiente',
+            subtotal: total,
+            costo_envio: COSTO_ENVIO_FIJO,
+            total: totalFinal,
+            items: carrito
+          });
+
+        if (dbError && dbError.code !== '23505') {
+          throw dbError;
+        }
       }
+
+      // Si existe un pedido previo, usamos su monto total; de lo contrario usamos totalFinal
+      const montoAPagar = pedidoExistente ? pedidoExistente.total : totalFinal;
 
       if (metodoPago === 'webpay') {
         const response = await fetch('/api/webpay/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: totalFinal,
+            amount: montoAPagar,
             buyOrder: codigo,
             sessionId: `sesion-${Date.now()}`,
             returnUrl: `${window.location.origin}/api/webpay/commit`
@@ -453,12 +377,12 @@ export default function ConfirmacionPagoPage() {
           const form = document.createElement('form');
           form.action = data.url;
           form.method = 'POST';
-          
+
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = 'token_ws';
           input.value = data.token;
-          
+
           form.appendChild(input);
           document.body.appendChild(form);
           form.submit();
@@ -471,7 +395,7 @@ export default function ConfirmacionPagoPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: totalFinal,
+            amount: montoAPagar,
             buyOrder: codigo,
           })
         });
@@ -568,7 +492,7 @@ export default function ConfirmacionPagoPage() {
     );
   }
 
-  if (carrito.length === 0 && !mostrarModalExito) {
+  if (carrito.length === 0 && !pedidoExistente && !mostrarModalExito) {
     return (
       <div className="site-shell min-h-screen flex flex-col bg-[#f8f3e9]">
         <header className="border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
@@ -626,34 +550,16 @@ export default function ConfirmacionPagoPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-12 flex-1 w-full">
         <div className="mb-6">
-          <h1 className="brand-serif text-2xl sm:text-3xl font-bold text-stone-900">Revisión y Confirmación de Pedido</h1>
-          <p className="text-stone-600 text-sm mt-1">Verifica la ubicación de despacho, el detalle de tus productos y el método de pago seleccionado.</p>
+          <h1 className="brand-serif text-2xl sm:text-3xl font-bold text-stone-900">
+            {pedidoExistente ? `Pagar Reserva ${pedidoExistente.codigo_pedido}` : 'Revisión y Confirmación de Pedido'}
+          </h1>
+          <p className="text-stone-600 text-sm mt-1">
+            {pedidoExistente ? 'Revisa tu pedido pendiente y selecciona el método de pago para completarlo.' : 'Verifica la ubicación de despacho, el detalle de tus productos y el método de pago seleccionado.'}
+          </p>
         </div>
 
-        {errorStock && (
-          <div className="w-full bg-rose-50 border border-rose-300 text-rose-800 rounded-2xl p-4 mb-6 flex items-start gap-3">
-            <svg className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <p className="font-bold text-sm">Disponibilidad de Inventario</p>
-              <p className="text-xs text-rose-700 mt-0.5">{errorStock}</p>
-            </div>
-          </div>
-        )}
-
-        <TimerReserva
-          segundosRestantes={segundosRestantes}
-          totalSegundos={120}
-          estaExpirado={reservaExpirada}
-          cargandoReserva={cargandoReserva}
-          codigoReserva={codigoReserva}
-          onReintentarReserva={handleReintentarReserva}
-          onVolverTienda={handleVolverTienda}
-        />
-
         <form noValidate onSubmit={handleConfirmarPedido} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           <div className="lg:col-span-7 space-y-8">
             <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-stone-200">
               <div className="flex items-center justify-between pb-4 border-b border-stone-100 mb-6">
@@ -668,32 +574,32 @@ export default function ConfirmacionPagoPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="campo-nombre" className={`block text-xs font-bold uppercase tracking-wider mb-1.5 transition-colors ${errores.nombre ? 'text-red-600' : 'text-stone-600'}`}>Nombre y Apellido *</label>
-                    <input id="campo-nombre" type="text" placeholder="Ej: Matías González" value={nombre} onChange={(e) => { setNombre(e.target.value); if (errores.nombre) setErrores((prev) => ({ ...prev, nombre: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition ${errores.nombre ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
+                    <input disabled={!!pedidoExistente} id="campo-nombre" type="text" placeholder="Ej: Matías González" value={nombre} onChange={(e) => { setNombre(e.target.value); if (errores.nombre) setErrores((prev) => ({ ...prev, nombre: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition disabled:bg-stone-100 disabled:text-stone-500 ${errores.nombre ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
                     {errores.nombre && (<p className="mt-1 text-xs text-red-600 font-medium flex items-center gap-1"><svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>{errores.nombre}</span></p>)}
                   </div>
                   <div>
                     <label htmlFor="campo-telefono" className={`block text-xs font-bold uppercase tracking-wider mb-1.5 transition-colors ${errores.telefono ? 'text-red-600' : 'text-stone-600'}`}>Teléfono de Contacto *</label>
-                    <input id="campo-telefono" type="tel" placeholder="Ej: 912345678" value={telefono} onChange={(e) => { setTelefono(e.target.value); if (errores.telefono) setErrores((prev) => ({ ...prev, telefono: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition ${errores.telefono ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
+                    <input disabled={!!pedidoExistente} id="campo-telefono" type="tel" placeholder="Ej: 912345678" value={telefono} onChange={(e) => { setTelefono(e.target.value); if (errores.telefono) setErrores((prev) => ({ ...prev, telefono: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition disabled:bg-stone-100 disabled:text-stone-500 ${errores.telefono ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
                     {errores.telefono && (<p className="mt-1 text-xs text-red-600 font-medium flex items-center gap-1"><svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>{errores.telefono}</span></p>)}
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="campo-email" className={`block text-xs font-bold uppercase tracking-wider mb-1.5 transition-colors ${errores.email ? 'text-red-600' : 'text-stone-600'}`}>Correo Electrónico *</label>
-                  <input id="campo-email" type="email" placeholder="correo@ejemplo.cl" value={email} onChange={(e) => { setEmail(e.target.value); if (errores.email) setErrores((prev) => ({ ...prev, email: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition ${errores.email ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
+                  <input disabled={!!pedidoExistente} id="campo-email" type="email" placeholder="correo@ejemplo.cl" value={email} onChange={(e) => { setEmail(e.target.value); if (errores.email) setErrores((prev) => ({ ...prev, email: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition disabled:bg-stone-100 disabled:text-stone-500 ${errores.email ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
                   {errores.email && (<p className="mt-1 text-xs text-red-600 font-medium flex items-center gap-1"><svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>{errores.email}</span></p>)}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">Región *</label>
-                    <select value={region} onChange={(e) => setRegion(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2.5 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition bg-white">
+                    <select disabled={!!pedidoExistente} value={region} onChange={(e) => setRegion(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2.5 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition bg-white disabled:bg-stone-100 disabled:text-stone-500">
                       {REGIONES_CHILE.map((reg) => (<option key={reg} value={reg}>{reg}</option>))}
                     </select>
                   </div>
                   <div>
                     <label htmlFor="campo-comuna" className={`block text-xs font-bold uppercase tracking-wider mb-1.5 transition-colors ${errores.comuna ? 'text-red-600' : 'text-stone-600'}`}>Comuna / Ciudad *</label>
-                    <input id="campo-comuna" type="text" placeholder="Ej: Providencia" value={comuna} onChange={(e) => { setComuna(e.target.value); if (errores.comuna) setErrores((prev) => ({ ...prev, comuna: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition ${errores.comuna ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
+                    <input disabled={!!pedidoExistente} id="campo-comuna" type="text" placeholder="Ej: Providencia" value={comuna} onChange={(e) => { setComuna(e.target.value); if (errores.comuna) setErrores((prev) => ({ ...prev, comuna: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition disabled:bg-stone-100 disabled:text-stone-500 ${errores.comuna ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
                     {errores.comuna && (<p className="mt-1 text-xs text-red-600 font-medium flex items-center gap-1"><svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>{errores.comuna}</span></p>)}
                   </div>
                 </div>
@@ -701,18 +607,18 @@ export default function ConfirmacionPagoPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2">
                     <label htmlFor="campo-direccion" className={`block text-xs font-bold uppercase tracking-wider mb-1.5 transition-colors ${errores.direccion ? 'text-red-600' : 'text-stone-600'}`}>Calle y Número *</label>
-                    <input id="campo-direccion" type="text" placeholder="Ej: Av. Providencia 1234" value={direccion} onChange={(e) => { setDireccion(e.target.value); if (errores.direccion) setErrores((prev) => ({ ...prev, direccion: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition ${errores.direccion ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
+                    <input disabled={!!pedidoExistente} id="campo-direccion" type="text" placeholder="Ej: Av. Providencia 1234" value={direccion} onChange={(e) => { setDireccion(e.target.value); if (errores.direccion) setErrores((prev) => ({ ...prev, direccion: undefined })); }} className={`w-full text-sm rounded-xl border px-3.5 py-2.5 outline-none transition disabled:bg-stone-100 disabled:text-stone-500 ${errores.direccion ? 'border-red-500 bg-red-50/20 text-stone-900 focus:border-red-600 focus:ring-1 focus:ring-red-500' : 'border-stone-300 focus:border-[#314235] focus:ring-1 focus:ring-[#314235]'}`} />
                     {errores.direccion && (<p className="mt-1 text-xs text-red-600 font-medium flex items-center gap-1"><svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>{errores.direccion}</span></p>)}
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">Depto / Casa <span className="text-stone-400 font-normal">(Opcional)</span></label>
-                    <input type="text" placeholder="Ej: Depto 502" value={depto} onChange={(e) => setDepto(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2.5 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition" />
+                    <input disabled={!!pedidoExistente} type="text" placeholder="Ej: Depto 502" value={depto} onChange={(e) => setDepto(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2.5 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition disabled:bg-stone-100 disabled:text-stone-500" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">Instrucciones de entrega <span className="text-stone-400 font-normal">(Opcional)</span></label>
-                  <textarea rows={2} placeholder="Ej: Dejar en conserjería..." value={instrucciones} onChange={(e) => setInstrucciones(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition resize-none" />
+                  <textarea disabled={!!pedidoExistente} rows={2} placeholder="Ej: Dejar en conserjería..." value={instrucciones} onChange={(e) => setInstrucciones(e.target.value)} className="w-full text-sm rounded-xl border border-stone-300 px-3.5 py-2 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition resize-none disabled:bg-stone-100 disabled:text-stone-500" />
                 </div>
               </div>
             </div>
@@ -766,25 +672,28 @@ export default function ConfirmacionPagoPage() {
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-stone-200">
               <div className="flex items-center justify-between pb-4 border-b border-stone-100">
                 <h2 className="font-bold text-stone-900 text-lg brand-serif">Detalle del Pedido</h2>
-                <span className="text-xs font-bold text-[#8C7762] bg-[#8C7762]/10 px-3 py-1 rounded-full">{totalProductos} {totalProductos === 1 ? 'producto' : 'productos'}</span>
+                <span className="text-xs font-bold text-[#8C7762] bg-[#8C7762]/10 px-3 py-1 rounded-full">{pedidoExistente ? pedidoExistente.items.reduce((acc: number, item: any) => acc + item.cantidad, 0) : totalProductos} {(pedidoExistente ? pedidoExistente.items.reduce((acc: number, item: any) => acc + item.cantidad, 0) : totalProductos) === 1 ? 'producto' : 'productos'}</span>
               </div>
 
               <div className="divide-y divide-stone-100 my-4 max-h-[380px] overflow-y-auto pr-1">
-                {carrito.map((item) => (
+                {(pedidoExistente ? pedidoExistente.items : carrito).map((item: any) => (
                   <div key={item.id} className="py-3.5 flex items-center gap-3">
                     <img src={item.imagen} alt={item.nombre} className="w-14 h-14 object-cover rounded-xl border border-stone-200 shrink-0" onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80'; }} />
                     <div className="flex-1 min-w-0">
                       <h3 className="text-xs font-bold text-stone-900 truncate">{item.nombre}</h3>
                       <p className="text-[11px] text-stone-500">{formatearPrecio(item.precio)} c/u</p>
                       <div className="flex items-center gap-2 mt-1.5">
-                        {actualizarCantidad && (
+                        {actualizarCantidad && !pedidoExistente && (
                           <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50 text-xs">
                             <button type="button" onClick={() => actualizarCantidad(item.id, -1)} className="px-2 py-0.5 text-stone-600 hover:text-black font-bold cursor-pointer">-</button>
                             <span className="px-2 font-bold text-stone-800 text-xs">{item.cantidad}</span>
                             <button type="button" onClick={() => actualizarCantidad(item.id, 1)} className="px-2 py-0.5 text-stone-600 hover:text-black font-bold cursor-pointer">+</button>
                           </div>
                         )}
-                        <button type="button" onClick={() => eliminarDelCarrito(item.id)} className="text-[10px] text-red-500 hover:underline cursor-pointer ml-1">Quitar</button>
+                        {pedidoExistente && (
+                          <span className="px-2 font-bold text-stone-800 text-xs border border-stone-200 rounded-lg bg-stone-50">Cant: {item.cantidad}</span>
+                        )}
+                        {!pedidoExistente && <button type="button" onClick={() => eliminarDelCarrito(item.id)} className="text-[10px] text-red-500 hover:underline cursor-pointer ml-1">Quitar</button>}
                       </div>
                     </div>
                     <div className="text-right"><span className="text-xs font-bold text-stone-900 block">{formatearPrecio(item.precio * item.cantidad)}</span></div>
@@ -793,38 +702,59 @@ export default function ConfirmacionPagoPage() {
               </div>
 
               <div className="border-t border-stone-100 pt-4 space-y-2.5 text-xs">
-                <div className="flex justify-between text-stone-600"><span>Subtotal productos:</span><span className="font-semibold text-stone-900">{formatearPrecio(total)}</span></div>
-                <div className="flex justify-between text-stone-600"><span>IVA (19%):</span><span className="font-semibold text-stone-900">{formatearPrecio(iva)}</span></div>
-                <div className="flex justify-between items-center text-stone-600"><div className="flex items-center gap-1.5"><span>Despacho a domicilio:</span><span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded">Fijo</span></div><span className="font-bold text-emerald-800">{formatearPrecio(COSTO_ENVIO_FIJO)}</span></div>
-                <div className="border-t border-stone-200 pt-3.5 mt-2 flex justify-between items-baseline"><div><span className="text-sm font-bold text-stone-900 block">Total a Pagar</span><span className="text-[10px] text-stone-500">Impuestos y despacho aplicados</span></div><span className="text-xl font-bold text-[#314235] brand-serif">{formatearPrecio(totalFinal)}</span></div>
+                <div className="flex justify-between text-stone-600"><span>Subtotal productos:</span><span className="font-semibold text-stone-900">{formatearPrecio(pedidoExistente ? pedidoExistente.subtotal : total)}</span></div>
+                <div className="flex justify-between text-stone-600"><span>IVA (19%):</span><span className="font-semibold text-stone-900">{formatearPrecio(pedidoExistente ? Math.round(pedidoExistente.subtotal * 0.19) : iva)}</span></div>
+                <div className="flex justify-between items-center text-stone-600"><div className="flex items-center gap-1.5"><span>Despacho a domicilio:</span><span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded">Fijo</span></div><span className="font-bold text-emerald-800">{formatearPrecio(pedidoExistente ? pedidoExistente.costo_envio : COSTO_ENVIO_FIJO)}</span></div>
+                <div className="border-t border-stone-200 pt-3.5 mt-2 flex justify-between items-baseline"><div><span className="text-sm font-bold text-stone-900 block">Total a Pagar</span><span className="text-[10px] text-stone-500">Impuestos y despacho aplicados</span></div><span className="text-xl font-bold text-[#314235] brand-serif">{formatearPrecio(pedidoExistente ? pedidoExistente.total : totalFinal)}</span></div>
               </div>
 
               {Object.keys(errores).length > 0 && (
                 <div className="mt-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5"><svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><div><span className="font-bold block">Faltan campos por completar</span><span>Revisa los campos destacados en rojo.</span></div></div>
               )}
 
-              <button
-                type="submit"
-                disabled={carrito.length === 0 || procesandoPago || reservaExpirada || !!errorStock || cargandoReserva}
-                className="mt-6 w-full bg-[#314235] hover:bg-[#243127] text-white py-4 rounded-full font-bold text-sm transition shadow-lg hover:shadow-xl disabled:bg-stone-400 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>
-                  {procesandoPago
-                    ? `Conectando con ${metodoPago === 'webpay' ? 'Webpay' : 'Mercado Pago'}...`
-                    : cargandoReserva
-                    ? 'Apartando stock...'
-                    : reservaExpirada
-                    ? 'Reserva Expirada - Vuelve a Reservar'
-                    : errorStock
-                    ? 'Sin stock disponible'
-                    : `Pagar con ${metodoPago === 'webpay' ? 'Webpay Plus' : 'Mercado Pago'}`}
-                </span>
-                {!procesandoPago && !reservaExpirada && !errorStock && !cargandoReserva && <span>→</span>}
-              </button>
+              {pedidoExistente && pedidoExistente.estado === 'pendiente' && !tiempoAgotado && tiempoRestante !== null && (
+                <div className="mt-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-center flex flex-col items-center justify-center space-y-1">
+                  <span className="text-xs font-bold uppercase tracking-wider">Tiempo restante para pagar</span>
+                  <span className="text-2xl font-mono font-black tabular-nums">
+                    {Math.floor(tiempoRestante / 60).toString().padStart(2, '0')}:{(tiempoRestante % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+              )}
+
+              {tiempoAgotado && (
+                <div className="mt-5 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-center flex flex-col items-center justify-center space-y-2">
+                  <span className="text-sm font-bold">Tiempo agotado - Reserva liberada</span>
+                  <p className="text-xs">El límite de 5 minutos para pagar este pedido ha expirado.</p>
+                  <button type="button" onClick={handleVolverTienda} className="mt-2 text-xs bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition">Volver a la tienda</button>
+                </div>
+              )}
+
+              {!tiempoAgotado && (
+                <button
+                  type="submit"
+                  disabled={(carrito.length === 0 && !pedidoExistente) || procesandoPago}
+                  className="mt-6 w-full bg-[#314235] hover:bg-[#243127] text-white py-4 rounded-full font-bold text-sm transition shadow-lg hover:shadow-xl disabled:bg-stone-400 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>
+                    {procesandoPago
+                      ? `Conectando con ${metodoPago === 'webpay' ? 'Webpay' : 'Mercado Pago'}...`
+                      : `Pagar con ${metodoPago === 'webpay' ? 'Webpay Plus' : 'Mercado Pago'}`}
+                  </span>
+                  {!procesandoPago && <span>→</span>}
+                </button>
+              )}
             </div>
           </div>
         </form>
       </main>
     </div>
+  );
+}
+
+export default function ConfirmacionPagoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center pt-24"><div className="w-8 h-8 border-4 border-[#8C7762] border-t-transparent rounded-full animate-spin" /></div>}>
+      <ConfirmacionPagoContent />
+    </Suspense>
   );
 }
