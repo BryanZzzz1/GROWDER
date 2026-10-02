@@ -46,25 +46,46 @@ export function AccesosRapidos({ esAdmin }: AccesosRapidosProps) {
 
       {/* Tarjeta 3: Panel Administrador (si corresponde) o Catálogo */}
       {esAdmin ? (
-        <Link
-          href="/admin"
-          className="bg-stone-900 text-white rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group"
-        >
-          <div>
-            <div className="w-10 h-10 rounded-xl bg-stone-800 flex items-center justify-center text-emerald-400 font-bold text-lg mb-3">
-              ★
+        <>
+          <Link
+            href="/admin"
+            className="hidden lg:flex bg-stone-900 text-white rounded-2xl p-5 shadow-sm hover:shadow-md transition flex-col justify-between group"
+          >
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-stone-800 flex items-center justify-center text-emerald-400 font-bold text-lg mb-3">
+                ★
+              </div>
+              <h3 className="font-bold text-white group-hover:text-emerald-400 transition">
+                Panel Backoffice
+              </h3>
+              <p className="text-xs text-stone-300 mt-1">
+                Gestión de inventario, despacho de pedidos y control de usuarios.
+              </p>
             </div>
-            <h3 className="font-bold text-white group-hover:text-emerald-400 transition">
-              Panel Backoffice
-            </h3>
-            <p className="text-xs text-stone-300 mt-1">
-              Gestión de inventario, despacho de pedidos y control de usuarios.
-            </p>
-          </div>
-          <span className="text-xs font-bold text-emerald-400 mt-4 inline-block">
-            Ir a /admin →
-          </span>
-        </Link>
+            <span className="text-xs font-bold text-emerald-400 mt-4 inline-block">
+              Ir a /admin →
+            </span>
+          </Link>
+          <Link
+            href="/"
+            className="lg:hidden bg-white rounded-2xl p-5 border border-stone-200 shadow-sm hover:shadow-md hover:border-[#8C7762] transition group flex flex-col justify-between"
+          >
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-stone-100 group-hover:bg-[#f2ebe2] flex items-center justify-center text-[#8C7762] font-bold text-lg mb-3 transition">
+                +
+              </div>
+              <h3 className="font-bold text-stone-900 group-hover:text-[#8C7762] transition">
+                Catálogo GROWDER
+              </h3>
+              <p className="text-xs text-stone-500 mt-1">
+                Explora nuevos productos, ofertas exclusivas y novedades para el cultivo.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-[#8C7762] mt-4 inline-block">
+              Ir a la tienda →
+            </span>
+          </Link>
+        </>
       ) : (
         <Link
           href="/"

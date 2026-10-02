@@ -10,7 +10,7 @@ export function AdminHeader() {
           </div>
           <div className="hidden sm:block">
             <span className="block brand-serif font-bold tracking-tight text-lg leading-none text-[#2d2a23]">
-              SoMate
+              SuMate
             </span>
             <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-stone-500">
               Mates y accesorios
@@ -26,6 +26,12 @@ export function AdminHeader() {
             className="rounded-full px-4 py-2 text-sm font-semibold text-[#314235] transition hover:bg-[#e8e0d0]"
           >
             Catálogo
+          </Link>
+          <Link
+            href="/bodega"
+            className="rounded-full px-4 py-2 text-sm font-semibold text-[#314235] transition hover:bg-[#e8e0d0]"
+          >
+            Bodega
           </Link>
           <Link
             href="/admin"

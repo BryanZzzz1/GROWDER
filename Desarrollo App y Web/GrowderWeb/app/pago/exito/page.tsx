@@ -30,7 +30,7 @@ function ExitoContent() {
       }).catch(console.error);
 
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('somate_reserva_activa');
+        sessionStorage.removeItem('sumate_reserva_activa');
       }
     }
 

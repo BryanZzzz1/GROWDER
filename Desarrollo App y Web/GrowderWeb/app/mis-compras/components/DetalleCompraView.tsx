@@ -200,7 +200,7 @@ export function DetalleCompraView({
               <p>{pedido.comuna}, {pedido.region}</p>
               <p className="text-stone-400">Tel: +56 {pedido.telefono_cliente}</p>
               {pedido.instrucciones && (
-                <div className="mt-2 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[11px]">
+                <div className="mt-2 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[11px] break-words break-all">
                   <strong className="block">Indicaciones:</strong>
                   {pedido.instrucciones}
                 </div>

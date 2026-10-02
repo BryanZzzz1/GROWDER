@@ -12,7 +12,7 @@ function FracasoContent() {
   useEffect(() => {
     let codigo = searchParams.get('orden');
     if (!codigo && typeof window !== 'undefined') {
-      const guardada = sessionStorage.getItem('somate_reserva_activa');
+      const guardada = sessionStorage.getItem('sumate_reserva_activa');
       if (guardada) {
         try {
           const parsed = JSON.parse(guardada);
@@ -31,7 +31,7 @@ function FracasoContent() {
       }).catch(console.error);
 
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('somate_reserva_activa');
+        sessionStorage.removeItem('sumate_reserva_activa');
       }
     }
   }, [searchParams]);

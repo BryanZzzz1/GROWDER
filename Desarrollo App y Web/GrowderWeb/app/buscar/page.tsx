@@ -360,7 +360,7 @@ function ContenidoBuscar() {
             {isEditor && (
               <Link
                 href="/admin"
-                className="hidden md:inline-block rounded-full bg-[#314235] px-3.5 py-1.5 text-xs text-white font-semibold hover:bg-[#243127] transition"
+                className="hidden lg:inline-block rounded-full bg-[#314235] px-3.5 py-1.5 text-xs text-white font-semibold hover:bg-[#243127] transition"
               >
                 Admin
               </Link>

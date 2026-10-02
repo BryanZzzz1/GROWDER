@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import { RecuperarPasswordForm } from './components/RecuperarPasswordForm';
+import { ActualizarPasswordForm } from './components/ActualizarPasswordForm';
 
 export const metadata = {
-  title: 'Recuperar Contraseña | SuMateCL',
-  description: 'Solicita el restablecimiento de tu contraseña de acceso en SuMateCL.',
+  title: 'Nueva Contraseña | SuMateCL',
+  description: 'Establece tu nueva contraseña de acceso en SuMateCL.',
 };
 
-export default function RecuperarPasswordPage() {
+export default function ActualizarPasswordPage() {
   return (
     <Suspense
       fallback={
@@ -15,7 +15,7 @@ export default function RecuperarPasswordPage() {
         </div>
       }
     >
-      <RecuperarPasswordForm />
+      <ActualizarPasswordForm />
     </Suspense>
   );
 }

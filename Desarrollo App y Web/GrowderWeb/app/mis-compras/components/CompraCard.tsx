@@ -112,7 +112,7 @@ export function CompraCard({
                 {formatearPrecio(pedido.total)}
               </span>
               <span className="text-stone-300">·</span>
-              <span className="text-stone-500">Tienda Oficial SoMateCL</span>
+              <span className="text-stone-500">Tienda Oficial SuMateCL</span>
             </div>
           </div>
         </div>

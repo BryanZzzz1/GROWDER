@@ -275,7 +275,7 @@ export default function ClienteDetallePage() {
       </main>
 
       <footer className="w-full border-t border-stone-200/80 bg-white mt-auto py-6 text-center text-xs text-stone-500">
-        <p className="font-semibold text-stone-700">SoMateCL • Mates y Accesorios Artesanales</p>
+        <p className="font-semibold text-stone-700">SuMateCL • Mates y Accesorios Artesanales</p>
         <p className="text-[11px] text-stone-400 mt-1">Panel de Administración de Clientes</p>
       </footer>
     </div>

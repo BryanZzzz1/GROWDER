@@ -84,7 +84,7 @@ export function PedidoDetalleModal({
   };
 
   const textoWhatsapp = encodeURIComponent(
-    `Hola ${pedido.nombre_cliente}, te escribimos desde SoMate respecto a tu pedido ${pedido.codigo_pedido}.\n` +
+    `Hola ${pedido.nombre_cliente}, te escribimos desde SuMate respecto a tu pedido ${pedido.codigo_pedido}.\n` +
       `Estado actual de la entrega: ${estadoLocal.toUpperCase()}.\n` +
       (empresa ? `Repartidor a cargo: ${empresa}\n` : "") +
       `Destino: ${pedido.direccion}, ${pedido.comuna}, ${pedido.region}.\n` +
@@ -239,8 +239,8 @@ export function PedidoDetalleModal({
                     className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs focus:ring-2 focus:ring-[#314235] focus:outline-none"
                   >
                     <option value="">Seleccionar responsable...</option>
-                    <option value="Flota SoMate - Vehículo 1">Flota SoMate - Vehículo 1</option>
-                    <option value="Flota SoMate - Vehículo 2">Flota SoMate - Vehículo 2</option>
+                    <option value="Flota SuMate - Vehículo 1">Flota SuMate - Vehículo 1</option>
+                    <option value="Flota SuMate - Vehículo 2">Flota SuMate - Vehículo 2</option>
                     <option value="Repartidor Express (Externo)">Repartidor Express (Externo)</option>
                     <option value="Retiro en Tienda">Retiro en Tienda</option>
                   </select>

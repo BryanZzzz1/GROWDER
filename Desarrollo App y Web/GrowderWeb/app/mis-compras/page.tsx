@@ -76,7 +76,7 @@ function MisComprasContent() {
 
       // Respaldo por LocalStorage para usuarios invitados
       if (typeof window !== "undefined") {
-        const local = localStorage.getItem("somate_pedidos");
+        const local = localStorage.getItem("sumate_pedidos");
         if (local) {
           try {
             const parsed: Pedido[] = JSON.parse(local);
@@ -398,7 +398,7 @@ function MisComprasContent() {
       </main>
 
       <footer className="w-full border-t border-stone-200/80 bg-white mt-16 py-6 text-center text-xs text-stone-500">
-        <p className="font-semibold text-stone-700">SoMateCL • Mates y Accesorios Artesanales</p>
+        <p className="font-semibold text-stone-700">SuMateCL • Mates y Accesorios Artesanales</p>
         <p className="text-[11px] text-stone-400 mt-1">Despachos seguros a todo Chile con tarifa fija de $2.650</p>
       </footer>
     </div>

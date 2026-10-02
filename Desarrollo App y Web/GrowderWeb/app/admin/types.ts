@@ -15,7 +15,10 @@ export interface Producto {
   categoria?: string;
   categoria_id?: number | null;
   foto?: string;
-  imagenes?: { idimagen?: number; url: string }[];
+  imagenes?: {
+    idimagen?: number;
+    url: string;
+  }[];
 }
 
 export interface Usuario {
@@ -31,13 +34,24 @@ export interface StatusMessage {
   type: "success" | "error" | "info";
 }
 
-export type TabType = "inventario" | "producto" | "roles" | "pedidos";
+export type TabType =
+  | "inventario"
+  | "producto"
+  | "roles"
+  | "pedidos";
 
 // ==========================================
-// TIPOS DE PEDIDOS (Requerido por Vercel)
+// TIPOS DE PEDIDOS
 // ==========================================
 
-export type EstadoPedido = 'pendiente' | 'en despacho' | 'recibido';
+export type EstadoPedido =
+  | "pendiente"
+  | "preparando"
+  | "en transporte"
+  | "en despacho"
+  | "recibido"
+  | "problema stock"
+  | "entrega fallida";
 
 export interface PedidoItem {
   id?: number | string;
@@ -54,23 +68,30 @@ export interface Pedido {
   id: number | string;
   codigo_pedido: string;
   usuario_id?: string | null;
+
   nombre_cliente: string;
   email_cliente: string;
   telefono_cliente: string;
+
   region: string;
   comuna: string;
   direccion: string;
   depto?: string | null;
   instrucciones?: string | null;
+
   metodo_pago: string;
   estado: EstadoPedido;
+
   subtotal: number;
   costo_envio: number;
   total: number;
-  items: PedidoItem[]; 
+
+  items: PedidoItem[];
+
   empresa_transporte?: string | null;
   numero_seguimiento?: string | null;
   notas_despacho?: string | null;
+
   created_at: string;
   updated_at?: string;
 }

@@ -9,7 +9,7 @@ import SubNavbar from '@/app/components/SubNavbar';
 import BarraBusquedaNav from '@/app/components/BarraBusquedaNav';
 
 export default function DetalleProductoPage() {
-  const { carrito, carritoAbierto, setCarritoAbierto, eliminarDelCarrito, total, agregarAlCarrito } = usarCarrito(); 
+  const { carrito, carritoAbierto, setCarritoAbierto, eliminarDelCarrito, total, agregarAlCarrito } = usarCarrito();
   const totalProductos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
 
   const params = useParams();
@@ -19,9 +19,9 @@ export default function DetalleProductoPage() {
   const [cargando, setCargando] = useState(true);
   const [imagenSeleccionada, setImagenSeleccionada] = useState<string>('');
   const [cantidadCompra, setCantidadCompra] = useState(1);
-  const [colorSeleccionado, setColorSeleccionado] = useState<string>('Café moro');
+
   const [enviosAbierto, setEnviosAbierto] = useState<boolean>(true);
-  
+
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function DetalleProductoPage() {
       try {
         // Consultamos el producto
         const { data: prodData, error: errProd } = await supabase.from('producto').select('*').eq('idproducto', id).single();
-        
+
         // Si Supabase no encuentra el producto, lanzamos el error para ir al catch
         if (errProd) throw errProd;
 
@@ -115,7 +115,7 @@ export default function DetalleProductoPage() {
     return (
       <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A] flex flex-col">
         {/* Usamos el mismo header para mantener al cliente dentro de la app */}
-        <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md top-0 z-30">
+        <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-3 flex items-center justify-between gap-5">
             <Link href="/" className="flex items-center gap-3 text-left group">
               <img src="/logocircular.png" alt="SuMate Logo" className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
@@ -151,39 +151,24 @@ export default function DetalleProductoPage() {
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A]">
       {/* HEADER */}
-      <header className="w-full border-b border-[#8C7762]/20 bg-white/95 backdrop-blur-md top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-8 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-5">
-          <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
-            <Link href="/" className="flex items-center gap-2.5 text-left group shrink-0">
-              <img src="/logocircular.png" alt="SuMate Logo" className="h-10 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
-              <div>
-                <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">SuMateCL</span>
-                <span className="hidden lg:block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">Más que un mate, una experiencia</span>
-              </div>
-            </Link>
-
-            {/* Accesos móviles */}
-            <div className="flex items-center gap-2 sm:hidden shrink-0">
-              <button onClick={() => setCarritoAbierto(!carritoAbierto)} className="relative flex items-center justify-center w-9 h-9 border border-[#8C7762] rounded-full text-[#8C7762] hover:bg-[#8C7762]/10 transition cursor-pointer" aria-label="Abrir carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>
-                {totalProductos > 0 && <span className="absolute -top-1 -right-1 bg-[#8C7762] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{totalProductos}</span>}
-              </button>
-              {isAdmin && (
-                <Link href="/admin" className="rounded-full bg-[#8C7762] hover:bg-[#725F4C] px-3 py-1.5 text-xs font-bold text-white transition shadow-sm">
-                  Admin
-                </Link>
-              )}
+      <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
+          <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
+            <img src="/logocircular.png" alt="SuMate Logo" className="h-11 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+            <div className="hidden lg:block">
+              <span className="block brand-serif font-bold tracking-tight text-xl leading-none text-[#1A1A1A]">SuMateCL</span>
+              <span className="block mt-1 text-[10px] uppercase tracking-[0.22em] text-[#8C7762] font-semibold">Más que un mate, una experiencia</span>
             </div>
-          </div>
+          </Link>
 
-          {/* CENTRO: Barra de búsqueda */}
-          <div className="w-full sm:flex-1 sm:max-w-md sm:mx-4">
+          {/* CENTRO: Barra de búsqueda en el Navbar */}
+          <div className="flex-1 max-w-md mx-1 sm:mx-4">
             <BarraBusquedaNav
               placeholder="Buscar mates, bombillas, termos..."
             />
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Botón de acceso a Búsqueda Filtrada */}
             <Link
               href="/buscar"
@@ -247,16 +232,16 @@ export default function DetalleProductoPage() {
       </header>
 
       {/* SECCIÓN PRINCIPAL DE PRODUCTO */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
-          
-          {/* GALERÍA DE IMÁGENES */}
+      <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+
+          {/* GALERÍA DE IMÁGENES (CARRUSEL FUNCIONAL) */}
           <div className="flex flex-col gap-4">
-            
-            <div className="relative w-full h-[300px] sm:h-[450px] bg-white rounded-3xl border border-[#8C7762]/15 shadow-sm flex items-center justify-center p-4 sm:p-6 overflow-hidden group">
-              <img 
-                src={imagenSeleccionada} 
-                alt={producto.nombre} 
+
+            <div className="relative w-full h-[450px] bg-white rounded-3xl border border-[#8C7762]/15 shadow-sm flex items-center justify-center p-6 overflow-hidden group">
+              <img
+                src={imagenSeleccionada}
+                alt={producto.nombre}
                 className="max-h-full max-w-full object-contain transition-transform duration-300"
                 onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=600&q=80"; }}
               />
@@ -264,13 +249,13 @@ export default function DetalleProductoPage() {
               {/* Botones de Navegación del Carrusel */}
               {producto.imagenes.length > 1 && (
                 <>
-                  <button onClick={prevImage} className="absolute left-3 sm:left-4 bg-white/90 hover:bg-white text-stone-800 p-2.5 sm:p-3 rounded-full shadow-md opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"></path></svg>
+                  <button onClick={prevImage} className="absolute left-2 sm:left-4 bg-white/80 hover:bg-white text-stone-800 p-2 sm:p-3 rounded-full shadow-md transition-all cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"></path></svg>
                   </button>
-                  <button onClick={nextImage} className="absolute right-3 sm:right-4 bg-white/90 hover:bg-white text-stone-800 p-2.5 sm:p-3 rounded-full shadow-md opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"></path></svg>
+                  <button onClick={nextImage} className="absolute right-2 sm:right-4 bg-white/80 hover:bg-white text-stone-800 p-2 sm:p-3 rounded-full shadow-md transition-all cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"></path></svg>
                   </button>
-                  <div className="absolute bottom-3 sm:bottom-4 bg-black/60 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <div className="absolute bottom-4 bg-black/50 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-sm">
                     {producto.imagenes.indexOf(imagenSeleccionada) + 1} / {producto.imagenes.length}
                   </div>
                 </>
@@ -281,9 +266,9 @@ export default function DetalleProductoPage() {
             {producto.imagenes.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2 justify-center scrollbar-hide py-1">
                 {producto.imagenes.map((url: string, idx: number) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => setImagenSeleccionada(url)} 
+                  <button
+                    key={idx}
+                    onClick={() => setImagenSeleccionada(url)}
                     className={`w-[72px] h-[72px] rounded-2xl border-2 overflow-hidden bg-white transition-all shrink-0 cursor-pointer ${imagenSeleccionada === url ? 'border-[#527953] shadow-md ring-2 ring-[#527953]/20 scale-105' : 'border-[#8C7762]/20 opacity-60 hover:opacity-100 hover:scale-105'}`}
                   >
                     <img src={url} alt={`Vista ${idx}`} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=200&q=80"; }} />
@@ -307,13 +292,6 @@ export default function DetalleProductoPage() {
               <p className="text-[11px] text-stone-500 mt-1">Envíos rápidos a todo Chile. Calidad premium garantizada.</p>
             </div>
 
-            <div className="space-y-2 mt-1">
-              <label className="text-xs font-semibold text-stone-700 block uppercase tracking-wider">Tone / Color</label>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setColorSeleccionado('Café moro')} className={`px-5 py-2 rounded-full text-xs font-bold transition cursor-pointer border ${colorSeleccionado === 'Café moro' ? 'bg-[#8C7762] text-white border-[#8C7762] shadow-sm' : 'bg-white text-stone-700 border-[#8C7762]/30 hover:bg-[#8C7762]/5'}`}>Café moro</button>
-                <button type="button" onClick={() => setColorSeleccionado('Negro')} className={`px-5 py-2 rounded-full text-xs font-bold transition cursor-pointer border ${colorSeleccionado === 'Negro' ? 'bg-stone-900 text-white border-stone-900 shadow-sm' : 'bg-white text-stone-700 border-[#8C7762]/30 hover:bg-[#8C7762]/5'}`}>Negro Premium</button>
-              </div>
-            </div>
 
             <div className="space-y-3 mt-2">
               <label className="text-xs font-semibold text-stone-700 block uppercase tracking-wider">Cantidad</label>
@@ -326,8 +304,8 @@ export default function DetalleProductoPage() {
               </div>
 
               <div className="flex flex-col gap-2.5 pt-2">
-                <button onClick={() => { if (!producto) return; agregarAlCarrito({ id: String(producto.idproducto || id), nombre: `${producto.nombre} (${colorSeleccionado})`, precio: Number(producto.precio || 0), imagen: imagenSeleccionada || producto.imagenes?.[0] || producto.foto || '/placeholder.png' }, cantidadCompra); }} className="w-full bg-[#8C7762] hover:bg-[#785C3A] text-white text-xs font-bold py-3.5 rounded-full transition uppercase tracking-wider shadow-sm cursor-pointer">Añadir al carrito</button>
-                <button onClick={() => { if (!producto) return; agregarAlCarrito({ id: String(producto.idproducto || id), nombre: `${producto.nombre} (${colorSeleccionado})`, precio: Number(producto.precio || 0), imagen: imagenSeleccionada || producto.imagenes?.[0] || producto.foto || '/placeholder.png' }, cantidadCompra); setCarritoAbierto(true); }} className="w-full bg-[#527953] hover:bg-[#436444] text-white text-xs font-bold py-3.5 rounded-full transition uppercase tracking-wider shadow-sm cursor-pointer">Comprar ahora</button>
+                <button onClick={() => { if (!producto) return; agregarAlCarrito({ id: String(producto.idproducto || id), nombre: producto.nombre || 'Producto', precio: Number(producto.precio || 0), imagen: imagenSeleccionada || producto.imagenes?.[0] || producto.foto || '/placeholder.png' }, cantidadCompra); }} className="w-full bg-[#8C7762] hover:bg-[#785C3A] text-white text-xs font-bold py-3.5 rounded-full transition uppercase tracking-wider shadow-sm cursor-pointer">Añadir al carrito</button>
+                <button onClick={() => { if (!producto) return; agregarAlCarrito({ id: String(producto.idproducto || id), nombre: producto.nombre || 'Producto', precio: Number(producto.precio || 0), imagen: imagenSeleccionada || producto.imagenes?.[0] || producto.foto || '/placeholder.png' }, cantidadCompra); setCarritoAbierto(true); }} className="w-full bg-[#527953] hover:bg-[#436444] text-white text-xs font-bold py-3.5 rounded-full transition uppercase tracking-wider shadow-sm cursor-pointer">Comprar ahora</button>
               </div>
             </div>
 
@@ -352,11 +330,8 @@ export default function DetalleProductoPage() {
 
           <div className="border-t border-stone-200 pt-4">
             <button onClick={() => setEnviosAbierto(!enviosAbierto)} className="w-full flex justify-between items-center text-xs font-bold text-stone-800 py-2 cursor-pointer">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#527953]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h2" /></svg>
-                <span>Tiempos de Despacho</span>
-              </div>
-              <svg className={`w-4 h-4 text-[#8C7762] transition-transform ${enviosAbierto ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              <div className="flex items-center gap-2"><span className="text-[#527953]">🚚</span><span>Tiempos de Despacho</span></div>
+              <span className="text-[#8C7762]">{enviosAbierto ? '▲' : '▼'}</span>
             </button>
 
             {enviosAbierto && (

@@ -17,10 +17,10 @@ export default function CarroDesplegable() {
       className={`fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-in-out ${carritoAbierto ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
     >
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 w-full sm:w-auto">
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
         <div
           onClick={(e) => e.stopPropagation()}
-          className={`w-full sm:w-screen sm:max-w-md bg-white p-5 sm:p-6 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-in-out ${carritoAbierto ? 'translate-x-0' : 'translate-x-full'
+          className={`w-screen max-w-md bg-white p-6 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-in-out ${carritoAbierto ? 'translate-x-0' : 'translate-x-full'
             }`}
         >
 
@@ -61,9 +61,17 @@ export default function CarroDesplegable() {
           </div>
 
           <div className="border-t pt-4">
+            <div className="flex justify-between items-center mb-1 text-sm text-[#1A1A1A]">
+              <span>Subtotal:</span>
+              <span>${total.toLocaleString('es-CL')}</span>
+            </div>
+            <div className="flex justify-between items-center mb-4 text-sm text-[#1A1A1A]">
+              <span>IVA (19%):</span>
+              <span>${Math.round(total * 0.19).toLocaleString('es-CL')}</span>
+            </div>
             <div className="flex justify-between items-center mb-4 text-base font-bold text-[#1A1A1A]">
-              <span>Total:</span>
-              <span className="text-[#8C7762]">${total.toLocaleString('es-CL')}</span>
+              <span>Total a pagar:</span>
+              <span className="text-[#8C7762]">${Math.round(total * 1.19).toLocaleString('es-CL')}</span>
             </div>
 
             <button

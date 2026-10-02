@@ -246,7 +246,7 @@ export default function AdminPage() {
       }
 
       if (typeof window !== "undefined") {
-        const local = localStorage.getItem("somate_pedidos");
+        const local = localStorage.getItem("sumate_pedidos");
         if (local) {
           try {
             const parsed = JSON.parse(local);
@@ -580,7 +580,7 @@ export default function AdminPage() {
 
       <footer className="w-full border-t border-stone-800/10 bg-[#f8f3e9] mt-16">
         <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 py-7 flex flex-col sm:flex-row justify-between gap-3 text-sm">
-          <p className="font-bold text-[#314235]">SoMate • GROWDER</p>
+          <p className="font-bold text-[#314235]">SuMate • GROWDER</p>
           <p className="text-stone-500">Gestión Integral de Inventario, E-Commerce y Roles</p>
         </div>
       </footer>
