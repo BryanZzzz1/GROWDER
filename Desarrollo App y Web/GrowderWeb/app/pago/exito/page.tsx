@@ -28,7 +28,17 @@ function ExitoContent() {
         // Retorno de Mercado Pago: confirmamos el pedido con el RPC
         supabase.rpc('confirmar_pago_pedido', { p_codigo_pedido: orden })
           .then(({ error }) => {
-            if (error) console.error('Error al confirmar pedido MP:', error);
+            if (error) {
+              console.error('Error al confirmar pedido MP:', error);
+            } else {
+              // ---- AGREGADO: Disparar correo de confirmación de pago ----
+              fetch('/api/email/confirmacion-pago', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo_pedido: orden }),
+              }).catch((err) => console.error('Error al enviar correo MP:', err));
+              // -----------------------------------------------------------
+            }
           });
       }
 
@@ -137,7 +147,6 @@ export default function PagoExitoPage() {
         <div className="text-stone-600 font-bold text-sm">Confirmando pago...</div>
       </div>
     }>
-      {/* Esta es la línea que corregimos para que llame al contenido y no genere un bucle infinito */}
       <ExitoContent />
     </Suspense>
   );

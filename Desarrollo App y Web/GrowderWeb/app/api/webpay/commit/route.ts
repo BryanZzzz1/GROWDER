@@ -13,11 +13,11 @@ function obtenerDominioReal(request: Request) {
 async function procesarRetornoTransbank(request: Request) {
   const origin = obtenerDominioReal(request);
   const url = new URL(request.url);
-  
+
   let token_ws = url.searchParams.get('token_ws');
   let TBK_TOKEN = url.searchParams.get('TBK_TOKEN');
   let TBK_ORDEN_COMPRA = url.searchParams.get('TBK_ORDEN_COMPRA');
-  
+
   if (request.method === 'POST') {
     try {
       const bodyText = await request.text();
@@ -49,22 +49,30 @@ async function procesarRetornoTransbank(request: Request) {
     const tx = new WebpayPlus.Transaction(
       new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration)
     );
-    
+
     const commitResponse = await tx.commit(token_ws);
 
     if (commitResponse.status === 'AUTHORIZED') {
-      
+
       const { error } = await supabase.rpc('confirmar_pago_pedido', {
         p_codigo_pedido: commitResponse.buy_order
       });
 
       if (error) {
         console.error('Error en RPC confirmar_pago_pedido:', error);
+      } else {
+        // ---- AGREGADO: Disparar correo de confirmación de pago ----
+        fetch(`${origin}/api/email/confirmacion-pago`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo_pedido: commitResponse.buy_order }),
+        }).catch((err) => console.error('Error al enviar correo Transbank:', err));
+        // -----------------------------------------------------------
       }
 
       // Redirección a la carpeta anidada
       return NextResponse.redirect(`${origin}/pago/exito?orden=${commitResponse.buy_order}&monto=${commitResponse.amount}&token_ws=${token_ws}`);
-    
+
     } else {
       await supabase.rpc('cancelar_pedido', {
         p_codigo_pedido: commitResponse.buy_order,
