@@ -1,0 +1,75 @@
+- generic [active] [ref=f10e1]:
+  - generic [ref=f10e2]:
+    - banner [ref=f10e3]:
+      - generic [ref=f10e4]:
+        - link [ref=f10e5] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f10e6]
+        - search [ref=f10e8]:
+          - textbox "Buscar por mate, calabaza, bombilla, termo..." [ref=f10e9]
+          - button "Ejecutar busqueda" [ref=f10e10] [cursor=pointer]
+        - generic [ref=f10e13]:
+          - button "Abrir carrito" [ref=f10e14] [cursor=pointer]:
+            - generic [ref=f10e15]: $0
+          - link "← Volver al inicio" [ref=f10e19] [cursor=pointer]:
+            - /url: /
+      - navigation "Categorías de la base de datos" [ref=f10e20]:
+        - generic [ref=f10e22]:
+          - generic [ref=f10e23]: Categorías
+          - generic [ref=f10e25]:
+            - button "Todos los Productos" [ref=f10e26] [cursor=pointer]
+            - generic [ref=f10e28]: Cargando categorías...
+          - link "Filtrar" [ref=f10e32] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=f10e36]:
+      - generic [ref=f10e37]:
+        - generic [ref=f10e38]:
+          - link "Inicio" [ref=f10e39] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f10e40]: ›
+          - generic [ref=f10e41]: Búsqueda Filtrada
+        - generic [ref=f10e42]:
+          - heading "Todas las Categorías" [level=1] [ref=f10e44]
+          - generic [ref=f10e45]: Buscando productos...
+      - complementary [ref=f10e47]:
+        - generic [ref=f10e48]:
+          - generic [ref=f10e50]:
+            - heading "Filtros de Búsqueda" [level=2] [ref=f10e51]
+            - paragraph [ref=f10e52]: 0 productos encontrados
+          - generic [ref=f10e53]:
+            - generic [ref=f10e54]: Búsqueda por escrito
+            - textbox "Buscar mates, bombillas..." [ref=f10e56]
+          - generic [ref=f10e57]:
+            - generic [ref=f10e58]: Ordenar por Precio
+            - generic [ref=f10e59]:
+              - button "Destacados / Recientes ✓" [ref=f10e60] [cursor=pointer]:
+                - generic [ref=f10e61]: Destacados / Recientes
+                - generic [ref=f10e62]: ✓
+              - button "Menor a mayor precio" [ref=f10e63] [cursor=pointer]
+              - button "Mayor a menor precio" [ref=f10e68] [cursor=pointer]
+          - generic [ref=f10e73]:
+            - generic [ref=f10e74]: Categorías
+            - button "Todas las Categorías 0" [ref=f10e76] [cursor=pointer]:
+              - generic [ref=f10e77]: Todas las Categorías
+              - generic [ref=f10e78]: "0"
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f10e141]

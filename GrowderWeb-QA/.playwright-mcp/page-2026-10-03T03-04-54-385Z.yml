@@ -1,0 +1,58 @@
+- generic [ref=f18e1]:
+  - generic [ref=f18e131]:
+    - banner [ref=f18e132]:
+      - generic [ref=f18e133]:
+        - link "SuMate Logo SuMateCL" [ref=f18e134] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f18e135]
+          - generic [ref=f18e136]: SuMateCL
+        - link "← Volver a la tienda" [ref=f18e137] [cursor=pointer]:
+          - /url: /
+    - main [ref=f18e138]:
+      - generic [ref=f18e139]:
+        - heading "Identifícate para continuar" [level=1] [ref=f18e143]
+        - paragraph [ref=f18e144]: Ingresa a tu cuenta para confirmar tu pedido y coordinar el despacho seguro a tu dirección.
+        - generic [ref=f18e145]:
+          - generic [ref=f18e146]:
+            - generic [ref=f18e147]: Tu Carrito Actual
+            - generic [ref=f18e148]: 1 producto
+          - generic [ref=f18e149]: $31.198
+        - generic [ref=f18e150]:
+          - button "Iniciar Sesión" [ref=f18e151] [cursor=pointer]
+          - button "Crear Cuenta" [ref=f18e152] [cursor=pointer]
+        - generic [ref=f18e153]:
+          - generic [ref=f18e154]:
+            - generic [ref=f18e155]: Correo electrónico
+            - textbox "correo@ejemplo.cl" [ref=f18e156]
+          - generic [ref=f18e157]:
+            - generic [ref=f18e158]: Contraseña
+            - textbox "Tu contraseña" [ref=f18e159]
+          - button "Ingresar y Continuar al Pago" [ref=f18e160] [cursor=pointer]
+        - link "← Volver al catálogo" [ref=f18e162] [cursor=pointer]:
+          - /url: /
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - generic:
+              - img "Criollo Coquito Calabaza"
+              - generic:
+                - heading "Criollo Coquito Calabaza" [level=4]
+                - paragraph: 1 x $23.990
+              - button "Quitar"
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $23.990
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $4.558
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $28.548
+          - button "Ir a Pagar" [active]
+  - alert [ref=f18e5]

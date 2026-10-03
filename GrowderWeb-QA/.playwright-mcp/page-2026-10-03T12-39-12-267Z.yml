@@ -1,0 +1,110 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e10]:
+    - banner [ref=f1e11]:
+      - generic [ref=f1e12]:
+        - link "SM SuMate Mates y accesorios" [ref=f1e13] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f1e14]: SM
+          - generic [ref=f1e15]:
+            - generic [ref=f1e16]: SuMate
+            - generic [ref=f1e17]: Mates y accesorios
+        - navigation "Navegación principal" [ref=f1e18]:
+          - link "Catálogo" [ref=f1e19] [cursor=pointer]:
+            - /url: /
+          - link "Bodega" [ref=f1e20] [cursor=pointer]:
+            - /url: /bodega
+          - link "Administración" [ref=f1e21] [cursor=pointer]:
+            - /url: /admin
+    - main [ref=f1e22]:
+      - generic [ref=f1e24]:
+        - generic [ref=f1e25]:
+          - paragraph [ref=f1e26]: Panel de Control
+          - heading "Administración General" [level=1] [ref=f1e27]
+          - paragraph [ref=f1e28]: Controla el inventario en tiempo real, añade nuevos productos al catálogo o gestiona los roles y permisos de acceso para tu equipo.
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - generic [ref=f1e31]: Productos
+            - strong [ref=f1e32]: "3"
+          - generic [ref=f1e33]:
+            - generic [ref=f1e34]: Usuarios
+            - strong [ref=f1e35]: "13"
+          - generic [ref=f1e36]:
+            - generic [ref=f1e37]: Pedidos
+            - strong [ref=f1e38]: "18"
+      - generic [ref=f1e39]:
+        - button "Inventario en tiempo real 3" [ref=f1e40] [cursor=pointer]:
+          - generic [ref=f1e43]: Inventario en tiempo real
+          - generic [ref=f1e44]: "3"
+        - button "Agregar Producto" [active] [ref=f1e45] [cursor=pointer]
+        - button "Gestión de Roles 13" [ref=f1e49] [cursor=pointer]:
+          - generic [ref=f1e52]: Gestión de Roles
+          - generic [ref=f1e53]: "13"
+        - button "Gestión de Pedidos 18" [ref=f1e54] [cursor=pointer]:
+          - generic [ref=f1e57]: Gestión de Pedidos
+          - generic [ref=f1e58]: "18"
+      - generic [ref=f1e1037]:
+        - generic [ref=f1e1038]:
+          - generic [ref=f1e1039]:
+            - generic [ref=f1e1040]: Nuevo registro
+            - heading "Añadir un producto" [level=2] [ref=f1e1041]
+            - paragraph [ref=f1e1042]: Registra un nuevo producto en el catálogo general.
+          - button "Volver al inventario →" [ref=f1e1043] [cursor=pointer]
+        - generic [ref=f1e1044]:
+          - generic [ref=f1e1045]:
+            - generic [ref=f1e1046]: Nombre del producto *
+            - textbox "Nombre del producto *" [ref=f1e1047]:
+              - /placeholder: "Ej: Mate Torpedo Uruguayo con Virola de Alpaca"
+          - generic [ref=f1e1048]:
+            - generic [ref=f1e1049]:
+              - generic [ref=f1e1050]:
+                - generic [ref=f1e1051]: Categoría *
+                - button "+ Escribir nueva categoría" [ref=f1e1052] [cursor=pointer]
+              - combobox "Categoría *" [ref=f1e1053] [cursor=pointer]:
+                - option "Seleccionar categoría existente" [selected]
+                - option "Mates"
+                - option "+ Crear nueva categoría..."
+            - generic [ref=f1e1054]:
+              - generic [ref=f1e1055]: Precio ($ CLP) *
+              - spinbutton "Precio ($ CLP) *" [ref=f1e1056]
+          - generic [ref=f1e1058]:
+            - generic [ref=f1e1059]: Stock en bodega *
+            - spinbutton "Stock en bodega *" [ref=f1e1060]
+          - generic [ref=f1e1061]:
+            - generic [ref=f1e1062]: Galería de Imágenes (Máximo 3 fotos)
+            - button "Choose File" [ref=f1e1064] [cursor=pointer]
+            - generic [ref=f1e1065]: O usa un enlace web
+            - generic [ref=f1e1069]:
+              - textbox "https://ejemplo.com/foto.jpg" [ref=f1e1070]
+              - button "Añadir" [ref=f1e1071] [cursor=pointer]
+          - generic [ref=f1e1072]:
+            - generic [ref=f1e1073]: Descripción detallada *
+            - textbox "Descripción detallada *" [ref=f1e1074]:
+              - /placeholder: Describe los materiales, dimensiones, capacidad y detalles artesanales...
+          - generic [ref=f1e1075]:
+            - button "Guardar producto" [ref=f1e1076] [cursor=pointer]
+            - button "Ir al inventario" [ref=f1e1078] [cursor=pointer]
+    - contentinfo [ref=f1e125]:
+      - generic [ref=f1e126]:
+        - paragraph [ref=f1e127]: SuMate • GROWDER
+        - paragraph [ref=f1e128]: Gestión Integral de Inventario, E-Commerce y Roles
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f1e9]

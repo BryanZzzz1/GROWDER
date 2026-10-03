@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "SuMateCL" [ref=e6]
+        - heading "Iniciar sesión" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Ingresa a tu cuenta de SuMateCL
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]: Correo electrónico
+          - textbox "correo@ejemplo.com" [ref=e12]
+        - generic [ref=e13]:
+          - generic [ref=e14]: Contraseña
+          - textbox "Ingresa tu contraseña" [ref=e15]
+          - link "¿Se te olvidó tu contraseña?" [ref=e17] [cursor=pointer]:
+            - /url: /recuperar-password
+        - button "Iniciar sesión" [ref=e18] [cursor=pointer]
+      - paragraph [ref=e19]:
+        - text: ¿No tienes una cuenta?
+        - link "Regístrate" [ref=e20] [cursor=pointer]:
+          - /url: /registro
+      - link "← Volver al inicio" [ref=e22] [cursor=pointer]:
+        - /url: /
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=e23]

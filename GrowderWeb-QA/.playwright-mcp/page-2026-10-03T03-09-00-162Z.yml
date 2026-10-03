@@ -1,0 +1,111 @@
+- generic [active] [ref=f21e1]:
+  - generic [ref=f21e2]:
+    - banner [ref=f21e3]:
+      - generic [ref=f21e4]:
+        - link "SuMate Logo SuMateCL Mis Compras & Despachos" [ref=f21e5] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f21e6]
+          - generic [ref=f21e7]:
+            - generic [ref=f21e8]: SuMateCL
+            - generic [ref=f21e9]: Mis Compras & Despachos
+        - generic [ref=f21e10]:
+          - link "Catálogo" [ref=f21e11] [cursor=pointer]:
+            - /url: /
+          - link "mat.riosr" [ref=f21e12] [cursor=pointer]:
+            - /url: /cuenta
+    - main [ref=f21e15]:
+      - generic [ref=f21e62]:
+        - generic [ref=f21e63]:
+          - button "Volver a Mis compras" [ref=f21e64] [cursor=pointer]
+          - generic [ref=f21e68]: Pedido SOMATE-101
+        - generic [ref=f21e69]:
+          - generic [ref=f21e70]:
+            - generic [ref=f21e71]:
+              - generic [ref=f21e72]:
+                - generic [ref=f21e73]:
+                  - generic [ref=f21e74]: Estado del Despacho
+                  - heading "Paquete en camino a tu domicilio" [level=3] [ref=f21e75]
+                - generic [ref=f21e76]: En tránsito
+              - generic [ref=f21e79]:
+                - generic [ref=f21e84]:
+                  - heading "1. Pedido recibido" [level=4] [ref=f21e86]
+                  - paragraph [ref=f21e87]: Tu orden fue registrada correctamente en nuestro sistema.
+                  - paragraph [ref=f21e88]: Registrado el 30 de septiembre a las 07:00 a. m.
+                - generic [ref=f21e93]:
+                  - heading "2. Preparación" [level=4] [ref=f21e95]
+                  - paragraph [ref=f21e96]: Nuestro equipo está seleccionando y empaquetando minuciosamente tu pedido.
+                - generic [ref=f21e101]:
+                  - heading "3. Distribución" [level=4] [ref=f21e103]
+                  - paragraph [ref=f21e104]: El paquete ingresó al proceso de distribución general.
+                - generic [ref=f21e110]:
+                  - generic [ref=f21e111]:
+                    - heading "4. En reparto" [level=4] [ref=f21e112]
+                    - generic [ref=f21e113]: Actual
+                  - paragraph [ref=f21e114]: El pedido salió a reparto hacia tu dirección.
+                - generic [ref=f21e115]:
+                  - generic [ref=f21e116]: "5"
+                  - generic [ref=f21e117]:
+                    - heading "5. Entregado" [level=4] [ref=f21e119]
+                    - paragraph [ref=f21e120]: Paquete recibido conforme en tu dirección. ¡Que disfrutes tu experiencia SuMate!
+            - generic [ref=f21e121]:
+              - heading "Datos de tu Despacho" [level=4] [ref=f21e122]
+              - generic [ref=f21e123]:
+                - generic [ref=f21e124]:
+                  - generic [ref=f21e125]: "Repartidor Asignado:"
+                  - strong [ref=f21e126]: Logística interna SuMate
+                - generic [ref=f21e128]:
+                  - generic [ref=f21e129]: "Identificador de Ruta:"
+                  - strong [ref=f21e130]: Por asignar en empaque
+              - button "Volver a comprar" [ref=f21e132] [cursor=pointer]
+          - generic [ref=f21e134]:
+            - generic [ref=f21e135]:
+              - generic [ref=f21e136]: Comprobante de compra
+              - heading "Detalle de la compra" [level=3] [ref=f21e137]
+              - paragraph [ref=f21e138]: "30 de septiembre de 2026 • #SOMATE-101"
+            - generic [ref=f21e140]:
+              - generic [ref=f21e141]:
+                - img "Criollo Coquito Calabaza" [ref=f21e143]
+                - generic [ref=f21e144]:
+                  - paragraph [ref=f21e145]: Criollo Coquito Calabaza
+                  - paragraph [ref=f21e146]: 1 unidad × $22.350
+              - generic [ref=f21e147]: $22.350
+            - generic [ref=f21e148]:
+              - generic [ref=f21e149]:
+                - generic [ref=f21e150]: "Subtotal productos:"
+                - generic [ref=f21e151]: $22.350
+              - generic [ref=f21e152]:
+                - generic [ref=f21e153]: "Despacho a domicilio (Fijo Chile):"
+                - generic [ref=f21e154]: $2.650
+              - generic [ref=f21e155]:
+                - generic [ref=f21e156]: "Total pagado:"
+                - generic [ref=f21e157]: $25.000
+            - generic [ref=f21e158]:
+              - generic [ref=f21e159]: Dirección de entrega
+              - paragraph [ref=f21e160]: Matias Alarcon
+              - paragraph [ref=f21e161]: Av. Providencia 1234
+              - paragraph [ref=f21e162]: Providencia, Metropolitana
+              - paragraph [ref=f21e163]: "Tel: +56 912345678"
+    - contentinfo [ref=f21e58]:
+      - paragraph [ref=f21e59]: SuMateCL • Mates y Accesorios Artesanales
+      - paragraph [ref=f21e60]: Despachos seguros a todo Chile con tarifa fija de $2.650
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f21e61]

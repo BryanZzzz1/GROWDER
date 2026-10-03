@@ -1,0 +1,168 @@
+- generic [ref=f9e1]:
+  - generic [ref=f9e122]:
+    - banner [ref=f9e123]:
+      - generic [ref=f9e124]:
+        - link "SuMate Logo SuMateCL Confirmación de Pago" [ref=f9e125] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f9e126]
+          - generic [ref=f9e127]:
+            - generic [ref=f9e128]: SuMateCL
+            - generic [ref=f9e129]: Confirmación de Pago
+        - generic [ref=f9e130]:
+          - generic [ref=f9e131]:
+            - generic [ref=f9e134]: Compra Segura
+            - generic [ref=f9e135]: ·
+            - generic [ref=f9e136]: Envío a todo Chile
+          - button "← tienda" [ref=f9e137] [cursor=pointer]
+    - generic [ref=f9e139]:
+      - generic [ref=f9e140]:
+        - generic [ref=f9e141]: ✓
+        - generic [ref=f9e142]: Carrito
+      - generic [ref=f9e143]: ──
+      - generic [ref=f9e144]:
+        - generic [ref=f9e145]: "2"
+        - generic [ref=f9e146]: Despacho & Ubicación
+      - generic [ref=f9e147]: ──
+      - generic [ref=f9e148]:
+        - generic [ref=f9e149]: "3"
+        - generic [ref=f9e150]: Método de Pago
+    - main [ref=f9e151]:
+      - generic [ref=f9e152]:
+        - heading "Revisión y Confirmación de Pedido" [level=1] [ref=f9e153]
+        - paragraph [ref=f9e154]: Verifica la ubicación de despacho, el detalle de tus productos y el método de pago seleccionado.
+      - generic [ref=f9e155]:
+        - generic [ref=f9e156]:
+          - generic [ref=f9e157]:
+            - generic [ref=f9e158]:
+              - generic [ref=f9e164]:
+                - heading "Ubicación a donde se enviará" [level=2] [ref=f9e165]
+                - paragraph [ref=f9e166]: Despacho a domicilio en todo el territorio nacional
+              - generic [ref=f9e167]: "Tarifa Fija: $2.650 CLP"
+            - generic [ref=f9e168]:
+              - generic [ref=f9e169]:
+                - generic [ref=f9e170]:
+                  - generic [ref=f9e171]: Nombre y Apellido *
+                  - textbox "Nombre y Apellido *" [ref=f9e172]:
+                    - /placeholder: "Ej: Matías González"
+                - generic [ref=f9e173]:
+                  - generic [ref=f9e174]: Teléfono de Contacto *
+                  - textbox "Teléfono de Contacto *" [ref=f9e175]:
+                    - /placeholder: "Ej: 912345678"
+                    - text: "964258451"
+              - generic [ref=f9e176]:
+                - generic [ref=f9e177]: Correo Electrónico *
+                - textbox "Correo Electrónico *" [ref=f9e178]:
+                  - /placeholder: correo@ejemplo.cl
+                  - text: mat.riosr@duocuc.cl
+              - generic [ref=f9e179]:
+                - generic [ref=f9e180]:
+                  - generic [ref=f9e181]: Región *
+                  - combobox [ref=f9e182]:
+                    - option "Región Metropolitana de Santiago" [selected]
+                    - option "Arica y Parinacota"
+                    - option "Tarapacá"
+                    - option "Antofagasta"
+                    - option "Atacama"
+                    - option "Coquimbo"
+                    - option "Valparaíso"
+                    - option "Libertador General Bernardo O’Higgins"
+                    - option "Maule"
+                    - option "Ñuble"
+                    - option "Biobío"
+                    - option "La Araucanía"
+                    - option "Los Ríos"
+                    - option "Los Lagos"
+                    - option "Aysén del General Carlos Ibáñez del Campo"
+                    - option "Magallanes y de la Antártica Chilena"
+                - generic [ref=f9e183]:
+                  - generic [ref=f9e184]: Comuna / Ciudad *
+                  - textbox "Comuna / Ciudad *" [ref=f9e185]:
+                    - /placeholder: "Ej: Providencia"
+              - generic [ref=f9e186]:
+                - generic [ref=f9e187]:
+                  - generic [ref=f9e188]: Calle y Número *
+                  - textbox "Calle y Número *" [ref=f9e189]:
+                    - /placeholder: "Ej: Av. Providencia 1234"
+                - generic [ref=f9e190]:
+                  - generic [ref=f9e191]: Depto / Casa (Opcional)
+                  - 'textbox "Ej: Depto 502" [ref=f9e192]'
+              - generic [ref=f9e193]:
+                - generic [ref=f9e194]: Instrucciones de entrega (Opcional)
+                - 'textbox "Ej: Dejar en conserjería..." [ref=f9e195]'
+          - generic [ref=f9e196]:
+            - generic [ref=f9e202]:
+              - heading "Método de Pago" [level=2] [ref=f9e203]
+              - paragraph [ref=f9e204]: Selecciona cómo deseas pagar tu compra
+            - generic [ref=f9e205]:
+              - generic [ref=f9e211] [cursor=pointer]:
+                - generic [ref=f9e212]:
+                  - generic [ref=f9e213]: Webpay Plus (Transbank)
+                  - generic [ref=f9e214]: Modo Prueba
+                - paragraph [ref=f9e215]: Redcompra, débito y crédito a través de Transbank.
+              - generic [ref=f9e220] [cursor=pointer]:
+                - generic [ref=f9e221]:
+                  - generic [ref=f9e222]: Mercado Pago
+                  - generic [ref=f9e223]: Modo Prueba
+                - paragraph [ref=f9e224]: Tarjetas de crédito, débito y dinero en cuenta.
+        - generic [ref=f9e226]:
+          - generic [ref=f9e227]:
+            - heading "Detalle del Pedido" [level=2] [ref=f9e228]
+            - generic [ref=f9e229]: 1 producto
+          - generic [ref=f9e231]:
+            - img "Criollo Coquito Calabaza" [ref=f9e232]
+            - generic [ref=f9e233]:
+              - heading "Criollo Coquito Calabaza" [level=3] [ref=f9e234]
+              - paragraph [ref=f9e235]: $23.990 c/u
+              - generic [ref=f9e236]:
+                - generic [ref=f9e237]:
+                  - button "-" [ref=f9e238] [cursor=pointer]
+                  - generic [ref=f9e239]: "1"
+                  - button "+" [ref=f9e240] [cursor=pointer]
+                - button "Quitar" [ref=f9e241] [cursor=pointer]
+            - generic [ref=f9e242]: $23.990
+          - generic [ref=f9e244]:
+            - generic [ref=f9e245]:
+              - generic [ref=f9e246]: "Subtotal productos:"
+              - generic [ref=f9e247]: $23.990
+            - generic [ref=f9e248]:
+              - generic [ref=f9e249]: "IVA (19%):"
+              - generic [ref=f9e250]: $4.558
+            - generic [ref=f9e251]:
+              - generic [ref=f9e252]:
+                - generic [ref=f9e253]: "Despacho a domicilio:"
+                - generic [ref=f9e254]: Fijo
+              - generic [ref=f9e255]: $2.650
+            - generic [ref=f9e256]:
+              - generic [ref=f9e257]:
+                - generic [ref=f9e258]: Total a Pagar
+                - text: Impuestos y despacho aplicados
+              - generic [ref=f9e259]: $31.198
+          - button "Pagar con Webpay Plus →" [ref=f9e260] [cursor=pointer]:
+            - generic [ref=f9e261]: Pagar con Webpay Plus
+            - generic [ref=f9e262]: →
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - generic:
+              - img "Criollo Coquito Calabaza"
+              - generic:
+                - heading "Criollo Coquito Calabaza" [level=4]
+                - paragraph: 1 x $23.990
+              - button "Quitar"
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $23.990
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $4.558
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $28.548
+          - button "Ir a Pagar" [active]
+  - alert [ref=f9e5]

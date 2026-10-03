@@ -1,0 +1,7 @@
+[     431ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/login:0
+[   13283ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/login:0
+[   13564ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://ojffnbzcdxlzjrwzwpze.supabase.co/auth/v1/token?grant_type=password:0
+[   26049ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/login:0
+[   26784ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/actualizar-password:0
+[   26784ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/actualizar-password:0
+[   79906ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/login:0

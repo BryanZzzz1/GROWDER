@@ -1,0 +1,53 @@
+- generic [active] [ref=f6e1]:
+  - generic [ref=f6e2]:
+    - banner [ref=f6e3]:
+      - generic [ref=f6e4]:
+        - link "SuMate Logo SuMateCL Mis Compras & Despachos" [ref=f6e5] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f6e6]
+          - generic [ref=f6e7]:
+            - generic [ref=f6e8]: SuMateCL
+            - generic [ref=f6e9]: Mis Compras & Despachos
+        - generic [ref=f6e10]:
+          - link "Catálogo" [ref=f6e11] [cursor=pointer]:
+            - /url: /
+          - link "mat.riosr" [ref=f6e12] [cursor=pointer]:
+            - /url: /cuenta
+    - main [ref=f6e15]:
+      - generic [ref=f6e16]:
+        - generic [ref=f6e17]:
+          - generic [ref=f6e18]:
+            - heading "Mis Compras" [level=1] [ref=f6e19]
+            - paragraph [ref=f6e20]: Consulta el historial de tus pedidos y realiza el seguimiento de cada paquete en camino.
+          - generic [ref=f6e21]: Seguimiento en vivo
+        - generic [ref=f6e26]:
+          - generic [ref=f6e27]:
+            - button "Todas (0)" [ref=f6e28] [cursor=pointer]
+            - button "Por recibir (0)" [ref=f6e29] [cursor=pointer]
+            - button "Entregadas (0)" [ref=f6e30] [cursor=pointer]
+          - textbox "Buscar por producto o código..." [ref=f6e32]
+        - paragraph [ref=f6e35]: Cargando tus compras...
+    - contentinfo [ref=f6e36]:
+      - paragraph [ref=f6e37]: SuMateCL • Mates y Accesorios Artesanales
+      - paragraph [ref=f6e38]: Despachos seguros a todo Chile con tarifa fija de $2.650
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f6e39]

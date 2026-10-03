@@ -1,0 +1,1 @@
+[     535ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://ojffnbzcdxlzjrwzwpze.supabase.co/rest/v1/usuario?select=id%2Cemail%2Ctelefono%2Cfecha_nacimiento%2Crol&id=eq.9fd4de7e-bc58-469f-b050-16dee5fefb99:0

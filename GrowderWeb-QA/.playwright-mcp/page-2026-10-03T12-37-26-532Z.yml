@@ -1,0 +1,351 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e10]:
+    - banner [ref=f1e11]:
+      - generic [ref=f1e12]:
+        - link "SM SuMate Mates y accesorios" [ref=f1e13] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f1e14]: SM
+          - generic [ref=f1e15]:
+            - generic [ref=f1e16]: SuMate
+            - generic [ref=f1e17]: Mates y accesorios
+        - navigation "Navegación principal" [ref=f1e18]:
+          - link "Catálogo" [ref=f1e19] [cursor=pointer]:
+            - /url: /
+          - link "Bodega" [ref=f1e20] [cursor=pointer]:
+            - /url: /bodega
+          - link "Administración" [ref=f1e21] [cursor=pointer]:
+            - /url: /admin
+    - main [ref=f1e22]:
+      - generic [ref=f1e24]:
+        - generic [ref=f1e25]:
+          - paragraph [ref=f1e26]: Panel de Control
+          - heading "Administración General" [level=1] [ref=f1e27]
+          - paragraph [ref=f1e28]: Controla el inventario en tiempo real, añade nuevos productos al catálogo o gestiona los roles y permisos de acceso para tu equipo.
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - generic [ref=f1e31]: Productos
+            - strong [ref=f1e32]: "3"
+          - generic [ref=f1e33]:
+            - generic [ref=f1e34]: Usuarios
+            - strong [ref=f1e35]: "13"
+          - generic [ref=f1e36]:
+            - generic [ref=f1e37]: Pedidos
+            - strong [ref=f1e38]: "18"
+      - generic [ref=f1e39]:
+        - button "Inventario en tiempo real 3" [ref=f1e40] [cursor=pointer]:
+          - generic [ref=f1e43]: Inventario en tiempo real
+          - generic [ref=f1e44]: "3"
+        - button "Agregar Producto" [ref=f1e45] [cursor=pointer]
+        - button "Gestión de Roles 13" [active] [ref=f1e49] [cursor=pointer]:
+          - generic [ref=f1e52]: Gestión de Roles
+          - generic [ref=f1e53]: "13"
+        - button "Gestión de Pedidos 18" [ref=f1e54] [cursor=pointer]:
+          - generic [ref=f1e57]: Gestión de Pedidos
+          - generic [ref=f1e58]: "18"
+      - generic [ref=f1e129]:
+        - generic [ref=f1e130]:
+          - generic [ref=f1e131]:
+            - heading "Gestión de Roles y Permisos" [level=2] [ref=f1e132]
+            - paragraph [ref=f1e133]: Asigna permisos dentro de la plataforma o suspende usuarios.
+          - generic [ref=f1e134]:
+            - textbox "Buscar por correo o teléfono..." [ref=f1e136]
+            - button "Refrescar" [ref=f1e137] [cursor=pointer]
+        - generic [ref=f1e138]:
+          - generic [ref=f1e139]:
+            - generic [ref=f1e140]: Administrador (1)
+            - paragraph [ref=f1e142]: Control total de la tienda. Puede gestionar productos, stock, y asignar o revocar roles de otros usuarios.
+          - generic [ref=f1e143]:
+            - generic [ref=f1e144]: Editor (2)
+            - paragraph [ref=f1e146]: Acceso al panel para añadir productos, editar precios, descripciones y actualizar el inventario.
+          - generic [ref=f1e147]:
+            - generic [ref=f1e148]: Cliente (3)
+            - paragraph [ref=f1e150]: Usuario estándar. Puede explorar el catálogo, agregar al carrito, comprar y dejar valoraciones. No accede aquí.
+        - generic [ref=f1e151]:
+          - generic [ref=f1e152]:
+            - generic [ref=f1e153]:
+              - heading "Equipo de Trabajo 5" [level=3] [ref=f1e154]:
+                - text: Equipo de Trabajo
+                - generic [ref=f1e155]: "5"
+              - paragraph [ref=f1e156]: Administradores y Editores
+            - table [ref=f1e158]:
+              - rowgroup [ref=f1e159]:
+                - row [ref=f1e160]:
+                  - columnheader "Usuario" [ref=f1e161]
+                  - columnheader "Teléfono" [ref=f1e162]
+                  - columnheader "Rol actual" [ref=f1e163]
+                  - columnheader "Estado" [ref=f1e164]
+                  - columnheader "Asignar Rol" [ref=f1e165]
+              - rowgroup [ref=f1e166]:
+                - row [ref=f1e167]:
+                  - 'cell "b br.silvam@duocuc.cl ID: ec58f84f..." [ref=f1e168]':
+                    - generic [ref=f1e169]:
+                      - generic [ref=f1e170]: b
+                      - generic [ref=f1e171]:
+                        - paragraph [ref=f1e172]: br.silvam@duocuc.cl
+                        - generic [ref=f1e173]: "ID: ec58f84f..."
+                  - cell "996280721" [ref=f1e174]
+                  - cell "👑 Admin" [ref=f1e175]
+                  - cell [ref=f1e177]:
+                    - button "Activa" [ref=f1e178] [cursor=pointer]
+                  - cell [ref=f1e179]:
+                    - combobox [ref=f1e181] [cursor=pointer]:
+                      - option "3 - Cliente"
+                      - option "2 - Editor"
+                      - option "1 - Administrador" [selected]
+                - row [ref=f1e182]:
+                  - 'cell "b bsilva@nomed.org ID: 3fc16287..." [ref=f1e183]':
+                    - generic [ref=f1e184]:
+                      - generic [ref=f1e185]: b
+                      - generic [ref=f1e186]:
+                        - paragraph [ref=f1e187]: bsilva@nomed.org
+                        - generic [ref=f1e188]: "ID: 3fc16287..."
+                  - cell "996280721" [ref=f1e189]
+                  - cell "👑 Admin" [ref=f1e190]
+                  - cell [ref=f1e192]:
+                    - button "Activa" [ref=f1e193] [cursor=pointer]
+                  - cell [ref=f1e194]:
+                    - combobox [ref=f1e196] [cursor=pointer]:
+                      - option "3 - Cliente"
+                      - option "2 - Editor"
+                      - option "1 - Administrador" [selected]
+                - row [ref=f1e197]:
+                  - 'cell "i ignacioovasquez14@gmail.com ID: b58ec520..." [ref=f1e198]':
+                    - generic [ref=f1e199]:
+                      - generic [ref=f1e200]: i
+                      - generic [ref=f1e201]:
+                        - paragraph [ref=f1e202]: ignacioovasquez14@gmail.com
+                        - generic [ref=f1e203]: "ID: b58ec520..."
+                  - cell "332823842" [ref=f1e204]
+                  - cell "👑 Admin" [ref=f1e205]
+                  - cell [ref=f1e207]:
+                    - button "Activa" [ref=f1e208] [cursor=pointer]
+                  - cell [ref=f1e209]:
+                    - combobox [ref=f1e211] [cursor=pointer]:
+                      - option "3 - Cliente"
+                      - option "2 - Editor"
+                      - option "1 - Administrador" [selected]
+                - row [ref=f1e212]:
+                  - 'cell "m mat.riosr@duocuc.cl ID: 9fd4de7e..." [ref=f1e213]':
+                    - generic [ref=f1e214]:
+                      - generic [ref=f1e215]: m
+                      - generic [ref=f1e216]:
+                        - paragraph [ref=f1e217]: mat.riosr@duocuc.cl
+                        - generic [ref=f1e218]: "ID: 9fd4de7e..."
+                  - cell "964258451" [ref=f1e219]
+                  - cell "👑 Admin" [ref=f1e220]
+                  - cell [ref=f1e222]:
+                    - button "Activa" [ref=f1e223] [cursor=pointer]
+                  - cell [ref=f1e224]:
+                    - combobox [ref=f1e226] [cursor=pointer]:
+                      - option "3 - Cliente"
+                      - option "2 - Editor"
+                      - option "1 - Administrador" [selected]
+                - row [ref=f1e227]:
+                  - 'cell "m matiasignacio.g.m19@gmail.com ID: 495fdb32..." [ref=f1e228]':
+                    - generic [ref=f1e229]:
+                      - generic [ref=f1e230]: m
+                      - generic [ref=f1e231]:
+                        - paragraph [ref=f1e232]: matiasignacio.g.m19@gmail.com
+                        - generic [ref=f1e233]: "ID: 495fdb32..."
+                  - cell "971908229" [ref=f1e234]
+                  - cell "👑 Admin" [ref=f1e235]
+                  - cell [ref=f1e237]:
+                    - button "Activa" [ref=f1e238] [cursor=pointer]
+                  - cell [ref=f1e239]:
+                    - combobox [ref=f1e241] [cursor=pointer]:
+                      - option "3 - Cliente"
+                      - option "2 - Editor"
+                      - option "1 - Administrador" [selected]
+          - generic [ref=f1e242]:
+            - generic [ref=f1e243]:
+              - heading "Clientes Registrados 8" [level=3] [ref=f1e244]:
+                - text: Clientes Registrados
+                - generic [ref=f1e245]: "8"
+              - paragraph [ref=f1e246]: Usuarios estándar
+            - table [ref=f1e248]:
+              - rowgroup [ref=f1e249]:
+                - row [ref=f1e250]:
+                  - columnheader "Usuario" [ref=f1e251]
+                  - columnheader "Teléfono" [ref=f1e252]
+                  - columnheader "Rol actual" [ref=f1e253]
+                  - columnheader "Estado" [ref=f1e254]
+                  - columnheader "Asignar Rol" [ref=f1e255]
+                  - columnheader "Acciones" [ref=f1e256]
+              - rowgroup [ref=f1e257]:
+                - row [ref=f1e258]:
+                  - 'cell "b bryansilvamedina@gmail.com ID: b97da513..." [ref=f1e259]':
+                    - generic [ref=f1e260]:
+                      - generic [ref=f1e261]: b
+                      - generic [ref=f1e262]:
+                        - paragraph [ref=f1e263]: bryansilvamedina@gmail.com
+                        - generic [ref=f1e264]: "ID: b97da513..."
+                  - cell "941872459" [ref=f1e265]
+                  - cell "👤 Cliente" [ref=f1e266]
+                  - cell [ref=f1e268]:
+                    - button "Suspendida" [ref=f1e269] [cursor=pointer]
+                  - cell [ref=f1e270]:
+                    - combobox [disabled] [ref=f1e272] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e273]:
+                    - link "Ver Info" [ref=f1e274] [cursor=pointer]:
+                      - /url: /admin/clientes/b97da513-7e97-4062-9c56-865ba81e2eed
+                - row [ref=f1e278]:
+                  - 'cell "q qa_1790998045837@duocuc.cl ID: 84ca66b3..." [ref=f1e279]':
+                    - generic [ref=f1e280]:
+                      - generic [ref=f1e281]: q
+                      - generic [ref=f1e282]:
+                        - paragraph [ref=f1e283]: qa_1790998045837@duocuc.cl
+                        - generic [ref=f1e284]: "ID: 84ca66b3..."
+                  - cell "987654321" [ref=f1e285]
+                  - cell "👤 Cliente" [ref=f1e286]
+                  - cell [ref=f1e288]:
+                    - button "Activa" [ref=f1e289] [cursor=pointer]
+                  - cell [ref=f1e290]:
+                    - combobox [ref=f1e292] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e293]:
+                    - link "Ver Info" [ref=f1e294] [cursor=pointer]:
+                      - /url: /admin/clientes/84ca66b3-e777-41e4-bd7e-13cb0d925bc5
+                - row [ref=f1e298]:
+                  - 'cell "q qa_1790998275237@duocuc.cl ID: 093d98b7..." [ref=f1e299]':
+                    - generic [ref=f1e300]:
+                      - generic [ref=f1e301]: q
+                      - generic [ref=f1e302]:
+                        - paragraph [ref=f1e303]: qa_1790998275237@duocuc.cl
+                        - generic [ref=f1e304]: "ID: 093d98b7..."
+                  - cell "987654321" [ref=f1e305]
+                  - cell "👤 Cliente" [ref=f1e306]
+                  - cell [ref=f1e308]:
+                    - button "Activa" [ref=f1e309] [cursor=pointer]
+                  - cell [ref=f1e310]:
+                    - combobox [ref=f1e312] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e313]:
+                    - link "Ver Info" [ref=f1e314] [cursor=pointer]:
+                      - /url: /admin/clientes/093d98b7-4a4a-49f9-bdeb-044e30cf0311
+                - row [ref=f1e318]:
+                  - 'cell "q qa_1790998425158@duocuc.cl ID: dda66691..." [ref=f1e319]':
+                    - generic [ref=f1e320]:
+                      - generic [ref=f1e321]: q
+                      - generic [ref=f1e322]:
+                        - paragraph [ref=f1e323]: qa_1790998425158@duocuc.cl
+                        - generic [ref=f1e324]: "ID: dda66691..."
+                  - cell "987654321" [ref=f1e325]
+                  - cell "👤 Cliente" [ref=f1e326]
+                  - cell [ref=f1e328]:
+                    - button "Activa" [ref=f1e329] [cursor=pointer]
+                  - cell [ref=f1e330]:
+                    - combobox [ref=f1e332] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e333]:
+                    - link "Ver Info" [ref=f1e334] [cursor=pointer]:
+                      - /url: /admin/clientes/dda66691-1905-4b12-af88-0177e92553bb
+                - row [ref=f1e338]:
+                  - 'cell "q qa_1790998751719@duocuc.cl ID: 6df88f74..." [ref=f1e339]':
+                    - generic [ref=f1e340]:
+                      - generic [ref=f1e341]: q
+                      - generic [ref=f1e342]:
+                        - paragraph [ref=f1e343]: qa_1790998751719@duocuc.cl
+                        - generic [ref=f1e344]: "ID: 6df88f74..."
+                  - cell "987654321" [ref=f1e345]
+                  - cell "👤 Cliente" [ref=f1e346]
+                  - cell [ref=f1e348]:
+                    - button "Activa" [ref=f1e349] [cursor=pointer]
+                  - cell [ref=f1e350]:
+                    - combobox [ref=f1e352] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e353]:
+                    - link "Ver Info" [ref=f1e354] [cursor=pointer]:
+                      - /url: /admin/clientes/6df88f74-b598-4e63-bde1-efd0f5a38e6e
+                - row [ref=f1e358]:
+                  - 'cell "q qa_1790998989192@duocuc.cl ID: 4f1496e4..." [ref=f1e359]':
+                    - generic [ref=f1e360]:
+                      - generic [ref=f1e361]: q
+                      - generic [ref=f1e362]:
+                        - paragraph [ref=f1e363]: qa_1790998989192@duocuc.cl
+                        - generic [ref=f1e364]: "ID: 4f1496e4..."
+                  - cell "987654321" [ref=f1e365]
+                  - cell "👤 Cliente" [ref=f1e366]
+                  - cell [ref=f1e368]:
+                    - button "Activa" [ref=f1e369] [cursor=pointer]
+                  - cell [ref=f1e370]:
+                    - combobox [ref=f1e372] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e373]:
+                    - link "Ver Info" [ref=f1e374] [cursor=pointer]:
+                      - /url: /admin/clientes/4f1496e4-627b-415e-8884-b5136d5cbf4e
+                - row [ref=f1e378]:
+                  - 'cell "q qa_1791030002956@duocuc.cl ID: 4d30700b..." [ref=f1e379]':
+                    - generic [ref=f1e380]:
+                      - generic [ref=f1e381]: q
+                      - generic [ref=f1e382]:
+                        - paragraph [ref=f1e383]: qa_1791030002956@duocuc.cl
+                        - generic [ref=f1e384]: "ID: 4d30700b..."
+                  - cell "987654321" [ref=f1e385]
+                  - cell "👤 Cliente" [ref=f1e386]
+                  - cell [ref=f1e388]:
+                    - button "Activa" [ref=f1e389] [cursor=pointer]
+                  - cell [ref=f1e390]:
+                    - combobox [ref=f1e392] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e393]:
+                    - link "Ver Info" [ref=f1e394] [cursor=pointer]:
+                      - /url: /admin/clientes/4d30700b-6a04-4328-ba84-dc7800662619
+                - row [ref=f1e398]:
+                  - 'cell "q qa_1791030281529@duocuc.cl ID: 9526907b..." [ref=f1e399]':
+                    - generic [ref=f1e400]:
+                      - generic [ref=f1e401]: q
+                      - generic [ref=f1e402]:
+                        - paragraph [ref=f1e403]: qa_1791030281529@duocuc.cl
+                        - generic [ref=f1e404]: "ID: 9526907b..."
+                  - cell "987654321" [ref=f1e405]
+                  - cell "👤 Cliente" [ref=f1e406]
+                  - cell [ref=f1e408]:
+                    - button "Activa" [ref=f1e409] [cursor=pointer]
+                  - cell [ref=f1e410]:
+                    - combobox [ref=f1e412] [cursor=pointer]:
+                      - option "3 - Cliente" [selected]
+                      - option "2 - Editor"
+                      - option "1 - Administrador"
+                  - cell [ref=f1e413]:
+                    - link "Ver Info" [ref=f1e414] [cursor=pointer]:
+                      - /url: /admin/clientes/9526907b-2280-4141-8cf9-540f7832adc8
+    - contentinfo [ref=f1e125]:
+      - generic [ref=f1e126]:
+        - paragraph [ref=f1e127]: SuMate • GROWDER
+        - paragraph [ref=f1e128]: Gestión Integral de Inventario, E-Commerce y Roles
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f1e9]

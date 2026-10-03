@@ -1,0 +1,136 @@
+- generic [ref=f17e1]:
+  - generic [ref=f17e2]:
+    - banner [ref=f17e3]:
+      - generic [ref=f17e4]:
+        - link [ref=f17e5] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f17e6]
+        - search [ref=f17e8]:
+          - textbox "Buscar por mate, calabaza, bombilla, termo..." [ref=f17e9]
+          - button "Ejecutar busqueda" [ref=f17e10] [cursor=pointer]
+        - generic [ref=f17e13]:
+          - button "Abrir carrito" [ref=f17e14] [cursor=pointer]:
+            - generic [ref=f17e15]: $0
+          - link "← Volver al inicio" [ref=f17e19] [cursor=pointer]:
+            - /url: /
+      - navigation "Categorías de la base de datos" [ref=f17e20]:
+        - generic [ref=f17e22]:
+          - generic [ref=f17e23]: Categorías
+          - generic [ref=f17e25]:
+            - button "Todos los Productos 3" [ref=f17e143] [cursor=pointer]:
+              - generic [ref=f17e27]: Todos los Productos
+              - generic [ref=f17e144]: "3"
+            - button "Mates 3" [ref=f17e145] [cursor=pointer]:
+              - generic [ref=f17e146]: Mates
+              - generic [ref=f17e147]: "3"
+          - link "Filtrar" [ref=f17e32] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=f17e36]:
+      - generic [ref=f17e37]:
+        - generic [ref=f17e38]:
+          - link "Inicio" [ref=f17e39] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f17e40]: ›
+          - generic [ref=f17e41]: Búsqueda Filtrada
+        - generic [ref=f17e42]:
+          - heading "Todas las Categorías" [level=1] [ref=f17e44]
+          - generic [ref=f17e45]: 3 productos encontrados
+        - generic [ref=f17e211]:
+          - generic [ref=f17e212]: "Filtros aplicados:"
+          - generic [ref=f17e213]:
+            - generic [ref=f17e214]: "Precio: Mayor a Menor"
+            - button "✕" [ref=f17e215] [cursor=pointer]
+          - button "Limpiar todos" [ref=f17e216] [cursor=pointer]
+      - generic [ref=f17e46]:
+        - complementary [ref=f17e47]:
+          - generic [ref=f17e48]:
+            - generic [ref=f17e49]:
+              - generic [ref=f17e50]:
+                - heading "Filtros de Búsqueda" [level=2] [ref=f17e51]
+                - paragraph [ref=f17e52]: 3 productos encontrados
+              - button "Limpiar filtros" [ref=f17e217] [cursor=pointer]
+            - generic [ref=f17e53]:
+              - generic [ref=f17e54]: Búsqueda por escrito
+              - textbox "Buscar mates, bombillas..." [ref=f17e56]
+            - generic [ref=f17e57]:
+              - generic [ref=f17e58]: Ordenar por Precio
+              - generic [ref=f17e59]:
+                - button "Destacados / Recientes" [ref=f17e218] [cursor=pointer]
+                - button "Menor a mayor precio" [ref=f17e63] [cursor=pointer]
+                - button "Mayor a menor precio ✓" [active] [ref=f17e219] [cursor=pointer]:
+                  - generic [ref=f17e69]: Mayor a menor precio
+                  - generic [ref=f17e220]: ✓
+            - generic [ref=f17e73]:
+              - generic [ref=f17e74]: Categorías
+              - generic [ref=f17e75]:
+                - button "Todas las Categorías 3" [ref=f17e158] [cursor=pointer]:
+                  - generic [ref=f17e77]: Todas las Categorías
+                  - generic [ref=f17e78]: "3"
+                - button "Mates 3" [ref=f17e159] [cursor=pointer]:
+                  - generic [ref=f17e160]: Mates
+                  - generic [ref=f17e161]: "3"
+            - button "Restablecer todos los filtros" [ref=f17e222] [cursor=pointer]
+        - generic [ref=f17e80]:
+          - article [ref=f17e198] [cursor=pointer]:
+            - link "Ver detalle de Imperial Virola Alpaca" [ref=f17e199]:
+              - /url: /product/12
+            - generic [ref=f17e200]:
+              - img "Imperial Virola Alpaca" [ref=f17e202]
+              - generic [ref=f17e203]:
+                - generic [ref=f17e204]: Mates
+                - heading "Imperial Virola Alpaca" [level=3] [ref=f17e205]
+                - paragraph [ref=f17e206]: "Mate Imperial Negro – Virola y Fleje de Alpaca Descubre la elegancia y la tradición en su máxima expresión. Este Mate Imperial destaca por su sofisticado trabajo artesanal combinando una virola de alpaca de finos acabados con un fleje de acero grabado, logrando un contraste único y un estilo distinguido. Interior: Calabaza natural seleccionada de buen grosor, ideal para resaltar el auténtico sabor de la yerba mate. Exterior: Forrado en cuero legítimo de color negro profundo con costuras reforzadas. Base: Apoyo firme y estable para acompañarte en cada cebada. Un modelo exclusivo pensado para quienes buscan durabilidad, presencia y la mejor experiencia matera. (Nota: Al ser un producto artesanal de calabaza natural, las dimensiones y formas de cada pieza son únicas)."
+            - generic [ref=f17e207]:
+              - generic [ref=f17e208]:
+                - generic [ref=f17e209]: Precio CLP
+                - text: $36.990
+              - generic [ref=f17e210]: 11 disponibles
+          - article [ref=f17e185] [cursor=pointer]:
+            - link "Ver detalle de Criollo Galleta" [ref=f17e186]:
+              - /url: /product/13
+            - generic [ref=f17e187]:
+              - img "Criollo Galleta" [ref=f17e189]
+              - generic [ref=f17e190]:
+                - generic [ref=f17e191]: Mates
+                - heading "Criollo Galleta" [level=3] [ref=f17e192]
+                - paragraph [ref=f17e193]: "Un homenaje a las raíces materas. El Mate Galleta Criollo destaca por su distintiva forma aplanada y estilo sobrio, pensado para acompañarte en el día a día con el sabor más puro y tradicional. Interior: Calabaza natural seleccionada, trabajada para ofrecer una cebada pareja y mantener la temperatura ideal. Exterior: Cuero vacuno de alta calidad con costuras artesanales de gran firmeza. Diseño: Silueta tipo \"galleta\", compacta y muy cómoda al agarre, ideal para un uso práctico y tradicional. Base: Apoyo estable para posarlo con total seguridad. La opción perfecta para los amantes del mate clásico que valoran la autenticidad, la durabilidad y el buen cebar. (Nota: Al ser elaborado en calabaza natural, cada pieza presenta variaciones únicas en tamaño y forma)."
+            - generic [ref=f17e194]:
+              - generic [ref=f17e195]:
+                - generic [ref=f17e196]: Precio CLP
+                - text: $25.990
+              - generic [ref=f17e197]: 4 disponibles
+          - article [ref=f17e172] [cursor=pointer]:
+            - link "Ver detalle de Criollo Coquito Calabaza" [ref=f17e173]:
+              - /url: /product/14
+            - generic [ref=f17e174]:
+              - img "Criollo Coquito Calabaza" [ref=f17e176]
+              - generic [ref=f17e177]:
+                - generic [ref=f17e178]: Mates
+                - heading "Criollo Coquito Calabaza" [level=3] [ref=f17e179]
+                - paragraph [ref=f17e180]: "Pequeño en tamaño, pero enorme en tradición. El Mate Criollo Coquito es el compañero ideal para tus cebadas individuales o para disfrutar de un buen mate express sin desperdiciar yerba. Interior: Calabaza natural seleccionada de formato \"coquito\" (de boca más pequeña y forma redondeada), perfecta para optimizar el rendimiento de la yerba. Exterior: Forrado en cuero legítimo de excelente terminación con costuras artesanales reforzadas. Diseño: Tamaño compacto y ergonómico que calza perfectamente en la mano, muy fácil de transportar. Base: Apoyo firme y equilibrado para una cebada segura. Ideal para quienes buscan practicidad, economía de yerba y todo el encanto de la artesanía clásica. (Nota: Cada pieza es única en forma y dimensiones por tratarse de un fruto de calabaza natural)."
+            - generic [ref=f17e181]:
+              - generic [ref=f17e182]:
+                - generic [ref=f17e183]: Precio CLP
+                - text: $23.990
+              - generic [ref=f17e184]: 8 disponibles
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f17e141]

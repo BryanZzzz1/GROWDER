@@ -1,0 +1,64 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e2]:
+    - banner [ref=f8e3]:
+      - generic [ref=f8e4]:
+        - link [ref=f8e5] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f8e6]
+        - search [ref=f8e8]:
+          - textbox "Buscar mates, bombillas, termos..." [ref=f8e9]
+          - button "Ejecutar busqueda" [ref=f8e10] [cursor=pointer]
+        - generic [ref=f8e13]:
+          - button "Abrir carrito" [ref=f8e15] [cursor=pointer]:
+            - generic [ref=f8e16]: $0
+          - link "Mis compras" [ref=f8e23] [cursor=pointer]:
+            - /url: /mis-compras
+      - navigation "Categorías de la base de datos" [ref=f8e27]:
+        - generic [ref=f8e29]:
+          - generic [ref=f8e30]: Categorías
+          - generic [ref=f8e32]:
+            - button "Todos los Productos" [ref=f8e33] [cursor=pointer]
+            - generic [ref=f8e35]: Cargando categorías...
+          - link "Filtrar" [ref=f8e39] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=f8e43]:
+      - img "50% de descuento en tu primer envío - SuMateCL" [ref=f8e46]
+      - generic [ref=f8e47]:
+        - generic [ref=f8e48]:
+          - generic [ref=f8e49]:
+            - paragraph [ref=f8e51]: Nuestra tienda
+            - heading "Encuentra tu próximo mate" [level=2] [ref=f8e52]
+            - paragraph [ref=f8e53]: Mates, bombillas, termos y accesorios para acompañar cada cebada.
+          - paragraph [ref=f8e54]: Cargando catálogo...
+        - paragraph [ref=f8e57]: Cargando inventario de SuMateCL...
+      - generic [ref=f8e59]:
+        - generic [ref=f8e60]:
+          - paragraph [ref=f8e61]: SuMateCL
+          - heading "Tradición, diseño y buenos mates." [level=2] [ref=f8e62]
+          - paragraph [ref=f8e63]: Explora nuestra selección y encuentra el producto que acompañará tus próximos mates.
+        - button "Ver catálogo" [ref=f8e64] [cursor=pointer]
+    - contentinfo [ref=f8e65]:
+      - generic [ref=f8e67]:
+        - paragraph [ref=f8e68]: SuMateCL • GROWDER
+        - paragraph [ref=f8e69]: Gestión Integral de Inventario y E-Commerce
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f8e70]

@@ -1,0 +1,39 @@
+- generic [active] [ref=f3e1]:
+  - main [ref=f3e2]:
+    - generic [ref=f3e3]:
+      - link [ref=f3e5] [cursor=pointer]:
+        - /url: /
+        - img "SuMateCL" [ref=f3e6]
+        - heading "Recuperar contraseña" [level=1] [ref=f3e7]
+        - paragraph [ref=f3e8]: Ingresa tu correo para recibir las instrucciones de recuperacion
+      - generic [ref=f3e9]:
+        - generic [ref=f3e10]:
+          - generic [ref=f3e11]: Correo electronico registrado
+          - textbox "correo@ejemplo.com" [ref=f3e12]
+        - button "Enviar enlace de recuperacion" [ref=f3e13] [cursor=pointer]
+      - generic [ref=f3e14]:
+        - link "← Volver a iniciar sesion" [ref=f3e15] [cursor=pointer]:
+          - /url: /login
+        - link "Ir a la pagina principal" [ref=f3e16] [cursor=pointer]:
+          - /url: /
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f3e17]

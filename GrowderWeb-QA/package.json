@@ -1,0 +1,24 @@
+{
+  "name": "growder-web-qa",
+  "version": "1.0.0",
+  "description": "Pruebas automatizadas Playwright para GrowderWeb con patron POM",
+  "scripts": {
+    "test": "playwright test",
+    "test:admin": "playwright test tests/admin",
+    "test:cliente": "playwright test tests/cliente",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "clean:allure": "node -e \"const fs = require('fs'); fs.rmSync('allure-results', { recursive: true, force: true }); fs.rmSync('allure-report', { recursive: true, force: true });\"",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "report": "playwright show-report",
+    "test:allure": "npm run clean:allure && playwright test && npm run allure:generate && npm run allure:open"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.0.0",
+    "allure-commandline": "^2.46.1",
+    "allure-playwright": "^3.13.0",
+    "typescript": "^5.0.0"
+  }
+}

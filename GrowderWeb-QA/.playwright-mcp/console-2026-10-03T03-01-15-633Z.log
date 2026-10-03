@@ -1,0 +1,2 @@
+[     262ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/registro:0
+[   39318ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://prueba1-seven-sigma.vercel.app/login:0

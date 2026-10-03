@@ -1,0 +1,95 @@
+- generic [ref=f18e1]:
+  - generic [ref=f18e2]:
+    - banner [ref=f18e6]:
+      - generic [ref=f18e7]:
+        - link [ref=f18e8] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f18e9]
+        - search [ref=f18e11]:
+          - textbox "Buscar mates, bombillas, termos..." [ref=f18e12]
+          - button "Ejecutar busqueda" [ref=f18e13] [cursor=pointer]
+        - generic [ref=f18e16]:
+          - link "Filtros" [ref=f18e17] [cursor=pointer]:
+            - /url: /buscar
+          - button "$23.990 1" [ref=f18e22] [cursor=pointer]:
+            - generic [ref=f18e23]: $23.990
+            - generic [ref=f18e24]: "1"
+      - navigation "Categorías de la base de datos" [ref=f18e30]:
+        - generic [ref=f18e32]:
+          - generic [ref=f18e33]: Categorías
+          - generic [ref=f18e35]:
+            - button "Todos los Productos" [ref=f18e36] [cursor=pointer]
+            - button "Mates" [ref=f18e38] [cursor=pointer]
+          - link "Filtrar" [ref=f18e41] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=f18e45]:
+      - generic [ref=f18e46]:
+        - generic [ref=f18e47]:
+          - generic [ref=f18e48]:
+            - img "Criollo Coquito Calabaza" [ref=f18e49]
+            - button
+            - button
+            - generic [ref=f18e50]: 1 / 2
+          - generic [ref=f18e51]:
+            - button [ref=f18e52] [cursor=pointer]:
+              - img "Vista 0" [ref=f18e53]
+            - button [ref=f18e54] [cursor=pointer]:
+              - img "Vista 1" [ref=f18e55]
+        - generic [ref=f18e56]:
+          - generic [ref=f18e57]:
+            - generic [ref=f18e58]: Mates
+            - generic [ref=f18e59]: Edición Importada
+          - heading "Criollo Coquito Calabaza" [level=1] [ref=f18e60]
+          - generic [ref=f18e61]:
+            - generic [ref=f18e62]:
+              - paragraph [ref=f18e63]: $23.990
+              - generic [ref=f18e64]: CLP
+            - paragraph [ref=f18e65]: Envíos rápidos a todo Chile. Calidad premium garantizada.
+          - generic [ref=f18e66]:
+            - generic [ref=f18e67]: Cantidad
+            - generic [ref=f18e69]:
+              - button "−" [ref=f18e70] [cursor=pointer]
+              - generic [ref=f18e71]: "1"
+              - button "+" [ref=f18e72] [cursor=pointer]
+            - generic [ref=f18e73]:
+              - button "Añadir al carrito" [active] [ref=f18e74] [cursor=pointer]
+              - button "Comprar ahora" [ref=f18e75] [cursor=pointer]
+          - generic [ref=f18e76]:
+            - generic [ref=f18e77]: Despacho o retiro listo en Santiago
+            - paragraph [ref=f18e81]: Coordinación directa para entregas en el día o despachos a todo Chile.
+          - generic [ref=f18e83]:
+            - heading "Descripción del Producto" [level=3] [ref=f18e84]
+            - paragraph [ref=f18e85]: "Pequeño en tamaño, pero enorme en tradición. El Mate Criollo Coquito es el compañero ideal para tus cebadas individuales o para disfrutar de un buen mate express sin desperdiciar yerba. Interior: Calabaza natural seleccionada de formato \"coquito\" (de boca más pequeña y forma redondeada), perfecta para optimizar el rendimiento de la yerba. Exterior: Forrado en cuero legítimo de excelente terminación con costuras artesanales reforzadas. Diseño: Tamaño compacto y ergonómico que calza perfectamente en la mano, muy fácil de transportar. Base: Apoyo firme y equilibrado para una cebada segura. Ideal para quienes buscan practicidad, economía de yerba y todo el encanto de la artesanía clásica. (Nota: Cada pieza es única en forma y dimensiones por tratarse de un fruto de calabaza natural)."
+      - generic [ref=f18e86]:
+        - generic [ref=f18e87]: Garantía SuMateCL
+        - heading "Información de Envíos & Cuidados" [level=2] [ref=f18e88]
+        - generic [ref=f18e89]:
+          - button "🚚 Tiempos de Despacho ▲" [ref=f18e90] [cursor=pointer]:
+            - generic [ref=f18e91]:
+              - generic [ref=f18e92]: 🚚
+              - generic [ref=f18e93]: Tiempos de Despacho
+            - generic [ref=f18e94]: ▲
+          - paragraph [ref=f18e95]: Envíos dentro de la Región Metropolitana llegan entre 24 y 48 horas hábiles. Para regiones, coordinamos mediante Starken o Blue Express asegurando un embalaje protegido para que tu producto llegue intacto.
+  - generic [ref=f18e98]:
+    - generic [ref=f18e99]:
+      - generic [ref=f18e100]:
+        - heading "Tu Carrito" [level=2] [ref=f18e101]
+        - button "✕" [ref=f18e102] [cursor=pointer]
+      - generic [ref=f18e104]:
+        - img "Criollo Coquito Calabaza" [ref=f18e105]
+        - generic [ref=f18e106]:
+          - heading "Criollo Coquito Calabaza" [level=4] [ref=f18e107]
+          - paragraph [ref=f18e108]: 1 x $23.990
+        - button "Quitar" [ref=f18e109] [cursor=pointer]
+    - generic [ref=f18e110]:
+      - generic [ref=f18e111]:
+        - generic [ref=f18e112]: "Subtotal:"
+        - generic [ref=f18e113]: $23.990
+      - generic [ref=f18e114]:
+        - generic [ref=f18e115]: "IVA (19%):"
+        - generic [ref=f18e116]: $4.558
+      - generic [ref=f18e117]:
+        - generic [ref=f18e118]: "Total a pagar:"
+        - generic [ref=f18e119]: $28.548
+      - button "Ir a Pagar" [ref=f18e120] [cursor=pointer]
+  - alert [ref=f18e5]

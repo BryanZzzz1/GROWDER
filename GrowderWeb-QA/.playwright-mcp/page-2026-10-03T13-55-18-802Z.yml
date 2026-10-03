@@ -1,0 +1,64 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e24]:
+    - banner [ref=e25]:
+      - generic [ref=e26]:
+        - link [ref=e27] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=e28]
+        - search [ref=e30]:
+          - textbox "Buscar mates, bombillas, termos..." [ref=e31]
+          - button "Ejecutar busqueda" [ref=e32] [cursor=pointer]
+        - generic [ref=e35]:
+          - button "Abrir carrito" [ref=e37] [cursor=pointer]:
+            - generic [ref=e38]: $0
+          - link "Mis compras" [ref=e45] [cursor=pointer]:
+            - /url: /mis-compras
+      - navigation "Categorías de la base de datos" [ref=e49]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: Categorías
+          - generic [ref=e54]:
+            - button "Todos los Productos" [ref=e55] [cursor=pointer]
+            - generic [ref=e57]: Cargando categorías...
+          - link "Filtrar" [ref=e61] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=e65]:
+      - img "50% de descuento en tu primer envío - SuMateCL" [ref=e68]
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - paragraph [ref=e73]: Nuestra tienda
+            - heading "Encuentra tu próximo mate" [level=2] [ref=e74]
+            - paragraph [ref=e75]: Mates, bombillas, termos y accesorios para acompañar cada cebada.
+          - paragraph [ref=e76]: Cargando catálogo...
+        - paragraph [ref=e79]: Cargando inventario de SuMateCL...
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - paragraph [ref=e83]: SuMateCL
+          - heading "Tradición, diseño y buenos mates." [level=2] [ref=e84]
+          - paragraph [ref=e85]: Explora nuestra selección y encuentra el producto que acompañará tus próximos mates.
+        - button "Ver catálogo" [ref=e86] [cursor=pointer]
+    - contentinfo [ref=e87]:
+      - generic [ref=e89]:
+        - paragraph [ref=e90]: SuMateCL • GROWDER
+        - paragraph [ref=e91]: Gestión Integral de Inventario y E-Commerce
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=e23]

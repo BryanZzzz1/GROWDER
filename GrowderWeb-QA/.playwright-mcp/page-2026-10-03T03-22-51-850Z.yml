@@ -1,0 +1,107 @@
+- generic [active] [ref=f22e1]:
+  - generic [ref=f22e22]:
+    - banner [ref=f22e23]:
+      - generic [ref=f22e24]:
+        - link [ref=f22e25] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f22e26]
+        - search [ref=f22e28]:
+          - textbox "Buscar mates, bombillas, termos..." [ref=f22e29]
+          - button "Ejecutar busqueda" [ref=f22e30] [cursor=pointer]
+        - generic [ref=f22e33]:
+          - button "Abrir carrito" [ref=f22e35] [cursor=pointer]:
+            - generic [ref=f22e36]: $0
+          - link "Mis compras" [ref=f22e43] [cursor=pointer]:
+            - /url: /mis-compras
+      - navigation "Categorías de la base de datos" [ref=f22e47]:
+        - generic [ref=f22e49]:
+          - generic [ref=f22e50]: Categorías
+          - generic [ref=f22e52]:
+            - button "Todos los Productos 3" [ref=f22e53] [cursor=pointer]:
+              - generic [ref=f22e54]: Todos los Productos
+              - generic [ref=f22e55]: "3"
+            - button "Mates 3" [ref=f22e56] [cursor=pointer]:
+              - generic [ref=f22e57]: Mates
+              - generic [ref=f22e58]: "3"
+          - link "Filtrar" [ref=f22e60] [cursor=pointer]:
+            - /url: /buscar
+    - main [ref=f22e64]:
+      - img "50% de descuento en tu primer envío - SuMateCL" [ref=f22e67]
+      - generic [ref=f22e68]:
+        - generic [ref=f22e69]:
+          - generic [ref=f22e70]:
+            - paragraph [ref=f22e72]: Nuestra tienda
+            - heading "Encuentra tu próximo mate" [level=2] [ref=f22e73]
+            - paragraph [ref=f22e74]: Mates, bombillas, termos y accesorios para acompañar cada cebada.
+          - paragraph [ref=f22e75]: 3 productos disponibles
+        - generic [ref=f22e76]:
+          - article [ref=f22e77]:
+            - link "Ver Criollo Coquito Calabaza" [ref=f22e78] [cursor=pointer]:
+              - /url: /product/14
+            - generic [ref=f22e79]:
+              - img "Criollo Coquito Calabaza" [ref=f22e80]
+              - generic [ref=f22e81]: Mates
+              - generic [ref=f22e82]: 8 disponibles
+              - generic [ref=f22e83]: →
+            - generic [ref=f22e84]:
+              - generic [ref=f22e85]:
+                - heading "Criollo Coquito Calabaza" [level=3] [ref=f22e86]
+                - generic [ref=f22e87]: $23.990
+              - paragraph [ref=f22e88]: "Pequeño en tamaño, pero enorme en tradición. El Mate Criollo Coquito es el compañero ideal para tus cebadas individuales o para disfrutar de un buen mate express sin desperdiciar yerba. Interior: Calabaza natural seleccionada de formato \"coquito\" (de boca más pequeña y forma redondeada), perfecta para optimizar el rendimiento de la yerba. Exterior: Forrado en cuero legítimo de excelente terminación con costuras artesanales reforzadas. Diseño: Tamaño compacto y ergonómico que calza perfectamente en la mano, muy fácil de transportar. Base: Apoyo firme y equilibrado para una cebada segura. Ideal para quienes buscan practicidad, economía de yerba y todo el encanto de la artesanía clásica. (Nota: Cada pieza es única en forma y dimensiones por tratarse de un fruto de calabaza natural)."
+          - article [ref=f22e89]:
+            - link "Ver Criollo Galleta" [ref=f22e90] [cursor=pointer]:
+              - /url: /product/13
+            - generic [ref=f22e91]:
+              - img "Criollo Galleta" [ref=f22e92]
+              - generic [ref=f22e93]: Mates
+              - generic [ref=f22e94]: 4 disponibles
+              - generic [ref=f22e95]: →
+            - generic [ref=f22e96]:
+              - generic [ref=f22e97]:
+                - heading "Criollo Galleta" [level=3] [ref=f22e98]
+                - generic [ref=f22e99]: $25.990
+              - paragraph [ref=f22e100]: "Un homenaje a las raíces materas. El Mate Galleta Criollo destaca por su distintiva forma aplanada y estilo sobrio, pensado para acompañarte en el día a día con el sabor más puro y tradicional. Interior: Calabaza natural seleccionada, trabajada para ofrecer una cebada pareja y mantener la temperatura ideal. Exterior: Cuero vacuno de alta calidad con costuras artesanales de gran firmeza. Diseño: Silueta tipo \"galleta\", compacta y muy cómoda al agarre, ideal para un uso práctico y tradicional. Base: Apoyo estable para posarlo con total seguridad. La opción perfecta para los amantes del mate clásico que valoran la autenticidad, la durabilidad y el buen cebar. (Nota: Al ser elaborado en calabaza natural, cada pieza presenta variaciones únicas en tamaño y forma)."
+          - article [ref=f22e101]:
+            - link "Ver Imperial Virola Alpaca" [ref=f22e102] [cursor=pointer]:
+              - /url: /product/12
+            - generic [ref=f22e103]:
+              - img "Imperial Virola Alpaca" [ref=f22e104]
+              - generic [ref=f22e105]: Mates
+              - generic [ref=f22e106]: 11 disponibles
+              - generic [ref=f22e107]: →
+            - generic [ref=f22e108]:
+              - generic [ref=f22e109]:
+                - heading "Imperial Virola Alpaca" [level=3] [ref=f22e110]
+                - generic [ref=f22e111]: $36.990
+              - paragraph [ref=f22e112]: "Mate Imperial Negro – Virola y Fleje de Alpaca Descubre la elegancia y la tradición en su máxima expresión. Este Mate Imperial destaca por su sofisticado trabajo artesanal combinando una virola de alpaca de finos acabados con un fleje de acero grabado, logrando un contraste único y un estilo distinguido. Interior: Calabaza natural seleccionada de buen grosor, ideal para resaltar el auténtico sabor de la yerba mate. Exterior: Forrado en cuero legítimo de color negro profundo con costuras reforzadas. Base: Apoyo firme y estable para acompañarte en cada cebada. Un modelo exclusivo pensado para quienes buscan durabilidad, presencia y la mejor experiencia matera. (Nota: Al ser un producto artesanal de calabaza natural, las dimensiones y formas de cada pieza son únicas)."
+      - generic [ref=f22e114]:
+        - generic [ref=f22e115]:
+          - paragraph [ref=f22e116]: SuMateCL
+          - heading "Tradición, diseño y buenos mates." [level=2] [ref=f22e117]
+          - paragraph [ref=f22e118]: Explora nuestra selección y encuentra el producto que acompañará tus próximos mates.
+        - button "Ver catálogo" [ref=f22e119] [cursor=pointer]
+    - contentinfo [ref=f22e120]:
+      - generic [ref=f22e122]:
+        - paragraph [ref=f22e123]: SuMateCL • GROWDER
+        - paragraph [ref=f22e124]: Gestión Integral de Inventario y E-Commerce
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f22e21]

@@ -1,0 +1,83 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e2]:
+    - banner [ref=f7e7]:
+      - generic [ref=f7e8]:
+        - link "SuMate Logo SuMateCL Mi Perfil" [ref=f7e9] [cursor=pointer]:
+          - /url: /
+          - img "SuMate Logo" [ref=f7e10]
+          - generic [ref=f7e11]:
+            - generic [ref=f7e12]: SuMateCL
+            - generic [ref=f7e13]: Mi Perfil
+        - link "← Volver a la tienda" [ref=f7e14] [cursor=pointer]:
+          - /url: /
+    - main [ref=f7e15]:
+      - link "← Volver al inicio" [ref=f7e17] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f7e18]:
+        - generic [ref=f7e19]:
+          - generic [ref=f7e20]: m
+          - generic [ref=f7e21]:
+            - generic [ref=f7e22]:
+              - heading "mat.riosr@duocuc.cl" [level=1] [ref=f7e23]
+              - generic [ref=f7e24]: Verificado
+            - paragraph [ref=f7e25]: Cliente GROWDER
+        - button "Cerrar sesión" [ref=f7e26] [cursor=pointer]
+      - generic [ref=f7e27]:
+        - generic [ref=f7e28]:
+          - generic [ref=f7e29]:
+            - generic [ref=f7e30]: "#"
+            - heading "Mis Compras" [level=3] [ref=f7e31]
+            - paragraph [ref=f7e32]: Seguimiento de pedidos en vivo y estados de envío por Starken o Chilexpress.
+          - link "Ver pedidos →" [ref=f7e33] [cursor=pointer]:
+            - /url: /mis-compras
+        - generic [ref=f7e34]:
+          - generic [ref=f7e35]:
+            - generic [ref=f7e36]: "@"
+            - heading "Seguridad" [level=3] [ref=f7e37]
+            - paragraph [ref=f7e38]: Contraseña y credenciales protegidas con cifrado seguro en Supabase GoTrue.
+          - generic [ref=f7e39]: Protegida
+        - generic [ref=f7e40]:
+          - generic [ref=f7e41]:
+            - generic [ref=f7e42]: +
+            - heading "Catálogo GROWDER" [level=3] [ref=f7e43]
+            - paragraph [ref=f7e44]: Explora nuevos productos, ofertas exclusivas y novedades para el cultivo.
+          - link "Ir a la tienda →" [ref=f7e45] [cursor=pointer]:
+            - /url: /
+      - generic [ref=f7e46]:
+        - generic [ref=f7e48]:
+          - heading "Datos de tu cuenta" [level=2] [ref=f7e49]
+          - paragraph [ref=f7e50]: Mantén actualizado tu teléfono para notificaciones de entrega.
+        - generic [ref=f7e52]:
+          - generic [ref=f7e53]:
+            - generic [ref=f7e62]: Correo de Inicio
+            - textbox [disabled] [ref=f7e64]: mat.riosr@duocuc.cl
+          - generic [ref=f7e56]:
+            - generic [ref=f7e65]: Teléfono de Contacto
+            - 'textbox "Ej: 912345678" [ref=f7e67]': "964258451"
+          - generic [ref=f7e59]:
+            - generic [ref=f7e68]: Fecha de Nacimiento
+            - textbox [ref=f7e70]: 2026-09-29
+          - generic [ref=f7e71]:
+            - button "Cancelar" [ref=f7e72] [cursor=pointer]
+            - button "Guardar Cambios" [ref=f7e73] [cursor=pointer]
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading "Tu Carrito" [level=2]
+            - button "✕"
+          - generic:
+            - paragraph: Tu carrito está vacío.
+        - generic:
+          - generic:
+            - generic: "Subtotal:"
+            - generic: $0
+          - generic:
+            - generic: "IVA (19%):"
+            - generic: $0
+          - generic:
+            - generic: "Total a pagar:"
+            - generic: $0
+          - button "Ir a Pagar" [disabled]
+  - alert [ref=f7e6]
