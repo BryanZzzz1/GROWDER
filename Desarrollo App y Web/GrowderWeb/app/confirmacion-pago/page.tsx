@@ -62,7 +62,7 @@ function ConfirmacionPagoContent() {
 
   const [mostrarModalExito, setMostrarModalExito] = useState(false);
   const [numeroPedido, setNumeroPedido] = useState('');
-  
+
   // Timer state
   const [pedidoExistente, setPedidoExistente] = useState<any>(null);
   const [tiempoRestante, setTiempoRestante] = useState<number | null>(null);
@@ -70,7 +70,7 @@ function ConfirmacionPagoContent() {
 
   useEffect(() => {
     if (!codigoURL) return;
-    
+
     let montado = true;
     const fetchPedido = async () => {
       const { data, error } = await supabase
@@ -78,13 +78,13 @@ function ConfirmacionPagoContent() {
         .select('*')
         .eq('codigo_pedido', codigoURL)
         .single();
-        
+
       if (!montado) return;
       if (error || !data) {
         console.error("Pedido no encontrado", error);
         return;
       }
-      
+
       setPedidoExistente(data);
       setNombre(data.nombre_cliente || '');
       setTelefono(data.telefono_cliente || '');
@@ -95,14 +95,14 @@ function ConfirmacionPagoContent() {
       setDepto(data.depto || '');
       setInstrucciones(data.instrucciones || '');
       setNumeroPedido(data.codigo_pedido);
-      
+
       if (data.estado !== 'pendiente') {
         // Si no está pendiente, podría ya estar pagado o cancelado.
         // Lo dejamos caer en la expiración automática o UI deshabilitada.
         setTiempoAgotado(true);
       }
     };
-    
+
     fetchPedido();
     return () => { montado = false; };
   }, [codigoURL]);
@@ -116,7 +116,7 @@ function ConfirmacionPagoContent() {
     const interval = setInterval(() => {
       const ahora = Date.now();
       const dif = expiracion - ahora;
-      
+
       if (dif <= 0) {
         clearInterval(interval);
         setTiempoRestante(0);
@@ -474,7 +474,13 @@ function ConfirmacionPagoContent() {
             {tabAuth === 'login' ? (
               <form onSubmit={handleInlineLogin} className="space-y-4">
                 <div><label className="block text-xs font-bold text-stone-700 mb-1">Correo electrónico</label><input type="email" required placeholder="correo@ejemplo.cl" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" /></div>
-                <div><label className="block text-xs font-bold text-stone-700 mb-1">Contraseña</label><input type="password" required placeholder="Tu contraseña" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" /></div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">Contraseña</label>
+                  <input type="password" required placeholder="Tu contraseña" value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} className="w-full text-xs rounded-xl border px-3.5 py-2.5 outline-none focus:border-[#314235] transition" />
+                  <div className="flex justify-end mt-1.5">
+                    <Link href="/recuperar-password" className="text-[11px] font-semibold text-[#8C7762] hover:text-[#725F4C] hover:underline transition">¿Se te olvidó tu contraseña?</Link>
+                  </div>
+                </div>
                 <button type="submit" disabled={authCargandoSubmit} className="w-full bg-[#314235] hover:bg-[#243127] disabled:opacity-60 text-white font-bold py-3 rounded-full text-xs transition shadow-md cursor-pointer">{authCargandoSubmit ? 'Iniciando sesión...' : 'Ingresar y Continuar al Pago'}</button>
               </form>
             ) : (

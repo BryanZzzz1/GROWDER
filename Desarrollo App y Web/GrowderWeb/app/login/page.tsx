@@ -95,6 +95,15 @@ function LoginForm() {
               required
               className="w-full rounded-xl border border-stone-300 px-4 py-3 outline-none focus:border-[#8C7762] transition"
             />
+            
+            <div className="flex justify-end mt-2">
+              <Link
+                href="/recuperar-password"
+                className="text-xs font-semibold text-[#8C7762] hover:text-[#725F4C] hover:underline transition"
+              >
+                ¿Se te olvidó tu contraseña?
+              </Link>
+            </div>
           </div>
 
           <button
