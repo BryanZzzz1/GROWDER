@@ -14,17 +14,33 @@ import { SupabaseService } from '../services/supabase.service';
 export class CheckoutPage implements OnInit {
   checkoutForm: FormGroup;
   carrito: Productos[] = [];
+
+  // Variables de cálculo
   totalProductos: number = 0;
+  iva: number = 0;
   costoEnvioFijo: number = 2650;
   totalFinal: number = 0;
+
   metodoPagoSeleccionado: 'webpay' | 'mercadopago' = 'webpay';
   procesando: boolean = false;
 
   regiones = [
+    'Región de Arica y Parinacota',
+    'Región de Tarapacá',
+    'Región de Antofagasta',
+    'Región de Atacama',
+    'Región de Coquimbo',
+    'Región de Valparaíso',
     'Región Metropolitana de Santiago',
-    'Valparaíso',
-    'Biobío',
-    // ... agrega las demás
+    'Región del Libertador General Bernardo O\'Higgins',
+    'Región del Maule',
+    'Región de Ñuble',
+    'Región del Biobío',
+    'Región de La Araucanía',
+    'Región de Los Ríos',
+    'Región de Los Lagos',
+    'Región de Aysén del General Carlos Ibáñez del Campo',
+    'Región de Magallanes y de la Antártica Chilena'
   ];
 
   constructor(
@@ -32,7 +48,7 @@ export class CheckoutPage implements OnInit {
     private bd: ServicebdService,
     private router: Router,
     private toastController: ToastController,
-    private supabase: SupabaseService // Para llamar a la Edge Function
+    private supabase: SupabaseService
   ) {
     this.checkoutForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -72,7 +88,8 @@ export class CheckoutPage implements OnInit {
 
   calcularTotales() {
     this.totalProductos = this.carrito.reduce((acc, prod) => acc + (prod.precio * (prod.cantidad || 1)), 0);
-    this.totalFinal = this.totalProductos + this.costoEnvioFijo;
+    this.iva = Math.round(this.totalProductos * 0.19);
+    this.totalFinal = this.totalProductos + this.iva + this.costoEnvioFijo;
   }
 
   async procesarPago() {
@@ -91,15 +108,11 @@ export class CheckoutPage implements OnInit {
     const formValues = this.checkoutForm.value;
 
     try {
-      // 1. Obtener sesión de usuario activa
       const { data: { session } } = await this.supabase.client.auth.getSession();
       const usuarioId = session?.user?.id || null;
       const emailCliente = formValues.email?.trim() || session?.user?.email || '';
-
-      // 2. Generar código único de orden
       const codigoOrden = `SM-${Math.floor(100000 + Math.random() * 900000)}`;
 
-      // 3. Estructurar snapshot JSONB de items idéntico a la versión Web
       const itemsPayload = this.carrito.map(p => ({
         idproducto: p.idproducto,
         nombre: p.nombre,
@@ -108,7 +121,7 @@ export class CheckoutPage implements OnInit {
         imagen: p.foto || 'assets/placeholder-mate.png'
       }));
 
-      // 4. Pre-persistencia en la tabla 'pedidos'
+      // 1. Guardar en Base de Datos como PENDIENTE
       const { data: pedidoData, error: dbError } = await this.supabase.client
         .from('pedidos')
         .insert({
@@ -136,7 +149,7 @@ export class CheckoutPage implements OnInit {
         throw new Error(`Error BD (${dbError.code}): ${dbError.message}`);
       }
 
-      // 4.5. Inserción obligatoria en historial_compras
+      // 2. Registrar en historial de compras
       const itemsHistorial = this.carrito.map(p => ({
         idproducto: p.idproducto,
         nombre: p.nombre,
@@ -153,10 +166,10 @@ export class CheckoutPage implements OnInit {
         .insert(itemsHistorial);
 
       if (errorHistorial) {
-        console.error('[CHECKOUT] Error al insertar en historial_compras:', errorHistorial);
+        console.error('[CHECKOUT] Error en historial_compras:', errorHistorial);
       }
 
-      // 5. Invocación de Reserva / Descuento atómico de stock (si existe RPC)
+      // 3. Reservar Stock temporalmente
       try {
         await this.supabase.client.rpc('crear_reserva_stock', {
           p_codigo_reserva: codigoOrden,
@@ -166,10 +179,10 @@ export class CheckoutPage implements OnInit {
           p_email: emailCliente
         });
       } catch (stockEx) {
-        console.warn('RPC crear_reserva_stock omitida o en fallback:', stockEx);
+        console.warn('RPC crear_reserva_stock omitida:', stockEx);
       }
 
-      // 6. Invocación de Pasarela (Edge Function para Webpay o Mercado Pago)
+      // 4. Invocar Pasarela para obtener link de pago
       const { data: gatewayData, error: gatewayError } = await this.supabase.client.functions.invoke('procesar-pago', {
         body: {
           metodo: this.metodoPagoSeleccionado,
@@ -180,18 +193,18 @@ export class CheckoutPage implements OnInit {
       });
 
       if (gatewayError) {
-        console.warn('Fallo en pasarela, pero pedido quedó registrado:', gatewayError);
+        console.warn('Fallo en pasarela:', gatewayError);
       }
 
-      // 7. Vaciar carrito y feedback al usuario
+      // ELIMINADO: Ya no disparamos el correo aquí.
+
+      // 5. Vaciar carrito y redirigir
       await this.bd.vaciarCarrito();
-      this.presentToast('¡Pedido registrado con éxito!', 'success');
+      this.presentToast('Redirigiendo al pago seguro...', 'success');
 
       if (gatewayData?.url) {
-        // Redirigir a pasarela en navegador / Capacitor Browser
         window.location.href = gatewayData.url;
       } else {
-        // Si no retorna URL inmediata, redirigir al historial
         this.router.navigate(['/historial-compras']);
       }
 
@@ -200,6 +213,36 @@ export class CheckoutPage implements OnInit {
       this.presentToast(err.message || 'Error al procesar el pedido', 'danger');
     } finally {
       this.procesando = false;
+    }
+  }
+
+  // MÉTODO CONSERVADO PARA QUE PUEDAS COPIARLO A TU PÁGINA DE ÉXITO
+  // Dejamos esta función aquí momentáneamente para que no pierdas el código, 
+  // pero ya no se ejecuta al hacer clic en "Pagar".
+  private async enviarCorreoConfirmacion(codigoOrden: string, emailCliente: string, direccion: string, itemsPayload: any[]) {
+    try {
+      const datosCorreo = {
+        orden_id: codigoOrden,
+        email_cliente: emailCliente,
+        subtotal: this.totalProductos,
+        iva: this.iva,
+        costo_envio: this.costoEnvioFijo,
+        total: this.totalFinal,
+        items: itemsPayload,
+        despacho: direccion
+      };
+
+      const { data, error } = await this.supabase.client.functions.invoke('enviar-correo', {
+        body: datosCorreo
+      });
+
+      if (error) {
+        console.error('[EDGE FUNCTION] Error al enviar correo:', error.message);
+      } else {
+        console.log('[EDGE FUNCTION] Correo enviado exitosamente:', data);
+      }
+    } catch (err) {
+      console.error('[EDGE FUNCTION] Excepción al conectar:', err);
     }
   }
 

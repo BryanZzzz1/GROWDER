@@ -11,7 +11,7 @@
 
 <ion-content [fullscreen]="true" class="checkout-content">
   <main class="checkout-shell">
-    
+
     <!-- Visual Stepper -->
     <div class="stepper">
       <div class="step completed">
@@ -31,7 +31,7 @@
     </div>
 
     <form [formGroup]="checkoutForm" class="checkout-form">
-      
+
       <!-- Shipping Card -->
       <section class="checkout-section">
         <h2 class="section-title">Datos de Envío</h2>
@@ -42,7 +42,7 @@
               <input formControlName="nombre" placeholder="Ej: Matías González" type="text" />
             </div>
           </div>
-          
+
           <div class="input-row split">
             <div class="input-group">
               <label>Teléfono *</label>
@@ -50,7 +50,8 @@
             </div>
             <div class="input-group full-width-select">
               <label>Región *</label>
-              <ion-select interface="action-sheet" formControlName="region" placeholder="Selecciona tu región" cancelText="Cancelar">
+              <ion-select interface="action-sheet" formControlName="region" placeholder="Selecciona tu región"
+                cancelText="Cancelar">
                 <ion-select-option *ngFor="let reg of regiones" [value]="reg">{{reg}}</ion-select-option>
               </ion-select>
             </div>
@@ -130,10 +131,15 @@
             </div>
           </div>
 
+          <!-- SECCIÓN ACTUALIZADA CON EL DESGLOSE DE IVA -->
           <div class="summary-totals">
             <div class="totals-row">
-              <span>Subtotal</span>
+              <span>Subtotal (Neto)</span>
               <span>{{totalProductos | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
+            </div>
+            <div class="totals-row">
+              <span>IVA (19%)</span>
+              <span>{{iva | currency:'CLP':'symbol-narrow':'1.0-0'}}</span>
             </div>
             <div class="totals-row">
               <span>Despacho a domicilio</span>
@@ -142,15 +148,16 @@
             <div class="divider"></div>
             <div class="totals-row grand-total">
               <div class="total-label">
-                <strong>Total</strong>
-                <small>IVA incluido</small>
+                <strong>Total Final</strong>
               </div>
               <strong>{{totalFinal | currency:'CLP':'symbol-narrow':'1.0-0'}}</strong>
             </div>
           </div>
+          <!-- FIN SECCIÓN ACTUALIZADA -->
+
         </div>
       </section>
-      
+
       <div class="spacing-bottom"></div>
     </form>
 

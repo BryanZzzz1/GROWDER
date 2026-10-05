@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { ServicebdService } from '../../services/servicesbd.service';
-import { CartService } from '../../services/cart.service';
 
 interface Compra {
   id: number | string;
@@ -25,7 +24,6 @@ export class HistorialComprasPage implements OnInit {
 
   constructor(
     private bd: ServicebdService,
-    private cartService: CartService,
     private router: Router,
     private toastController: ToastController,
     private cdr: ChangeDetectorRef
@@ -41,8 +39,9 @@ export class HistorialComprasPage implements OnInit {
   async cargarHistorial() {
     this.cargando = true;
     try {
-      this.historialCompras = await this.cartService.getPurchaseHistory();
-      console.log('[Mis Compras] Registros obtenidos:', this.historialCompras);
+      // CORRECCIÓN: Ahora llama a bd.obtenerHistorialCompras() en vez de usar cartService directamente
+      this.historialCompras = await this.bd.obtenerHistorialCompras();
+      console.log('[Mis Compras] Registros obtenidos desde Supabase:', this.historialCompras);
     } catch (error: any) {
       console.error('[Mis Compras] Error al cargar:', error);
       const toast = await this.toastController.create({
@@ -64,7 +63,7 @@ export class HistorialComprasPage implements OnInit {
 
   async volverAComprar(idproducto: number) {
     const producto = await this.bd.getProductById(idproducto);
-    
+
     if (!producto || !producto.activo) {
       const toast = await this.toastController.create({
         message: 'Este artículo ya no se encuentra disponible en nuestro catálogo',

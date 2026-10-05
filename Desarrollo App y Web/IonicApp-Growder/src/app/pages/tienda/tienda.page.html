@@ -34,16 +34,9 @@
     </header>
 
     <!-- Promo Banner -->
-    <section class="promo-banner" *ngIf="!searchQuery">
-      <div class="banner-content">
-        <span class="badge">NUEVA COLECCIÓN</span>
-        <h2 class="brand-serif">Mates Torpedo</h2>
-        <p>Artesanía en cuero y virola de acero.</p>
-        <button class="cta-banner">Ver colección</button>
-      </div>
-      <div class="banner-image">
-        <img src="../../../assets/img/fondo testeo.png" alt="Promo" />
-      </div>
+    <section class="promo-banner full-image-banner" *ngIf="!searchQuery" style="padding: 0; background: transparent; border-radius: 1.5rem; overflow: hidden; margin-bottom: 1.5rem; cursor: pointer;">
+      <!-- Asegúrate de guardar la imagen adjunta en esta ruta o actualiza el nombre del archivo -->
+      <img src="../../../assets/img/banner-sumate.png" alt="50% de Descuento en tu primer envío" style="width: 100%; display: block; object-fit: cover;" />
     </section>
 
     <!-- Chips Filters -->

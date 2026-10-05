@@ -19,16 +19,16 @@ export class ReviewService {
     return data || [];
   }
 
-  async addReview(productId: number, text: string, rating: number): Promise<boolean> {
+  async addReview(productId: number, username: string, text: string, rating: number): Promise<boolean> {
     const user = this.authService.currentUser;
     if (!user) return false;
-    const { error } = await this.supabaseService.client.from('resena').insert({ idproducto: productId, texto: text, calificacion: rating, user_id: user.id });
+    const { error } = await this.supabaseService.client.from('resena').insert({ idproducto: productId, username: username, texto: text, calificacion: rating, user_id: user.id });
     if (error) throw error;
     return true;
   }
 
-  async addReply(reviewId: number, text: string): Promise<void> {
+  async addReply(reviewId: number, text: string, username: string): Promise<void> {
     const user = this.authService.currentUser;
-    if (user) await this.supabaseService.client.from('respuestas').insert({ id_resena: reviewId, respuesta_texto: text, user_id: user.id });
+    if (user) await this.supabaseService.client.from('respuestas').insert({ id_resena: reviewId, respuesta_username: username, respuesta_texto: text, user_id: user.id });
   }
 }

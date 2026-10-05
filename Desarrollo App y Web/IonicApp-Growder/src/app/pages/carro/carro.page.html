@@ -1,18 +1,22 @@
-<ion-content [fullscreen]="true" class="cart-content">
-  <!-- Top Bar -->
-  <ion-header class="ion-no-border">
-    <ion-toolbar>
-      <ion-title class="brand-serif">Mi Carrito</ion-title>
-      <ion-buttons slot="end">
-        <ion-button (click)="vaciarCarrito()" *ngIf="carrito.length > 0">
-          <ion-icon name="trash-outline" color="medium"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<!-- Top Bar Fija arriba -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tienda"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="brand-serif">Mi Carrito</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="vaciarCarrito()" *ngIf="carrito.length > 0">
+        <ion-icon name="trash-outline" color="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <main class="cart-shell">
-    
+<!-- Zona deslizable: SOLO LOS PRODUCTOS -->
+<ion-content [fullscreen]="true" class="cart-content">
+  <main class="cart-shell" style="padding-bottom: 20px;">
+
     <!-- Empty State -->
     <div *ngIf="!carrito.length" class="empty-state">
       <div class="empty-icon-wrapper">
@@ -29,7 +33,7 @@
         <div class="item-image">
           <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre" (error)="onImgError($event)" />
         </div>
-        
+
         <div class="item-details">
           <div class="item-header">
             <h3>{{ producto.nombre }}</h3>
@@ -37,19 +41,17 @@
               <ion-icon name="trash-outline"></ion-icon>
             </button>
           </div>
-          
+
           <div class="item-footer">
             <span class="price">${{ producto.precio | number:'1.0-0' }}</span>
-            
+
             <div class="quantity-pill">
-              <button class="qty-btn" 
-                      (click)="actualizarCantidad(producto, (producto.cantidad || 1) - 1)" 
-                      [disabled]="(producto.cantidad || 1) <= 1">
+              <button class="qty-btn" (click)="actualizarCantidad(producto, (producto.cantidad || 1) - 1)"
+                [disabled]="(producto.cantidad || 1) <= 1">
                 <ion-icon name="remove"></ion-icon>
               </button>
               <span class="qty">{{ producto.cantidad || 1 }}</span>
-              <button class="qty-btn" 
-                      (click)="actualizarCantidad(producto, (producto.cantidad || 1) + 1)">
+              <button class="qty-btn" (click)="actualizarCantidad(producto, (producto.cantidad || 1) + 1)">
                 <ion-icon name="add"></ion-icon>
               </button>
             </div>
@@ -57,36 +59,47 @@
         </div>
       </div>
     </div>
-
-    <!-- Order Summary -->
-    <div *ngIf="carrito.length" class="order-summary">
-      <h3 class="brand-serif">Resumen de la Orden</h3>
-      
-      <div class="summary-row">
-        <span class="label">Subtotal</span>
-        <span class="value">${{ (mostrarPesos ? totalPesos : (totalDisplay | number:'1.0-0')) }}</span>
-      </div>
-      
-      <div class="summary-row">
-        <span class="label">Despacho a domicilio</span>
-        <span class="value">$2.650</span>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="summary-row total-row">
-        <span class="label">Total a pagar</span>
-        <span class="value">${{ (mostrarPesos ? totalPesos : (totalDisplay + 2650 | number:'1.0-0')) }}</span>
-      </div>
-
-      <button class="toggle-currency" (click)="toggleTotal()">
-        Mostrar en {{ mostrarPesos ? 'dólares' : 'pesos chilenos' }}
-      </button>
-
-      <button class="btn-primary checkout-btn" (click)="irAComprar()">
-        Continuar al Pago
-      </button>
-    </div>
-
   </main>
 </ion-content>
+
+<!-- Resumen Fijo abajo: SE UTILIZA ION-FOOTER -->
+<ion-footer class="ion-no-border" *ngIf="carrito.length > 0">
+  <div class="order-summary"
+    style="background: #ffffff; border-radius: 24px 24px 0 0; padding: 24px; box-shadow: 0 -10px 20px rgba(0,0,0,0.05);">
+    <h3 class="brand-serif" style="margin-top: 0; margin-bottom: 20px;">Resumen de la Orden</h3>
+
+    <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #666;">
+      <span class="label">Subtotal Neto</span>
+      <span class="value">${{ subtotalNeto | number:'1.0-0' }}</span>
+    </div>
+
+    <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #666;">
+      <span class="label">IVA (19%)</span>
+      <span class="value">${{ iva | number:'1.0-0' }}</span>
+    </div>
+
+    <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #666;">
+      <span class="label">Despacho a domicilio</span>
+      <span class="value">${{ costoDespacho | number:'1.0-0' }}</span>
+    </div>
+
+    <div class="divider" style="height: 1px; background: #eee; margin: 16px 0;"></div>
+
+    <div class="summary-row total-row"
+      style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 700; color: #1a1a1a; margin-bottom: 15px;">
+      <span class="label">Total a pagar</span>
+      <span class="value">${{ (mostrarPesos ? totalPesos : totalPagar) | number:'1.0-0' }}</span>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+      <a (click)="toggleTotal()" style="font-size: 0.85rem; color: #888; text-decoration: underline; cursor: pointer;">
+        Mostrar en {{ mostrarPesos ? 'dólares' : 'pesos chilenos' }}
+      </a>
+    </div>
+
+    <button class="btn-primary checkout-btn" (click)="irAComprar()"
+      style="width: 100%; padding: 15px; border-radius: 12px;">
+      Continuar al Pago
+    </button>
+  </div>
+</ion-footer>

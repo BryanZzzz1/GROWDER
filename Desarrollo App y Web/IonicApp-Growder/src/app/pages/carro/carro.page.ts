@@ -16,15 +16,22 @@ export class CarroPage implements OnInit {
   totalPesos: number = 0;
   mostrarPesos: boolean = false;
 
+  // Costo fijo de despacho
+  costoDespacho: number = 2650;
+
   constructor(
     private router: Router,
     private basededatosService: ServicebdService,
     private alertController: AlertController,
     private toastController: ToastController,
     private exchangeRateService: ExchangeRateService
-  ) {}
+  ) { }
 
   ngOnInit() {
+    this.cargarCarrito();
+  }
+
+  ionViewWillEnter() {
     this.cargarCarrito();
   }
 
@@ -33,23 +40,41 @@ export class CarroPage implements OnInit {
     if (currentUser) {
       this.carrito = await this.basededatosService.obtenerCarrito(currentUser.username);
       this.carrito.forEach(producto => {
-        producto.cantidad = producto.cantidad || 1; // Asegúrate de que la cantidad esté definida
+        producto.cantidad = producto.cantidad || 1;
       });
-      console.log('Carrito cargado:', this.carrito);
+      console.log('Carrito cargado desde la nube:', this.carrito);
       this.calcularTotal();
     } else {
       this.carrito = [];
     }
   }
 
-  
+  // ==========================================
+  // CÁLCULOS DEL RESUMEN DE ORDEN
+  // ==========================================
+
+  get subtotal() {
+    return this.carrito.reduce((acc, p) => acc + ((p.precio || 0) * (p.cantidad || 1)), 0);
+  }
+
+  get iva() {
+    return Math.round(this.subtotal - (this.subtotal / 1.19));
+  }
+
+  get subtotalNeto() {
+    return this.subtotal - this.iva;
+  }
+
+  get totalPagar() {
+    return this.subtotal + this.costoDespacho;
+  }
+
+  // ==========================================
+  // CÁLCULOS DE DIVISAS ORIGINALES
+  // ==========================================
+
   async calcularTotal() {
-    const totalDolares = this.carrito.reduce((acc, producto) => {
-      const precio = producto.precio || 0;
-      const cantidad = producto.cantidad || 0;
-      return acc + (precio * cantidad);
-    }, 0);
-    
+    const totalDolares = this.subtotal;
     await this.convertirADolares(totalDolares);
   }
 
@@ -65,15 +90,6 @@ export class CarroPage implements OnInit {
 
   toggleTotal() {
     this.mostrarPesos = !this.mostrarPesos;
-  }
-
-  get totalDisplay() {
-    const totalDolares = this.carrito.reduce((acc, producto) => {
-      const precio = producto.precio || 0;
-      const cantidad = producto.cantidad || 0;
-      return acc + (precio * cantidad);
-    }, 0);
-    return this.mostrarPesos ? this.totalPesos : totalDolares;
   }
 
   async presentAlert(producto: Productos) {
@@ -116,18 +132,15 @@ export class CarroPage implements OnInit {
     await toast.present();
   }
 
-async irAComprar() {
+  async irAComprar() {
     const currentUser = await this.basededatosService.getCurrentUser();
     if (currentUser) {
-      // Verificamos cantidades válidas antes de avanzar
       for (const producto of this.carrito) {
         if (producto.cantidad === undefined || producto.cantidad <= 0) {
           this.presentToast(`La cantidad para ${producto.nombre} no es válida.`);
           return;
         }
       }
-      
-      // El salto hacia la nueva vista de pago
       this.router.navigate(['/checkout']);
     } else {
       this.presentToast('Error: Usuario no encontrado');
@@ -150,22 +163,20 @@ async irAComprar() {
   }
 
   async actualizarCantidad(producto: Productos, nuevaCantidad: number) {
-  try {
-    await this.basededatosService.actualizarCantidad(producto.idproducto, nuevaCantidad);
-    
-    // Actualiza el carrito para reflejar los cambios
-    const currentUser = await this.basededatosService.getCurrentUser();
-    if (currentUser) {
-      this.carrito = await this.basededatosService.obtenerCarrito(currentUser.username);
-    }
+    try {
+      await this.basededatosService.actualizarCantidad(producto.idproducto, nuevaCantidad);
 
-    // Recalcula el total
-    this.calcularTotal();
-  } catch (e) {
-    console.error('Error al actualizar cantidad:', e);
-    this.presentToast('Error al actualizar cantidad');
+      const currentUser = await this.basededatosService.getCurrentUser();
+      if (currentUser) {
+        this.carrito = await this.basededatosService.obtenerCarrito(currentUser.username);
+      }
+
+      this.calcularTotal();
+    } catch (e) {
+      console.error('Error al actualizar cantidad:', e);
+      this.presentToast('Error al actualizar cantidad');
+    }
   }
-}
 
   onImgError(event: Event) {
     const target = event.target as HTMLImageElement;
@@ -173,5 +184,4 @@ async irAComprar() {
       target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="%23314235" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="background:%23f8f3e9"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
     }
   }
-
 }

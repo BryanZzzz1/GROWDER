@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true" class="detail-content">
   <main class="detail-shell" *ngIf="producto">
-    
+
     <!-- Floating Header Actions -->
     <div class="floating-actions">
       <button class="action-btn back-btn" (click)="goBack()" aria-label="Volver">
@@ -14,17 +14,17 @@
     <!-- Image Carousel -->
     <section class="image-gallery">
       <div class="carousel-container">
-        <img [src]="productImages[currentImageIndex] || 'https://ionicframework.com/docs/img/demos/card-media.png'" [alt]="producto.nombre" />
-        
+        <img [src]="productImages[currentImageIndex] || 'https://ionicframework.com/docs/img/demos/card-media.png'"
+          [alt]="producto.nombre" />
+
         <div class="carousel-controls" *ngIf="productImages.length > 1">
           <button class="arrow prev" (click)="previousImage()"><ion-icon name="chevron-back"></ion-icon></button>
           <button class="arrow next" (click)="nextImage()"><ion-icon name="chevron-forward"></ion-icon></button>
         </div>
-        
+
         <div class="carousel-indicators" *ngIf="productImages.length > 1">
-          <span *ngFor="let img of productImages; let i = index" 
-                class="dot" [class.active]="i === currentImageIndex" 
-                (click)="selectImage(i)"></span>
+          <span *ngFor="let img of productImages; let i = index" class="dot" [class.active]="i === currentImageIndex"
+            (click)="selectImage(i)"></span>
         </div>
       </div>
     </section>
@@ -34,7 +34,7 @@
       <div class="title-row">
         <h1 class="brand-serif">{{ producto.nombre }}</h1>
       </div>
-      
+
       <div class="meta-row">
         <div class="rating">
           <span class="stars">★★★★★</span>
@@ -53,21 +53,13 @@
         </span>
       </div>
 
-      <!-- Variants (Dummy) -->
-      <div class="variants-section">
-        <h3>Tipo de Virola</h3>
-        <div class="chips-container">
-          <button class="chip" [class.active]="selectedVariant === 'Acero'" (click)="selectVariant('Acero')">Acero Inox.</button>
-          <button class="chip" [class.active]="selectedVariant === 'Alpaca'" (click)="selectVariant('Alpaca')">Alpaca</button>
-          <button class="chip" [class.active]="selectedVariant === 'Normal'" (click)="selectVariant('Normal')">Normal</button>
-        </div>
-      </div>
-
       <!-- Description -->
       <div class="description-section">
         <h3>Descripción</h3>
         <p class="product-description">
-          {{ producto.descripcion || 'Una pieza seleccionada para acompañar tus momentos con calidad y personalidad. Hecho a mano por artesanos locales, cuidando cada detalle para ofrecer la mejor experiencia en tus mates diarios.' }}
+          {{ producto.descripcion || 'Una pieza seleccionada para acompañar tus momentos con calidad y personalidad.
+          Hecho a mano por artesanos locales, cuidando cada detalle para ofrecer la mejor experiencia en tus mates
+          diarios.' }}
         </p>
       </div>
 
@@ -77,12 +69,24 @@
           <h3>Reseñas ({{ resenas.length }})</h3>
           <ion-icon [name]="mostrarComentarios ? 'chevron-up' : 'chevron-down'"></ion-icon>
         </div>
-        
+
         <div class="reviews-content" *ngIf="mostrarComentarios">
           <div *ngIf="!resenas.length" class="empty-reviews">
             <p>Aún no hay reseñas. ¡Sé el primero!</p>
           </div>
-          
+
+          <div class="add-review-box" *ngIf="username">
+            <h4 style="margin-top: 0;">Escribe una reseña</h4>
+            <div class="rating-input" style="font-size: 1.5rem; color: #ccc; margin-bottom: 10px;">
+              <span *ngFor="let star of [1,2,3,4,5]" 
+                    (click)="setRating(star)" 
+                    [class.filled]="star <= nuevaCalificacion"
+                    [ngStyle]="{'color': star <= nuevaCalificacion ? '#ffc107' : '#ccc', 'cursor': 'pointer'}">★</span>
+            </div>
+            <ion-textarea [(ngModel)]="nuevaResena" placeholder="¿Qué te pareció el producto?" rows="3" style="border: 1px solid #ccc; border-radius: 8px; padding: 5px; margin-bottom: 10px;"></ion-textarea>
+            <button class="btn-primary btn-sm" (click)="agregarResena()">Enviar Reseña</button>
+          </div>
+
           <div class="review-card" *ngFor="let resena of resenas">
             <div class="review-top">
               <div class="reviewer">
@@ -97,10 +101,15 @@
               </div>
             </div>
             <p class="review-text">{{ resena.texto }}</p>
-            
+
             <div class="reply-card" *ngFor="let respuesta of resena.respuestas">
-              <strong>Growder Team</strong>
+              <strong>{{ respuesta.respuesta_username || 'Growder Team' }}</strong>
               <p>{{ respuesta.respuesta_texto }}</p>
+            </div>
+
+            <div class="reply-input-box" *ngIf="username" style="margin-top: 15px; display: flex; gap: 10px;">
+              <ion-input [(ngModel)]="respuestaTexto[resena.id]" placeholder="Escribe una respuesta..." style="border: 1px solid #ccc; border-radius: 8px; padding: 0 10px;"></ion-input>
+              <button class="btn-secondary btn-sm" (click)="agregarRespuesta(resena.id)" style="padding: 0 15px; border-radius: 8px;">Responder</button>
             </div>
           </div>
         </div>
@@ -111,7 +120,8 @@
 
 <!-- Bottom CTA -->
 <div class="bottom-cta-bar" *ngIf="producto">
-  <button class="btn-primary" (click)="agregarAlCarrito()" [disabled]="(producto.cantidad ?? 0) <= 0" [ngClass]="{'out-of-stock-btn': (producto.cantidad ?? 0) <= 0}">
+  <button class="btn-primary" (click)="agregarAlCarrito()" [disabled]="(producto.cantidad ?? 0) <= 0"
+    [ngClass]="{'out-of-stock-btn': (producto.cantidad ?? 0) <= 0}">
     {{ (producto.cantidad ?? 0) > 0 ? 'Añadir al Carrito' : 'Agotado' }}
   </button>
 </div>

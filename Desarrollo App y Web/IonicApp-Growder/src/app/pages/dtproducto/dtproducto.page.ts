@@ -23,12 +23,11 @@ export class DtproductoPage implements OnInit {
 
   mostrarComentarios: boolean = false;
   isFavorite: boolean = false;
-  selectedVariant: string = 'Normal';
 
   constructor(private route: ActivatedRoute,
-              private router: Router,
-              private bd: ServicebdService,
-              private toastController: ToastController) {}
+    private router: Router,
+    private bd: ServicebdService,
+    private toastController: ToastController) { }
 
   async ngOnInit() {
     const idproducto = this.route.snapshot.paramMap.get('idproducto');
@@ -50,7 +49,7 @@ export class DtproductoPage implements OnInit {
     });
     await toast.present();
   }
-  
+
   private fetchProducto(idproducto: number) {
     this.bd.fetchProductos().then(async productos => {
       this.producto = productos.find(p => p.idproducto === idproducto)!;
@@ -67,21 +66,28 @@ export class DtproductoPage implements OnInit {
     }));
   }
 
+  // CORRECCIÓN 1: Lógica inteligente para encontrar siempre el nombre de usuario
   private async getUsername() {
     const user = await this.bd.getCurrentUser();
     if (user) {
-      this.username = user.username;
-      this.foto = user.foto;
+      if (user.nombre) {
+        this.username = user.nombre.split(' ')[0];
+      } else if (user.username) {
+        this.username = user.username;
+      } else if (user.email) {
+        this.username = user.email.split('@')[0];
+      } else {
+        this.username = 'Usuario';
+      }
+      this.foto = user.foto || '';
     }
   }
-  
+
   async agregarAlCarrito() {
     const currentUser = await this.bd.getCurrentUser();
     if (currentUser) {
-      const added = await this.bd.agregarAlCarrito(this.producto, currentUser.username);
-      if (added) {
-        this.presentToast(`${this.producto.nombre} añadido al carrito`);
-      }
+      await this.bd.agregarAlCarrito(this.producto, this.username);
+      this.presentToast(`${this.producto.nombre} añadido al carrito`);
     } else {
       const toast = await this.toastController.create({
         message: 'Inicia sesión para guardar este producto.',
@@ -98,10 +104,11 @@ export class DtproductoPage implements OnInit {
     const currentUser = await this.bd.getCurrentUser();
     if (currentUser) {
       if (this.nuevaResena.trim() && this.nuevaCalificacion >= 1) {
-        this.bd.insertarResena(this.producto.idproducto, currentUser.username, this.nuevaResena, this.nuevaCalificacion)
+        // CORRECCIÓN 2: Usamos this.username que ya está limpio y asegurado
+        this.bd.insertarResena(this.producto.idproducto, this.username, this.nuevaResena, this.nuevaCalificacion)
           .then((saved) => {
             if (!saved) throw new Error('No se pudo guardar la reseña');
-            this.resenas.push({ id: Date.now(), username: currentUser.username, texto: this.nuevaResena, calificacion: this.nuevaCalificacion, respuestas: [], foto: this.foto });
+            this.resenas.push({ id: Date.now(), username: this.username, texto: this.nuevaResena, calificacion: this.nuevaCalificacion, respuestas: [], foto: this.foto });
             this.nuevaResena = '';
             this.nuevaCalificacion = 0;
           })
@@ -121,14 +128,15 @@ export class DtproductoPage implements OnInit {
   async agregarRespuesta(resenaId: number) {
     const currentUser = await this.bd.getCurrentUser();
     const respuesta = this.respuestaTexto[resenaId];
-    
+
     if (currentUser) {
       if (respuesta && respuesta.trim()) {
         try {
-          await this.bd.insertarRespuesta(resenaId, respuesta, currentUser.username);
+          // CORRECCIÓN 3: Usamos this.username para la respuesta
+          await this.bd.insertarRespuesta(resenaId, respuesta, this.username);
           const resena = this.resenas.find(r => r.id === resenaId);
           if (resena) {
-            resena.respuestas.push({ respuesta_username: currentUser.username, respuesta_texto: respuesta });
+            resena.respuestas.push({ respuesta_username: this.username, respuesta_texto: respuesta });
             this.respuestaTexto[resenaId] = '';
           }
         } catch (error) {
@@ -170,10 +178,6 @@ export class DtproductoPage implements OnInit {
   toggleFavorite() {
     this.isFavorite = !this.isFavorite;
     this.presentToast(this.isFavorite ? 'Agregado a favoritos' : 'Eliminado de favoritos');
-  }
-
-  selectVariant(variant: string) {
-    this.selectedVariant = variant;
   }
 
   goBack() {

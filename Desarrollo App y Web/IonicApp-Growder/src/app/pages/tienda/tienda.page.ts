@@ -16,11 +16,11 @@ export class TiendaPage implements OnInit {
   categorias: any[] = [];
   categoriaSeleccionada: string = 'Todos';
   searchQuery: string = '';
-  
+
   isLoggedIn = false;
   userName: string = 'Invitado';
   userFoto: string = '';
-  
+
   rangoPrecioMin: number = 0;
   rangoPrecioMax: number = 100000;
   soloStock: boolean = false;
@@ -30,7 +30,7 @@ export class TiendaPage implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private modalCtrl: ModalController
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.cargarDatos();
@@ -39,7 +39,6 @@ export class TiendaPage implements OnInit {
       if (status) {
         const user = await this.bd.getCurrentUser();
         if (user) {
-          // Si tiene nombre en el metadata, usamos eso, sino la primera parte del email
           if (user.nombre) {
             this.userName = user.nombre.split(' ')[0];
           } else if (user.email) {
@@ -77,12 +76,12 @@ export class TiendaPage implements OnInit {
 
   filterProducts() {
     let result = this.arregloProductos;
-    
+
     if (this.searchQuery && this.searchQuery.trim() !== '') {
       const q = this.searchQuery.toLowerCase();
       result = result.filter(p => p.nombre.toLowerCase().includes(q));
     }
-    
+
     if (this.categoriaSeleccionada !== 'Todos') {
       result = result.filter(p => p.categoria === this.categoriaSeleccionada || p.categoria_id?.toString() === this.categoriaSeleccionada);
     }
@@ -92,10 +91,10 @@ export class TiendaPage implements OnInit {
     if (this.soloStock) {
       result = result.filter(p => (p.cantidad ?? 0) > 0);
     }
-    
+
     this.filteredProductos = result;
   }
-  
+
   async abrirModalFiltros() {
     const modal = await this.modalCtrl.create({
       component: FiltroModalComponent,
@@ -118,7 +117,7 @@ export class TiendaPage implements OnInit {
       this.filterProducts();
     }
   }
-  
+
   seleccionarCategoria(catNombre: string) {
     this.categoriaSeleccionada = catNombre;
     this.filterProducts();
@@ -144,10 +143,9 @@ export class TiendaPage implements OnInit {
   async agregarAlCarrito(producto: Productos) {
     const currentUser = await this.bd.getCurrentUser();
     if (currentUser) {
-      const added = await this.bd.agregarAlCarrito(producto, currentUser.username);
-      if (added) {
-        this.presentToast(`${producto.nombre} añadido al carrito`);
-      }
+      // AQUÍ ESTÁ LA CORRECCIÓN: Quitamos el const added y el if
+      await this.bd.agregarAlCarrito(producto, currentUser.username);
+      this.presentToast(`${producto.nombre} añadido al carrito`);
     } else {
       const toast = await this.toastController.create({
         message: 'Inicia sesión para guardar productos en tu carrito.',
@@ -162,7 +160,6 @@ export class TiendaPage implements OnInit {
 
   async toggleFavorite(producto: Productos, event: Event) {
     event.stopPropagation();
-    // Dummy favorite logic, can be expanded later
     this.presentToast(`${producto.nombre} agregado a favoritos`);
   }
 
