@@ -26,6 +26,9 @@ function MisComprasContent() {
   const [busqueda, setBusqueda] = useState("");
   const [pedidoManualId, setPedidoManualId] = useState<string | number | null>(null);
   const [mensajeRecompra, setMensajeRecompra] = useState<string | null>(null);
+  const [modoLimpieza, setModoLimpieza] = useState(false);
+  const [seleccionados, setSeleccionados] = useState<(string | number)[]>([]);
+  const [quitando, setQuitando] = useState(false);
 
   const pedidoActivo = useMemo(() => {
     if (compras.length === 0) return null;
@@ -233,6 +236,37 @@ function MisComprasContent() {
     }
   };
 
+  // Solo se pueden quitar compras que nunca se pagaron
+  const esDescartable = (c: Pedido) =>
+    ["cancelado", "cancelado_por_usuario", "rechazado"].includes(c.estado?.toLowerCase() || "");
+
+  const descartables = useMemo(() => compras.filter(esDescartable), [compras]);
+
+  const quitarSeleccionadas = async () => {
+    if (seleccionados.length === 0) return;
+    if (!window.confirm(`¿Quitar ${seleccionados.length} compra(s) sin completar de tu historial? Esta acción no se puede deshacer.`)) return;
+
+    setQuitando(true);
+    const { data, error } = await supabase
+      .from("pedidos")
+      .delete()
+      .in("id", seleccionados)
+      .in("estado", ["cancelado", "cancelado_por_usuario", "rechazado"])
+      .select("id");
+    setQuitando(false);
+
+    if (error || !data || data.length === 0) {
+      console.error("No se pudieron quitar las compras:", error);
+      window.alert("No se pudieron quitar las compras. Intenta nuevamente o contacta a soporte.");
+      return;
+    }
+
+    const borrados = data.map((d: any) => d.id);
+    setCompras((prev) => prev.filter((c) => !borrados.includes(c.id)));
+    setSeleccionados([]);
+    setModoLimpieza(false);
+  };
+
   const conteos = useMemo(() => {
     const total = compras.length;
     const porRecibir = compras.filter(
@@ -407,6 +441,56 @@ function MisComprasContent() {
               </div>
             </div>
 
+            {descartables.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-stone-200 rounded-2xl px-4 py-3 text-xs">
+                {!modoLimpieza ? (
+                  <>
+                    <span className="text-stone-600">
+                      Tienes {descartables.length} compra{descartables.length === 1 ? "" : "s"} sin completar.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setModoLimpieza(true)}
+                      className="px-4 py-2 rounded-full border border-stone-300 hover:bg-[#f8f3e9] text-stone-700 font-bold transition cursor-pointer"
+                    >
+                      Limpiar compras
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <label className="flex items-center gap-2 font-semibold text-stone-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-[#314235]"
+                        checked={seleccionados.length === descartables.length}
+                        onChange={(e) =>
+                          setSeleccionados(e.target.checked ? descartables.map((c) => c.id) : [])
+                        }
+                      />
+                      Seleccionar todas ({seleccionados.length}/{descartables.length})
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setModoLimpieza(false); setSeleccionados([]); }}
+                        className="px-4 py-2 rounded-full border border-stone-300 text-stone-700 font-bold hover:bg-stone-50 transition cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={quitarSeleccionadas}
+                        disabled={seleccionados.length === 0 || quitando}
+                        className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {quitando ? "Quitando..." : `Quitar seleccionadas (${seleccionados.length})`}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             {cargando ? (
               <div className="py-20 text-center">
                 <div className="w-8 h-8 border-3 border-[#314235] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -440,6 +524,13 @@ function MisComprasContent() {
                   <CompraCard
                     key={compra.id}
                     pedido={compra}
+                    seleccionable={modoLimpieza && esDescartable(compra)}
+                    seleccionada={seleccionados.includes(compra.id)}
+                    onToggleSeleccion={(p) =>
+                      setSeleccionados((prev) =>
+                        prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id]
+                      )
+                    }
                     onVerDetalle={(p) => setPedidoManualId(p.id)}
                     onVolverAComprar={handleVolverAComprar}
                     onCancelarPedido={handleCancelarPedido}

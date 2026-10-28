@@ -57,7 +57,7 @@ export function PedidosTab({
 
     pedidos.forEach((pedido) => {
       if (pedido.estado in conteo) {
-        conteo[pedido.estado]++;
+        conteo[pedido.estado as keyof typeof conteo]++;
       }
     });
 

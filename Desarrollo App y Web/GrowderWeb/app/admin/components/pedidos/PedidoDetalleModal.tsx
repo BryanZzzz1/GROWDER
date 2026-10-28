@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Pedido, EstadoPedido } from "../../types";
 import { PedidoEstadoBadge } from "./PedidoEstadoBadge";
+import { useFotosItems } from "@/src/lib/imagenesProducto";
 
 interface PedidoDetalleModalProps {
   pedido: Pedido | null;
@@ -20,6 +21,7 @@ export function PedidoDetalleModal({
   onActualizarEstado,
   onActualizarDatosDespacho,
 }: PedidoDetalleModalProps) {
+  const resolverFoto = useFotosItems(pedido?.items);
   const [empresa, setEmpresa] = useState(pedido?.empresa_transporte || "");
   const [guia, setGuia] = useState(pedido?.numero_seguimiento || "");
   const [notas, setNotas] = useState(pedido?.notas_despacho || "");
@@ -320,9 +322,9 @@ export function PedidoDetalleModal({
                   <div key={idx} className="py-3 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center overflow-hidden shrink-0">
-                        {item.foto ? (
+                        {resolverFoto(item) ? (
                           <img
-                            src={item.foto}
+                            src={resolverFoto(item)}
                             alt={item.nombre}
                             className="w-full h-full object-cover"
                           />

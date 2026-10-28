@@ -1,7 +1,8 @@
 'use client'
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 // AJUSTA ESTA RUTA según dónde tengas exportado tu cliente de Supabase en Next.js
-import { supabase } from '@/src/lib/supabase' 
+import { supabase } from '@/src/lib/supabase'
+import { obtenerFotosProductos } from '@/src/lib/imagenesProducto'
 
 export interface ItemCarrito {
   id: string
@@ -85,11 +86,12 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
       .eq('user_id', uid)
 
     if (!error && data) {
+      const fotos = await obtenerFotosProductos(data.map((item: any) => item.idproducto))
       const mapeado: ItemCarrito[] = data.map((item: any) => ({
         id: item.idproducto.toString(),
         nombre: item.nombre,
         precio: item.precio,
-        imagen: '/assets/placeholder-mate.png', // Placeholder por si no guardas la foto en BD
+        imagen: fotos[String(item.idproducto)] || '',
         cantidad: item.cantidad
       }))
       setCarrito(mapeado)

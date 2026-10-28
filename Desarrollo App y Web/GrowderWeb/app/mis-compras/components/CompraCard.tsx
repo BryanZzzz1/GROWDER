@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Pedido } from "@/app/admin/types";
 import { supabase } from "@/src/lib/supabase";
+import { useFotosItems } from "@/src/lib/imagenesProducto";
 
 interface CompraCardProps {
   pedido: Pedido;
   onVerDetalle: (pedido: Pedido) => void;
   onVolverAComprar?: (pedido: Pedido) => void;
   onCancelarPedido?: (pedido: Pedido) => void;
+  seleccionable?: boolean;
+  seleccionada?: boolean;
+  onToggleSeleccion?: (pedido: Pedido) => void;
 }
 
 export function CompraCard({
@@ -14,8 +18,13 @@ export function CompraCard({
   onVerDetalle,
   onVolverAComprar,
   onCancelarPedido,
+  seleccionable = false,
+  seleccionada = false,
+  onToggleSeleccion,
 }: CompraCardProps) {
   const primerItem = pedido.items?.[0];
+  const resolverFoto = useFotosItems(pedido.items);
+  const fotoPrimerItem = resolverFoto(primerItem);
   const totalItems =
     pedido.items?.reduce((acc, it) => acc + (it.cantidad || 1), 0) || 1;
 
@@ -72,6 +81,15 @@ export function CompraCard({
       {/* Barra superior con fecha y código de compra */}
       <div className="bg-[#fdfbf7] px-6 py-3.5 border-b border-stone-200/80 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
+          {seleccionable && (
+            <input
+              type="checkbox"
+              checked={seleccionada}
+              onChange={() => onToggleSeleccion?.(pedido)}
+              aria-label={`Seleccionar pedido ${pedido.codigo_pedido}`}
+              className="w-4 h-4 mr-1 accent-[#314235] cursor-pointer"
+            />
+          )}
           <span className="font-bold text-stone-900">
             {formatearFechaCabecera(pedido.created_at)}
           </span>
@@ -132,9 +150,9 @@ export function CompraCard({
         <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
           {/* Miniatura del producto */}
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-stone-100 border border-stone-200 overflow-hidden shrink-0 flex items-center justify-center">
-            {primerItem?.foto ? (
+            {fotoPrimerItem ? (
               <img
-                src={primerItem.foto}
+                src={fotoPrimerItem}
                 alt={primerItem.nombre}
                 className="w-full h-full object-cover"
               />

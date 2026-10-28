@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Pedido } from "@/app/admin/types";
 import { SeguimientoStepper } from "./SeguimientoStepper";
 import { supabase } from "@/src/lib/supabase";
+import { useFotosItems } from "@/src/lib/imagenesProducto";
 
 interface DetalleCompraViewProps {
   pedido: Pedido;
@@ -17,6 +18,7 @@ export function DetalleCompraView({
   onCancelarPedido,
 }: DetalleCompraViewProps) {
   const [copiado, setCopiado] = useState(false);
+  const resolverFoto = useFotosItems(pedido.items);
 
   const [tiempoRestante, setTiempoRestante] = useState<number | null>(null);
   const [tiempoAgotado, setTiempoAgotado] = useState(false);
@@ -212,9 +214,9 @@ export function DetalleCompraView({
                 <div key={idx} className="py-3 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 overflow-hidden shrink-0 flex items-center justify-center">
-                      {item.foto ? (
+                      {resolverFoto(item) ? (
                         <img
-                          src={item.foto}
+                          src={resolverFoto(item)}
                           alt={item.nombre}
                           className="w-full h-full object-cover"
                         />

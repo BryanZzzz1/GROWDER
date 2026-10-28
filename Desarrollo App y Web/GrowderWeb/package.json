@@ -9,18 +9,29 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.105",
+    "@ai-sdk/openai": "^4.0.102",
+    "@ai-sdk/react": "^4.0.157",
+    "@blobatar/react": "^2.7.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/supabase-js": "^2.115.0",
+    "ai": "^7.0.153",
+    "blobatar": "^2.7.0",
+    "lucide-react": "^1.61.0",
     "mercadopago": "^3.6.1",
     "next": "16.3.4",
     "nodemailer": "^10.0.13",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "transbank-sdk": "^6.1.1"
+    "transbank-sdk": "^6.1.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.2",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

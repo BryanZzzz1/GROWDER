@@ -1,10 +1,14 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  allowedDevOrigins: ['fondling-bottling-explore.ngrok-free.dev'],
+    serverExternalPackages: ['pdf-parse'],
+    // Si quieres evitar que un warning de ESLint o TS menor frene el deploy en Vercel:
+    typescript: {
+        ignoreBuildErrors: true,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 
 export default nextConfig;

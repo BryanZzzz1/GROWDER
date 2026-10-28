@@ -34,6 +34,12 @@ export function AdminHeader() {
             Bodega
           </Link>
           <Link
+            href="/admin/chatbot"
+            className="rounded-full px-4 py-2 text-sm font-semibold text-[#314235] transition hover:bg-[#e8e0d0]"
+          >
+            Gestión de IA
+          </Link>
+          <Link
             href="/admin"
             className="rounded-full bg-[#314235] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#243127]"
           >
