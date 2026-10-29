@@ -146,34 +146,34 @@ export default function ResenasProducto({ idproducto, onResumen }: Props) {
   };
 
   return (
-    <section id="resenas" className="mt-10 bg-white border border-[#8C7762]/15 rounded-3xl p-6 sm:p-8 shadow-sm">
+    <section id="resenas" className="mt-8 sm:mt-10 scroll-mt-32 bg-white border border-[#8C7762]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm overflow-hidden">
       <button
         type="button"
         onClick={() => setAbierto(!abierto)}
         className="w-full flex justify-between items-center cursor-pointer"
       >
-        <h2 className="text-xl font-bold text-stone-900">Reseñas ({resenas.length})</h2>
-        <span className="text-[#8C7762] text-xs">{abierto ? '▲' : '▼'}</span>
+        <h2 className="text-lg sm:text-xl font-bold text-stone-900">Reseñas ({resenas.length})</h2>
+        <span className="text-[#8C7762] text-xs p-2 -m-2">{abierto ? '▲' : '▼'}</span>
       </button>
 
       {abierto && (
-        <div className="mt-5 space-y-5">
+        <div className="mt-4 sm:mt-5 space-y-4 sm:space-y-5">
           {aviso && (
             <div className="bg-[#314235] text-white text-xs font-semibold px-4 py-2.5 rounded-xl">{aviso}</div>
           )}
 
           {/* Formulario */}
           {userId ? (
-            <div className="rounded-2xl border border-[#8C7762]/20 bg-[#FAF7F2] p-4">
-              <h3 className="text-sm font-bold text-stone-900 mb-2">Escribe una reseña</h3>
-              <div className="text-2xl mb-2" role="radiogroup" aria-label="Calificación">
+            <div className="rounded-2xl border border-[#8C7762]/20 bg-[#FAF7F2] p-3.5 sm:p-4">
+              <h3 className="text-sm font-bold text-stone-900 mb-1 sm:mb-2">Escribe una reseña</h3>
+              <div className="flex gap-1 text-3xl sm:text-2xl leading-none mb-3 sm:mb-2" role="radiogroup" aria-label="Calificación">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => setNuevaCalificacion(s)}
                     aria-label={`${s} estrellas`}
-                    className={`cursor-pointer transition ${s <= nuevaCalificacion ? 'text-[#ffc107]' : 'text-stone-300 hover:text-[#ffc107]/60'}`}
+                    className={`cursor-pointer transition p-1 -m-1 ${s <= nuevaCalificacion ? 'text-[#ffc107]' : 'text-stone-300 hover:text-[#ffc107]/60'}`}
                   >
                     ★
                   </button>
@@ -184,13 +184,13 @@ export default function ResenasProducto({ idproducto, onResumen }: Props) {
                 onChange={(e) => setNuevaResena(e.target.value)}
                 rows={3}
                 placeholder="¿Qué te pareció el producto?"
-                className="w-full text-xs rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 outline-none focus:border-[#527953] resize-none"
+                className="w-full min-w-0 text-base sm:text-xs rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 outline-none focus:border-[#527953] resize-none"
               />
               <button
                 type="button"
                 onClick={agregarResena}
                 disabled={enviando}
-                className="mt-3 px-5 py-2.5 rounded-full bg-[#527953] hover:bg-[#436444] text-white text-xs font-bold uppercase tracking-wider transition disabled:opacity-60 cursor-pointer"
+                className="mt-3 w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-full bg-[#527953] hover:bg-[#436444] text-white text-xs font-bold uppercase tracking-wider transition disabled:opacity-60 cursor-pointer"
               >
                 {enviando ? 'Enviando...' : 'Enviar reseña'}
               </button>
@@ -207,10 +207,10 @@ export default function ResenasProducto({ idproducto, onResumen }: Props) {
           ) : resenas.length === 0 ? (
             <p className="text-xs text-stone-500 text-center py-4">Aún no hay reseñas. ¡Sé el primero!</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {resenas.map((r) => (
-                <article key={r.id} className="rounded-2xl border border-stone-200 p-4">
-                  <div className="flex items-start justify-between gap-3">
+                <article key={r.id} className="rounded-2xl border border-stone-200 p-3.5 sm:p-4 overflow-hidden">
+                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-full bg-[#8C7762] text-white flex items-center justify-center text-sm font-bold shrink-0">
                         {r.username.charAt(0).toUpperCase()}
@@ -223,28 +223,28 @@ export default function ResenasProducto({ idproducto, onResumen }: Props) {
                     <Estrellas valor={r.calificacion || 0} className="text-base shrink-0" />
                   </div>
 
-                  <p className="mt-3 text-xs text-stone-700 leading-relaxed whitespace-pre-line">{r.texto}</p>
+                  <p className="mt-3 text-sm sm:text-xs text-stone-700 leading-relaxed whitespace-pre-line break-words">{r.texto}</p>
 
                   {r.respuestas.map((resp, i) => (
-                    <div key={resp.id ?? i} className="mt-3 ml-4 pl-3 border-l-2 border-[#8C7762]/30 bg-[#FAF7F2] rounded-r-xl py-2 pr-3">
-                      <strong className="block text-[11px] text-stone-900">{resp.respuesta_username || 'Growder Team'}</strong>
-                      <p className="text-xs text-stone-600 mt-0.5 whitespace-pre-line">{resp.respuesta_texto}</p>
+                    <div key={resp.id ?? i} className="mt-3 ml-2 sm:ml-4 pl-3 border-l-2 border-[#8C7762]/30 bg-[#FAF7F2] rounded-r-xl py-2 pr-3 min-w-0">
+                      <strong className="block text-[11px] text-stone-900 truncate">{resp.respuesta_username || 'Growder Team'}</strong>
+                      <p className="text-sm sm:text-xs text-stone-600 mt-0.5 whitespace-pre-line break-words">{resp.respuesta_texto}</p>
                     </div>
                   ))}
 
                   {userId && (
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-3 flex flex-col sm:flex-row gap-2">
                       <input
                         value={respuestaTexto[r.id] || ''}
                         onChange={(e) => setRespuestaTexto((p) => ({ ...p, [r.id]: e.target.value }))}
                         onKeyDown={(e) => e.key === 'Enter' && agregarRespuesta(r.id)}
                         placeholder="Escribe una respuesta..."
-                        className="flex-1 text-xs rounded-xl border border-stone-300 px-3 py-2 outline-none focus:border-[#527953]"
+                        className="w-full sm:flex-1 min-w-0 text-base sm:text-xs rounded-xl border border-stone-300 px-3 py-2.5 sm:py-2 outline-none focus:border-[#527953]"
                       />
                       <button
                         type="button"
                         onClick={() => agregarRespuesta(r.id)}
-                        className="px-4 rounded-xl border border-[#8C7762]/40 text-[#8C7762] hover:bg-[#8C7762] hover:text-white text-xs font-bold transition cursor-pointer"
+                        className="shrink-0 w-full sm:w-auto px-4 py-2.5 sm:py-0 rounded-xl border border-[#8C7762]/40 text-[#8C7762] hover:bg-[#8C7762] hover:text-white text-xs font-bold transition cursor-pointer"
                       >
                         Responder
                       </button>

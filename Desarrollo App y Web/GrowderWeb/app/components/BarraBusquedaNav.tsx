@@ -67,7 +67,7 @@ export default function BarraBusquedaNav({
         placeholder={placeholder}
         value={termino}
         onChange={handleChange}
-        className="w-full text-xs sm:text-sm rounded-full border border-stone-300 bg-stone-50/90 pl-9 pr-9 py-2 text-stone-800 placeholder:text-stone-400 outline-none focus:border-[#314235] focus:bg-white focus:ring-2 focus:ring-[#314235]/15 transition shadow-inner"
+        className="w-full min-w-0 text-xs sm:text-sm rounded-full border border-stone-300 bg-stone-50/90 pl-9 pr-9 py-2 text-stone-800 placeholder:text-stone-400 outline-none focus:border-[#314235] focus:bg-white focus:ring-2 focus:ring-[#314235]/15 transition shadow-inner"
       />
 
       {/* Boton Icono de Busqueda */}

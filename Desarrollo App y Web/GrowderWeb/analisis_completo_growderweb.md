@@ -540,7 +540,7 @@ En [`app/admin/components/pedidos/PedidoDetalleModal.tsx`](file:///f:/Growder/GR
 - **Estados Operativos del Pedido:**
   - `pendiente` $\rightarrow$ `pagado` $\rightarrow$ `preparando` $\rightarrow$ `en transporte` $\rightarrow$ `en despacho` $\rightarrow$ `recibido`.
   - Estados de excepción: `problema stock`, `entrega fallida`, `cancelado`, `rechazado`.
-- **Integración Logística:** Permite asignar la empresa transportista (ej. Starken, Chilexpress, Blue Express, Envíos Propios) y el número de guía de seguimiento (`numero_seguimiento`).
+- **Integración Logística:** Permite asignar el transportista o repartidor (campo `empresa_transporte`, texto libre) y el número de guía de seguimiento (`numero_seguimiento`).
 - **Enlace de Contacto Inmediato por WhatsApp:** Construye automáticamente una URL codificada `https://wa.me/...` con el mensaje preformateado con el nombre del cliente, código de pedido, estado actual y dirección de entrega.
 
 ### 8.7 Ficha Integral de Cliente 360° y Gestión de Envíos

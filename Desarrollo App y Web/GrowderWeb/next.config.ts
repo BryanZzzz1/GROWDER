@@ -2,12 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
     serverExternalPackages: ['pdf-parse'],
-    // Si quieres evitar que un warning de ESLint o TS menor frene el deploy en Vercel:
+    // Evita que un error de TypeScript frene el deploy en Vercel.
+    // (En Next 16 `next build` ya no ejecuta ESLint y la opción `eslint` fue eliminada.)
     typescript: {
         ignoreBuildErrors: true,
-    },
-    eslint: {
-        ignoreDuringBuilds: true,
     },
 };
 

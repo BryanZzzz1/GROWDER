@@ -34,6 +34,13 @@ textarea {
   font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif !important;
 }
 
+/* Seguro anti-desborde horizontal en móvil. `clip` (a diferencia de `hidden`)
+   no crea un contenedor de scroll, así que no rompe los `position: sticky`. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   width: 100%;

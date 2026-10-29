@@ -263,6 +263,30 @@ export default function ChatFlotante() {
     };
 
     // En móvil el chat ocupa toda la pantalla: se bloquea el scroll de la página detrás
+    // Área realmente visible en móvil (descuenta la barra del navegador y el teclado).
+    // `100dvh`/`inset-0` no bastan: en Chrome Android el teclado no reduce el viewport de diseño,
+    // y la barra de direcciones deja un hueco abajo donde asoma la página.
+    const [areaVisible, setAreaVisible] = useState<{ top: number; height: number } | null>(null);
+    useEffect(() => {
+        if (!abierto || typeof window === 'undefined' || window.innerWidth >= 640) {
+            setAreaVisible(null);
+            return;
+        }
+        const vv = window.visualViewport;
+        if (!vv) return;
+        const actualizar = () => {
+            setAreaVisible({ top: vv.offsetTop, height: vv.height });
+            if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        };
+        actualizar();
+        vv.addEventListener('resize', actualizar);
+        vv.addEventListener('scroll', actualizar);
+        return () => {
+            vv.removeEventListener('resize', actualizar);
+            vv.removeEventListener('scroll', actualizar);
+        };
+    }, [abierto]);
+
     useEffect(() => {
         if (!abierto || typeof window === 'undefined' || window.innerWidth >= 640) return;
         const previo = document.body.style.overflow;
@@ -293,7 +317,10 @@ export default function ChatFlotante() {
             )}
 
             {abierto && (
-                <div className="fixed inset-0 h-dvh w-full sm:static sm:inset-auto sm:h-[560px] sm:w-[380px] bg-white sm:border border-stone-200 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div
+                    style={areaVisible ? { top: areaVisible.top, height: areaVisible.height, bottom: 'auto' } : undefined}
+                    className="fixed inset-0 w-full sm:static sm:inset-auto sm:h-[560px] sm:w-[380px] bg-white sm:border border-stone-200 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in duration-150 sm:zoom-in-95"
+                >
                     {/* Header */}
                     <div className="bg-[#7c6b53] text-white px-4 py-3.5 flex items-center justify-between shadow-sm">
                         <div className="flex gap-2.5 items-center">

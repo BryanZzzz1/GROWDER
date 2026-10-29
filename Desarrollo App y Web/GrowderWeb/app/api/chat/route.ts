@@ -50,7 +50,7 @@ Los paneles /admin y /bodega solo se ven en escritorio (pantalla ≥ 1024px).
 
 const PRESET_CONOCIMIENTO_WEB = `
 === 🌐 CONOCIMIENTO BASE POR DEFECTO DE LA WEB (PRESET SUMATECL) ===
-- **Despachos y Envíos:** Costo fijo de **$2.650 CLP** a todo Chile continental (vía Starken, Blue Express o transporte asignado). El plazo estimado de preparación es de 24 a 48 horas hábiles y la entrega toma entre 2 a 5 días hábiles según la región.
+- **Despachos y Envíos:** Costo fijo de **$2.650 CLP** a todo Chile continental. No menciones empresas de transporte específicas: el despacho lo coordina SuMateCL. El plazo estimado de preparación es de 24 a 48 horas hábiles y la entrega toma entre 2 a 5 días hábiles según la región.
 - **Precios e Impuestos:** Todos los precios publicados en la web están en Pesos Chilenos (CLP) e **incluyen IVA (19%)**.
 - **Medios de Pago:** Aceptamos tarjetas de débito, crédito (vía Webpay Plus) y transferencia bancaria directa.
 - **Seguimiento de Compras:** Todo pedido genera un código único con formato **SM-XXXXXX**. El cliente puede ver el detalle completo en la sección [Mis Compras](/mis-compras).

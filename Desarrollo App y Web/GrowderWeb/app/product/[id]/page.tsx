@@ -169,7 +169,7 @@ export default function DetalleProductoPage() {
           </Link>
 
           {/* CENTRO: Barra de búsqueda en el Navbar */}
-          <div className="flex-1 max-w-md mx-1 sm:mx-4">
+          <div className="flex-1 min-w-0 max-w-md mx-0 sm:mx-4">
             <BarraBusquedaNav
               placeholder="Buscar mates, bombillas, termos..."
             />
@@ -239,8 +239,8 @@ export default function DetalleProductoPage() {
       </header>
 
       {/* SECCIÓN PRINCIPAL DE PRODUCTO */}
-      <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
           {/* GALERÍA DE IMÁGENES (CARRUSEL FUNCIONAL) */}
           <div className="flex flex-col gap-4">
@@ -347,7 +347,7 @@ export default function DetalleProductoPage() {
         <ResenasProducto idproducto={producto.idproducto ?? String(id)} onResumen={manejarResumenResenas} />
 
         {/* BLOQUE INFORMATIVO DE ENVÍOS */}
-        <div className="mt-16 bg-white border border-[#8C7762]/15 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div className="mt-10 sm:mt-16 bg-white border border-[#8C7762]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm">
           <span className="text-[10px] uppercase tracking-widest text-[#8C7762] font-bold block mb-1">Garantía SuMateCL</span>
           <h2 className="text-xl font-bold text-stone-900 mb-6">Información de Envíos & Cuidados</h2>
 
@@ -359,7 +359,7 @@ export default function DetalleProductoPage() {
 
             {enviosAbierto && (
               <p className="text-xs text-stone-600 mt-3 leading-relaxed pl-6">
-                Envíos dentro de la Región Metropolitana llegan entre 24 y 48 horas hábiles. Para regiones, coordinamos mediante Starken o Blue Express asegurando un embalaje protegido para que tu producto llegue intacto.
+                Envíos dentro de la Región Metropolitana llegan entre 24 y 48 horas hábiles. Para regiones, coordinamos el despacho asegurando un embalaje protegido para que tu producto llegue intacto.
               </p>
             )}
           </div>

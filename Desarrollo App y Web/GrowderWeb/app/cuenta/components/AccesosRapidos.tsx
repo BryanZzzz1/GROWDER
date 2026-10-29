@@ -20,7 +20,7 @@ export function AccesosRapidos({ esAdmin }: AccesosRapidosProps) {
             Mis Compras
           </h3>
           <p className="text-xs text-stone-500 mt-1">
-            Seguimiento de pedidos en vivo y estados de envío por Starken o Chilexpress.
+            Seguimiento de tus pedidos en vivo y estado de cada envío.
           </p>
         </div>
         <span className="text-xs font-bold text-[#8C7762] mt-4 inline-block">

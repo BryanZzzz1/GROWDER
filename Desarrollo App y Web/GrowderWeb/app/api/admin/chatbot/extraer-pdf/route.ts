@@ -35,17 +35,21 @@ export async function POST(req: Request) {
             // Lectura directa si es un archivo .txt
             textoExtraido = await file.text();
         } else {
-            // Importamos directamente el core de pdf-parse para evitar el bug del archivo de test en Next.js
-            const pdfParse = require('pdf-parse/lib/pdf-parse.js');
-            const arrayBuffer = await file.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const data = await pdfParse(buffer);
-            textoExtraido = data.text || '';
+            // pdf-parse v2: clase PDFParse (ya no existe `lib/pdf-parse.js` ni la función por defecto de la v1)
+            const { PDFParse } = await import('pdf-parse');
+            const parser = new PDFParse({ data: new Uint8Array(await file.arrayBuffer()) });
+            try {
+                const resultado = await parser.getText();
+                textoExtraido = resultado.text || '';
+            } finally {
+                await parser.destroy();
+            }
         }
 
         // Limpiamos saltos de línea múltiples y espacios basura para ahorrar tokens en la IA
         const contenidoLimpio = textoExtraido
             .replace(/\r\n/g, '\n')
+            .replace(/^-- \d+ of \d+ --$/gm, '') // marcas de página que agrega pdf-parse v2
             .replace(/\n{3,}/g, '\n\n')
             .trim();
 

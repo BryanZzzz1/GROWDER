@@ -167,7 +167,7 @@ export default function CuentaPage() {
             <div>
               <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-4 border border-[#8C7762]/20">#</div>
               <h3 className="font-bold text-stone-900 mb-2">Mis Compras</h3>
-              <p className="text-xs text-stone-500 leading-relaxed mb-6">Seguimiento de pedidos en vivo y estados de envío por Starken o Chilexpress.</p>
+              <p className="text-xs text-stone-500 leading-relaxed mb-6">Seguimiento de tus pedidos en vivo y estado de cada envío.</p>
             </div>
             <Link href="/mis-compras" className="text-xs font-bold text-[#314235] hover:text-[#527953] transition flex items-center gap-1">Ver pedidos →</Link>
           </div>

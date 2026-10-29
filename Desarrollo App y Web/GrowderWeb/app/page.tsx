@@ -1120,7 +1120,7 @@ function ContenidoHome() {
 
           {/* BUSCADOR */}
 
-          <div className="mx-2 min-w-[200px] max-w-lg flex-1 sm:mx-4 sm:min-w-[280px]">
+          <div className="mx-0 min-w-0 max-w-lg flex-1 sm:mx-4 sm:min-w-[280px]">
             <BarraBusquedaNav
               valorInicial={
                 busquedaNav

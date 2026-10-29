@@ -325,7 +325,7 @@ function ContenidoBuscar() {
           </Link>
 
           {/* Campo de búsqueda superior interactivo */}
-          <div className="flex-1 max-w-lg mx-2">
+          <div className="flex-1 min-w-0 max-w-lg mx-0 sm:mx-2">
             <BarraBusquedaNav
               valorInicial={busquedaTexto}
               alCambiarTexto={(val) => handleCambiarTexto(val)}
