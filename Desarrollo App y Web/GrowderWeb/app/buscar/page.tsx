@@ -8,6 +8,7 @@ import { usarCarrito } from '@/app/datoscarro/estadocarro';
 import { useAuth } from '@/src/lib/context/AuthContext';
 import SubNavbar, { CategoriaBD } from '@/app/components/SubNavbar';
 import BarraBusquedaNav from '@/app/components/BarraBusquedaNav';
+import BuscadorMovil from '@/app/components/BuscadorMovil';
 import FiltrosBusqueda, { TipoOrden } from './components/FiltrosBusqueda';
 import GridResultados, { ProductoItem } from './components/GridResultados';
 
@@ -306,7 +307,7 @@ function ContenidoBuscar() {
     <div className="site-shell flex flex-col min-h-screen bg-[#f8f3e9]">
       {/* HEADER DE LA TIENDA */}
       <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
           {/* Logo SuMateCL */}
           <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
             <img
@@ -325,7 +326,7 @@ function ContenidoBuscar() {
           </Link>
 
           {/* Campo de búsqueda superior interactivo */}
-          <div className="flex-1 min-w-0 max-w-lg mx-0 sm:mx-2">
+          <div className="hidden sm:block flex-1 min-w-0 max-w-lg mx-0 sm:mx-2">
             <BarraBusquedaNav
               valorInicial={busquedaTexto}
               alCambiarTexto={(val) => handleCambiarTexto(val)}
@@ -336,6 +337,13 @@ function ContenidoBuscar() {
 
           {/* Acciones de Carrito y Cuenta */}
           <div className="flex items-center gap-3 shrink-0">
+            <BuscadorMovil
+              valorInicial={busquedaTexto}
+              alCambiarTexto={(val) => handleCambiarTexto(val)}
+              alBuscar={(term) => handleCambiarTexto(term)}
+              placeholder="Buscar por mate, calabaza, bombilla, termo..."
+            />
+
             <button
               type="button"
               onClick={() => setCarritoAbierto(!carritoAbierto)}

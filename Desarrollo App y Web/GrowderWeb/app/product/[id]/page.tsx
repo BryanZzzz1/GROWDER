@@ -7,6 +7,7 @@ import { supabase } from '@/src/lib/supabase';
 import { usarCarrito, ItemCarrito } from "@/app/datoscarro/estadocarro";
 import SubNavbar from '@/app/components/SubNavbar';
 import BarraBusquedaNav from '@/app/components/BarraBusquedaNav';
+import BuscadorMovil from '@/app/components/BuscadorMovil';
 import ResenasProducto from './components/ResenasProducto';
 
 export default function DetalleProductoPage() {
@@ -159,7 +160,7 @@ export default function DetalleProductoPage() {
     <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A]">
       {/* HEADER */}
       <header className="w-full border-b border-[#8C7762]/20 bg-white/90 backdrop-blur-md sticky top-0 z-30">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3 sm:gap-5">
           <Link href="/" className="flex items-center gap-3 text-left group shrink-0">
             <img src="/logocircular.png" alt="SuMate Logo" className="h-11 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105" />
             <div className="hidden lg:block">
@@ -169,13 +170,15 @@ export default function DetalleProductoPage() {
           </Link>
 
           {/* CENTRO: Barra de búsqueda en el Navbar */}
-          <div className="flex-1 min-w-0 max-w-md mx-0 sm:mx-4">
+          <div className="hidden sm:block flex-1 min-w-0 max-w-md mx-0 sm:mx-4">
             <BarraBusquedaNav
               placeholder="Buscar mates, bombillas, termos..."
             />
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <BuscadorMovil placeholder="Buscar mates, bombillas, termos..." />
+
             {/* Botón de acceso a Búsqueda Filtrada */}
             <Link
               href="/buscar"

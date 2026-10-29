@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface BarraBusquedaNavProps {
+  autoEnfocar?: boolean;
   valorInicial?: string;
   placeholder?: string;
   className?: string;
@@ -12,6 +13,7 @@ interface BarraBusquedaNavProps {
 }
 
 export default function BarraBusquedaNav({
+  autoEnfocar = false,
   valorInicial = '',
   placeholder = 'Buscar por mate, calabaza, bombilla, termo...',
   className = '',
@@ -21,6 +23,11 @@ export default function BarraBusquedaNav({
   const router = useRouter();
   const [termino, setTermino] = useState(valorInicial);
   const [prevValorInicial, setPrevValorInicial] = useState(valorInicial);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (autoEnfocar) inputRef.current?.focus();
+  }, [autoEnfocar]);
 
   if (valorInicial !== prevValorInicial) {
     setPrevValorInicial(valorInicial);
@@ -63,11 +70,12 @@ export default function BarraBusquedaNav({
       className={`relative w-full ${className}`}
     >
       <input
+        ref={inputRef}
         type="text"
         placeholder={placeholder}
         value={termino}
         onChange={handleChange}
-        className="w-full min-w-0 text-xs sm:text-sm rounded-full border border-stone-300 bg-stone-50/90 pl-9 pr-9 py-2 text-stone-800 placeholder:text-stone-400 outline-none focus:border-[#314235] focus:bg-white focus:ring-2 focus:ring-[#314235]/15 transition shadow-inner"
+        className="w-full min-w-0 text-base sm:text-sm rounded-full border border-stone-300 bg-stone-50/90 pl-9 pr-9 py-2 text-stone-800 placeholder:text-stone-400 outline-none focus:border-[#314235] focus:bg-white focus:ring-2 focus:ring-[#314235]/15 transition shadow-inner"
       />
 
       {/* Boton Icono de Busqueda */}

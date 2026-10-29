@@ -132,22 +132,23 @@ export default function CuentaPage() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-5 py-10">
-        <div className="mb-6">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-5 py-6 sm:py-10">
+        {/* En móvil ya existe "Volver a la tienda" en el encabezado: se evita el enlace duplicado */}
+        <div className="mb-6 hidden sm:block">
           <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-600 hover:text-[#314235] transition">
             ← Volver al inicio
           </Link>
         </div>
 
         {/* 1. Tarjeta de Cabecera del Perfil */}
-        <div className="bg-white rounded-[2rem] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm border border-stone-200/60 mb-6">
-          <div className="flex items-center gap-5 w-full sm:w-auto">
-            <div className="w-16 h-16 rounded-full bg-[#314235] text-white flex items-center justify-center text-2xl font-bold uppercase shrink-0">
+        <div className="bg-white rounded-3xl sm:rounded-[2rem] p-5 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-6 shadow-sm border border-stone-200/60 mb-4 sm:mb-6">
+          <div className="flex items-center gap-4 sm:gap-5 w-full sm:w-auto min-w-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#314235] text-white flex items-center justify-center text-xl sm:text-2xl font-bold uppercase shrink-0">
               {usuario?.email?.charAt(0)}
             </div>
-            <div>
-              <div className="flex items-center gap-3 mb-1 text-left">
-                <h1 className="text-lg font-bold text-stone-900 truncate max-w-[200px] sm:max-w-xs">{usuario?.email}</h1>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-1 text-left">
+                <h1 className="min-w-0 max-w-full text-base sm:text-lg font-bold text-stone-900 break-all sm:break-normal sm:truncate sm:max-w-xs">{usuario?.email}</h1>
                 <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Verificado</span>
               </div>
               <p className="text-sm text-stone-500 font-medium text-left">Cliente GROWDER</p>
@@ -155,45 +156,45 @@ export default function CuentaPage() {
           </div>
           <button 
             onClick={cerrarSesion}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100 transition cursor-pointer shrink-0"
+            className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-full bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100 transition cursor-pointer shrink-0"
           >
             Cerrar sesión
           </button>
         </div>
 
         {/* 2. Grid de Accesos Rápidos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white rounded-[2rem] p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+          <div className="bg-white rounded-3xl sm:rounded-[2rem] p-5 sm:p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-4 border border-[#8C7762]/20">#</div>
+              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-3 sm:mb-4 border border-[#8C7762]/20">#</div>
               <h3 className="font-bold text-stone-900 mb-2">Mis Compras</h3>
-              <p className="text-xs text-stone-500 leading-relaxed mb-6">Seguimiento de tus pedidos en vivo y estado de cada envío.</p>
+              <p className="text-xs text-stone-500 leading-relaxed mb-4 sm:mb-6">Seguimiento de tus pedidos en vivo y estado de cada envío.</p>
             </div>
             <Link href="/mis-compras" className="text-xs font-bold text-[#314235] hover:text-[#527953] transition flex items-center gap-1">Ver pedidos →</Link>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
+          <div className="bg-white rounded-3xl sm:rounded-[2rem] p-5 sm:p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-4 border border-[#8C7762]/20">@</div>
+              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-3 sm:mb-4 border border-[#8C7762]/20">@</div>
               <h3 className="font-bold text-stone-900 mb-2">Seguridad</h3>
-              <p className="text-xs text-stone-500 leading-relaxed mb-6">Contraseña y credenciales protegidas con cifrado seguro en Supabase GoTrue.</p>
+              <p className="text-xs text-stone-500 leading-relaxed mb-4 sm:mb-6">Contraseña y credenciales protegidas con cifrado seguro en Supabase GoTrue.</p>
             </div>
             <span className="text-xs font-bold text-emerald-600">Protegida</span>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
+          <div className="bg-white rounded-3xl sm:rounded-[2rem] p-5 sm:p-7 shadow-sm border border-stone-200/60 flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-4 border border-[#8C7762]/20">+</div>
+              <div className="w-10 h-10 rounded-xl bg-[#f8f3e9] flex items-center justify-center text-stone-600 font-bold mb-3 sm:mb-4 border border-[#8C7762]/20">+</div>
               <h3 className="font-bold text-stone-900 mb-2">Catálogo GROWDER</h3>
-              <p className="text-xs text-stone-500 leading-relaxed mb-6">Explora nuevos productos, ofertas exclusivas y novedades para el cultivo.</p>
+              <p className="text-xs text-stone-500 leading-relaxed mb-4 sm:mb-6">Explora nuevos productos, ofertas exclusivas y novedades para el cultivo.</p>
             </div>
             <Link href="/" className="text-xs font-bold text-[#314235] hover:text-[#527953] transition flex items-center gap-1">Ir a la tienda →</Link>
           </div>
         </div>
 
         {/* 3. Tarjeta de Datos de Cuenta */}
-        <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-stone-200/60 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="bg-white rounded-3xl sm:rounded-[2rem] p-5 sm:p-8 shadow-sm border border-stone-200/60 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 sm:mb-8">
             <div>
               <h2 className="font-bold text-lg text-stone-900">Datos de tu cuenta</h2>
               <p className="text-xs text-stone-500 mt-1">Mantén actualizado tu teléfono para notificaciones de entrega.</p>
@@ -201,7 +202,7 @@ export default function CuentaPage() {
             {!editando && (
               <button 
                 onClick={() => setEditando(true)}
-                className="px-5 py-2 rounded-full border border-stone-300 text-stone-700 font-bold text-xs hover:bg-stone-50 transition cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 sm:py-2 rounded-full border border-stone-300 text-stone-700 font-bold text-xs hover:bg-stone-50 transition cursor-pointer"
               >
                 Modificar
               </button>
@@ -219,7 +220,7 @@ export default function CuentaPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center border-b border-stone-100 pb-5">
                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Correo de Inicio</label>
                 <div className="sm:col-span-2">
-                  <input type="text" value={usuario?.email || ""} disabled className="w-full text-sm font-semibold text-stone-500 bg-stone-50 rounded-xl px-4 py-2 border border-stone-200 outline-none cursor-not-allowed" />
+                  <input type="text" value={usuario?.email || ""} disabled className="w-full text-base sm:text-sm font-semibold text-stone-500 bg-stone-50 rounded-xl px-4 py-2.5 sm:py-2 border border-stone-200 outline-none cursor-not-allowed" />
                 </div>
               </div>
 
@@ -231,7 +232,7 @@ export default function CuentaPage() {
                     value={telefono} 
                     onChange={(e) => setTelefono(e.target.value.replace(/\D/g, '').slice(0, 9))}
                     placeholder="Ej: 912345678"
-                    className="w-full text-sm font-bold text-stone-900 bg-white rounded-xl px-4 py-2 border border-stone-300 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition" 
+                    className="w-full min-w-0 text-base sm:text-sm font-bold text-stone-900 bg-white rounded-xl px-4 py-2.5 sm:py-2 border border-stone-300 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition" 
                   />
                 </div>
               </div>
@@ -243,12 +244,12 @@ export default function CuentaPage() {
                     type="date" 
                     value={fechaNacimiento} 
                     onChange={(e) => setFechaNacimiento(e.target.value)}
-                    className="w-full text-sm font-bold text-stone-900 bg-white rounded-xl px-4 py-2 border border-stone-300 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition" 
+                    className="w-full min-w-0 text-base sm:text-sm font-bold text-stone-900 bg-white rounded-xl px-4 py-2.5 sm:py-2 border border-stone-300 outline-none focus:border-[#314235] focus:ring-1 focus:ring-[#314235] transition" 
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:justify-end pt-4">
                 <button 
                   onClick={() => {
                     setTelefono(usuario?.telefono || "");
@@ -256,14 +257,14 @@ export default function CuentaPage() {
                     setEditando(false);
                   }}
                   disabled={guardando}
-                  className="px-5 py-2.5 rounded-full text-stone-500 font-bold text-xs hover:bg-stone-100 transition cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-full text-stone-500 font-bold text-xs hover:bg-stone-100 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button 
                   onClick={guardarCambios}
                   disabled={guardando}
-                  className="px-6 py-2.5 rounded-full bg-[#314235] text-white font-bold text-xs hover:bg-[#243127] transition shadow-md cursor-pointer disabled:opacity-70"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-full bg-[#314235] text-white font-bold text-xs hover:bg-[#243127] transition shadow-md cursor-pointer disabled:opacity-70"
                 >
                   {guardando ? "Guardando..." : "Guardar Cambios"}
                 </button>
@@ -271,17 +272,17 @@ export default function CuentaPage() {
             </div>
           ) : (
             <div className="space-y-0">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-5 border-t border-stone-100 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-4 sm:py-5 border-t border-stone-100 items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Correo de Inicio</span>
-                <span className="sm:col-span-2 text-sm font-semibold text-stone-800 sm:text-right">{usuario?.email}</span>
+                <span className="sm:col-span-2 text-sm font-semibold text-stone-800 sm:text-right break-all sm:break-normal">{usuario?.email}</span>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-5 border-t border-stone-100 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-4 sm:py-5 border-t border-stone-100 items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Teléfono de Contacto</span>
                 <span className="sm:col-span-2 text-sm font-semibold text-stone-800 sm:text-right">{telefono || <span className="text-stone-400 italic">No registrado</span>}</span>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-5 border-t border-stone-100 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 py-4 sm:py-5 border-t border-stone-100 items-center">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Fecha de Nacimiento</span>
                 <span className="sm:col-span-2 text-sm font-semibold text-stone-800 sm:text-right">
                   {fechaNacimiento ? new Date(fechaNacimiento).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-') : <span className="text-stone-400 italic">No registrada</span>}

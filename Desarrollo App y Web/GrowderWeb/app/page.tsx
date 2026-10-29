@@ -29,6 +29,7 @@ import SubNavbar, {
 } from "@/app/components/SubNavbar";
 
 import BarraBusquedaNav from "@/app/components/BarraBusquedaNav";
+import BuscadorMovil from "@/app/components/BuscadorMovil";
 
 /* =========================================================
    TIPOS
@@ -1094,7 +1095,7 @@ function ContenidoHome() {
       ==================================================== */}
 
       <header className="sticky top-0 z-30 w-full border-b border-[#8C7762]/20 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-8">
+        <div className="relative mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-5 sm:px-8">
           {/* LOGO */}
 
           <Link
@@ -1120,7 +1121,7 @@ function ContenidoHome() {
 
           {/* BUSCADOR */}
 
-          <div className="mx-0 min-w-0 max-w-lg flex-1 sm:mx-4 sm:min-w-[280px]">
+          <div className="mx-0 hidden min-w-0 max-w-lg flex-1 sm:mx-4 sm:block sm:min-w-[280px]">
             <BarraBusquedaNav
               valorInicial={
                 busquedaNav
@@ -1159,6 +1160,12 @@ function ContenidoHome() {
           {/* ACCIONES */}
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {/* LUPA (solo móvil): abre la barra de búsqueda sobre el encabezado */}
+            <BuscadorMovil
+              valorInicial={busquedaNav}
+              alCambiarTexto={(valor) => setBusquedaNav(valor)}
+            />
+
             {/* CARRITO */}
 
             <div className="group relative">
@@ -1323,6 +1330,16 @@ function ContenidoHome() {
 
             {usuario ? (
               <div className="flex items-center gap-2">
+                {/* Avatar del usuario con sesión iniciada (visible cuando el chip completo no cabe) */}
+                <Link
+                  href="/cuenta"
+                  aria-label={`Mi cuenta (${usuario.email})`}
+                  title={usuario.email}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#314235] text-sm font-bold uppercase text-white transition hover:bg-[#243127] xl:hidden"
+                >
+                  {usuario.email?.charAt(0)}
+                </Link>
+
                 <Link
                   href="/cuenta"
                   className="hidden items-center gap-2 rounded-full border border-[#8C7762]/20 bg-[#f8f3e9] py-1 pl-2.5 pr-3 transition hover:bg-[#efe7d8] xl:flex"
