@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { ToastController, ModalController } from '@ionic/angular';
 import { Productos } from '../../services/productos';
 import { ServicebdService } from '../../services/servicesbd.service';
+import { FavoritesService } from '../../services/favorites.service';
+import { NotificationsService } from '../../services/notifications.service';
 import { FiltroModalComponent } from '../../components/filtro-modal/filtro-modal.component';
 
 @Component({
@@ -24,16 +26,22 @@ export class TiendaPage implements OnInit {
   rangoPrecioMin: number = 0;
   rangoPrecioMax: number = 100000;
   soloStock: boolean = false;
+  favIds = new Set<number>();
+  noLeidas = 0;
 
   constructor(
     private bd: ServicebdService,
     private router: Router,
     private toastController: ToastController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private favs: FavoritesService,
+    private notif: NotificationsService
   ) { }
 
   ngOnInit() {
     this.cargarDatos();
+    this.favs.ids$.subscribe(ids => this.favIds = ids);
+    this.notif.noLeidas$.subscribe(n => this.noLeidas = n);
     this.bd.isUserLoggedIn.subscribe(async status => {
       this.isLoggedIn = status;
       if (status) {
@@ -160,8 +168,19 @@ export class TiendaPage implements OnInit {
 
   async toggleFavorite(producto: Productos, event: Event) {
     event.stopPropagation();
-    this.presentToast(`${producto.nombre} agregado a favoritos`);
+    const estado = await this.favs.toggle(producto.idproducto);
+    if (estado === null) {
+      const toast = await this.toastController.create({
+        message: 'Inicia sesión para guardar favoritos.', duration: 3000, position: 'bottom',
+        buttons: [{ text: 'Ingresar', handler: () => this.router.navigate(['/login']) }]
+      });
+      await toast.present();
+      return;
+    }
+    this.presentToast(estado ? `${producto.nombre} agregado a favoritos` : 'Eliminado de favoritos');
   }
+
+  irNotificaciones() { this.router.navigate(['/notificaciones']); }
 
   async presentToast(msj: string) {
     const toast = await this.toastController.create({

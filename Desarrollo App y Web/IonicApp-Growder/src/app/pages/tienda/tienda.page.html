@@ -16,8 +16,9 @@
             <h1 class="brand-serif">Hola, {{ userName }}</h1>
           </div>
         </div>
-        <button class="icon-btn" aria-label="Notificaciones">
+        <button class="icon-btn bell" aria-label="Notificaciones" (click)="irNotificaciones()">
           <ion-icon name="notifications-outline"></ion-icon>
+          <span class="badge" *ngIf="noLeidas > 0">{{ noLeidas > 9 ? '9+' : noLeidas }}</span>
         </button>
       </div>
 
@@ -60,9 +61,9 @@
       <div class="product-grid" *ngIf="filteredProductos.length; else emptyCatalog">
         <article class="product-card" *ngFor="let producto of filteredProductos" (click)="verDetalles(producto.idproducto)">
           <div class="image-wrapper">
-            <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre" (error)="$any($event.target).src = 'assets/placeholder.png'" />
-            <button class="fav-btn" (click)="toggleFavorite(producto, $event)">
-              <ion-icon name="heart-outline"></ion-icon>
+            <img [src]="producto.foto || 'assets/img/placeholder.svg'" [alt]="producto.nombre" (error)="$any($event.target).src = 'assets/img/placeholder.svg'" />
+            <button class="fav-btn" [class.active]="favIds.has(producto.idproducto)" (click)="toggleFavorite(producto, $event)">
+              <ion-icon [name]="favIds.has(producto.idproducto) ? 'heart' : 'heart-outline'"></ion-icon>
             </button>
           </div>
           <div class="product-info">

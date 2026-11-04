@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Productos } from '../../services/productos';
 import { ServicebdService } from '../../services/servicesbd.service';
 import { ToastController } from '@ionic/angular';
+import { FavoritesService } from '../../services/favorites.service';
 
 @Component({
   selector: 'app-buscar',
@@ -17,14 +18,17 @@ export class BuscarPage implements OnInit {
   
   // Suggested can be a random slice or just first few products
   productosSugeridos: Productos[] = [];
+  favIds = new Set<number>();
 
   constructor(
     private bd: ServicebdService,
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private favs: FavoritesService
   ) { }
 
   ngOnInit() {
+    this.favs.ids$.subscribe(ids => this.favIds = ids);
     this.cargarProductos();
   }
 
@@ -68,6 +72,16 @@ export class BuscarPage implements OnInit {
   seleccionarCategoria(cat: string) {
     this.categoriaSeleccionada = cat;
     this.filtrarProductos();
+  }
+
+  async toggleFavorite(producto: Productos, event: Event) {
+    event.stopPropagation();
+    const estado = await this.favs.toggle(producto.idproducto);
+    if (estado === null) {
+      this.presentToast('Inicia sesión para guardar favoritos.');
+      return;
+    }
+    this.presentToast(estado ? `${producto.nombre} agregado a favoritos` : 'Eliminado de favoritos');
   }
 
   verDetalles(idproducto: number) {

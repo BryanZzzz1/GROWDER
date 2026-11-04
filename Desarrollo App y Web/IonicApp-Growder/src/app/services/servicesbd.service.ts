@@ -268,10 +268,26 @@ export class ServicebdService {
         console.error('Error obteniendo historial desde Supabase:', error);
         return [];
       }
-      return data || [];
+      return this.completarFotosHistorial(data || []);
     } else {
       return this.obtenerHistorialComprasBase();
     }
+  }
+
+  /** Reemplaza la foto guardada en historial por la foto real del producto (la guardada puede ser una ruta inválida). */
+  private async completarFotosHistorial(items: any[]): Promise<any[]> {
+    const ids = [...new Set(items.map(i => i.idproducto).filter(id => id != null))];
+    if (!ids.length) return items;
+    const { data } = await this.supabaseService.client
+      .from('producto')
+      .select('idproducto, foto')
+      .in('idproducto', ids);
+    const fotos = new Map<number, string>((data || []).map((p: any) => [p.idproducto, p.foto]));
+    return items.map(i => {
+      const real = fotos.get(i.idproducto);
+      const valida = (f: any) => typeof f === 'string' && /^(https?:|data:)/.test(f);
+      return { ...i, foto: valida(real) ? real : (valida(i.foto) ? i.foto : '') };
+    });
   }
 
   // MÉTODO CORREGIDO: Ahora busca en Supabase

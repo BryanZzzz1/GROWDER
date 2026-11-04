@@ -65,6 +65,17 @@
           <ion-icon name="chevron-forward" class="arrow"></ion-icon>
         </button>
 
+        <button class="menu-item" (click)="router.navigate(['/favoritos'])">
+          <div class="item-icon" style="background: rgba(225, 29, 72, 0.08);">
+            <ion-icon name="heart" style="color: #e11d48;"></ion-icon>
+          </div>
+          <div class="item-content">
+            <strong>Mis Favoritos</strong>
+            <small>Productos que guardaste</small>
+          </div>
+          <ion-icon name="chevron-forward" class="arrow"></ion-icon>
+        </button>
+
         <button class="menu-item" (click)="abrirModalCambiarPassword()">
           <div class="item-icon bg-secondary-light">
             <ion-icon name="lock-closed" color="secondary"></ion-icon>
@@ -77,7 +88,7 @@
         </button>
 
         <!-- FAQ Toggle Button -->
-        <button class="menu-item" (click)="mostrarFaq = !mostrarFaq">
+        <button class="menu-item" (click)="router.navigate(['/ayuda'])">
           <div class="item-icon" style="background: rgba(140, 119, 98, 0.1);">
             <ion-icon name="help-circle-outline" style="color: #8C7762;"></ion-icon>
           </div>
@@ -85,49 +96,8 @@
             <strong>Centro de Ayuda</strong>
             <small>Envíos, cuidados y compras</small>
           </div>
-          <ion-icon [name]="mostrarFaq ? 'chevron-down' : 'chevron-forward'" class="arrow"></ion-icon>
+          <ion-icon name="chevron-forward" class="arrow"></ion-icon>
         </button>
-      </div>
-
-      <!-- FAQ Accordion (Conditionally rendered) -->
-      <div *ngIf="mostrarFaq" class="faq-container" style="margin-top: 1rem;">
-        <ion-accordion-group expand="inset" class="custom-accordion">
-          <ion-accordion value="faq1">
-            <ion-item slot="header" color="light">
-              <ion-label class="faq-question">¿Cuánto tarda el despacho?</ion-label>
-            </ion-item>
-            <div class="ion-padding faq-answer" slot="content">
-              El tiempo de despacho es de 24 a 48 horas hábiles. Nuestro reparto propio asegura que tus productos lleguen en perfectas condiciones.
-            </div>
-          </ion-accordion>
-
-          <ion-accordion value="faq2">
-            <ion-item slot="header" color="light">
-              <ion-label class="faq-question">¿Cómo curar mi mate?</ion-label>
-            </ion-item>
-            <div class="ion-padding faq-answer" slot="content">
-              Lávalo con agua tibia, llénalo con yerba húmeda usada y déjalo reposar por 24 horas. Repite el proceso una vez más y estará listo para usar.
-            </div>
-          </ion-accordion>
-
-          <ion-accordion value="faq3">
-            <ion-item slot="header" color="light">
-              <ion-label class="faq-question">¿Qué medios de pago aceptan?</ion-label>
-            </ion-item>
-            <div class="ion-padding faq-answer" slot="content">
-              Aceptamos Webpay Plus (Tarjetas de crédito y débito) y Mercado Pago.
-            </div>
-          </ion-accordion>
-
-          <ion-accordion value="faq4">
-            <ion-item slot="header" color="light">
-              <ion-label class="faq-question">¿Qué hago si hay retraso?</ion-label>
-            </ion-item>
-            <div class="ion-padding faq-answer" slot="content">
-              Por favor, contáctanos a través de nuestro soporte o redes sociales con tu número de pedido y lo resolveremos a la brevedad.
-            </div>
-          </ion-accordion>
-        </ion-accordion-group>
       </div>
     </section>
 

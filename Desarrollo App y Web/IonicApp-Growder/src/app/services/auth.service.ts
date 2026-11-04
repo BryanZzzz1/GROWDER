@@ -10,6 +10,7 @@ export class AuthService {
   private readonly loggedInSubject = new BehaviorSubject(false);
 
   readonly isUserLoggedIn: Observable<boolean> = this.loggedInSubject.asObservable();
+  readonly currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
 
   constructor(
     private supabaseService: SupabaseService,

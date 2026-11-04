@@ -24,8 +24,11 @@
         <article class="product-card" *ngFor="let producto of productosSugeridos"
           (click)="verDetalles(producto.idproducto)">
           <div class="image-wrapper">
-            <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre"
-              (error)="$any($event.target).src = 'assets/placeholder.png'" />
+            <img [src]="producto.foto || 'assets/img/placeholder.svg'" [alt]="producto.nombre"
+              (error)="$any($event.target).src = 'assets/img/placeholder.svg'" />
+            <button class="fav-btn" [class.active]="favIds.has(producto.idproducto)" (click)="toggleFavorite(producto, $event)">
+              <ion-icon [name]="favIds.has(producto.idproducto) ? 'heart' : 'heart-outline'"></ion-icon>
+            </button>
           </div>
           <div class="product-info">
             <h4 class="product-title">{{ producto.nombre }}</h4>
@@ -52,8 +55,11 @@
         <article class="product-card" *ngFor="let producto of productosMostrados"
           (click)="verDetalles(producto.idproducto)">
           <div class="image-wrapper">
-            <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre"
-              (error)="$any($event.target).src = 'assets/placeholder.png'" />
+            <img [src]="producto.foto || 'assets/img/placeholder.svg'" [alt]="producto.nombre"
+              (error)="$any($event.target).src = 'assets/img/placeholder.svg'" />
+            <button class="fav-btn" [class.active]="favIds.has(producto.idproducto)" (click)="toggleFavorite(producto, $event)">
+              <ion-icon [name]="favIds.has(producto.idproducto) ? 'heart' : 'heart-outline'"></ion-icon>
+            </button>
           </div>
           <div class="product-info">
             <h4 class="product-title">{{ producto.nombre }}</h4>

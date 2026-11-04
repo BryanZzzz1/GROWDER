@@ -31,7 +31,7 @@
     <div *ngIf="carrito.length" class="cart-items-container">
       <div class="cart-item" *ngFor="let producto of carrito">
         <div class="item-image">
-          <img [src]="producto.foto || 'assets/placeholder.png'" [alt]="producto.nombre" (error)="onImgError($event)" />
+          <img [src]="producto.foto || 'assets/img/placeholder.svg'" [alt]="producto.nombre" (error)="onImgError($event)" />
         </div>
 
         <div class="item-details">

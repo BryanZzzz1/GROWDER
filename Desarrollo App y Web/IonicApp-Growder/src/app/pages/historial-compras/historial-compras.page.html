@@ -41,7 +41,7 @@
         <!-- Detalle de Producto -->
         <div class="card-body">
           <div class="product-thumb">
-            <img [src]="item.foto || 'assets/placeholder.png'" [alt]="item.nombre" />
+            <img [src]="item.foto || 'assets/img/placeholder.svg'" [alt]="item.nombre" (error)="$any($event.target).src = 'assets/img/placeholder.svg'" />
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ item.nombre }}</h3>

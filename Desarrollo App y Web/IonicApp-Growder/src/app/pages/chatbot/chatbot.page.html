@@ -1,0 +1,61 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="chat-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" aria-label="Volver"><ion-icon name="arrow-back" slot="icon-only"></ion-icon></ion-button>
+    </ion-buttons>
+    <div class="bot-head">
+      <div class="bot-avatar"><ion-icon name="chatbubble-ellipses"></ion-icon></div>
+      <div class="bot-title">
+        <strong>SuMate Bot</strong>
+        <small><span class="dot"></span> Asistente de SuMateCL</small>
+      </div>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button (click)="nuevaConversacion()" aria-label="Nueva conversación" [disabled]="!mensajes.length">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="chat-content" [scrollY]="false">
+  <div class="chat-scroll" #scrollArea>
+    <!-- Bienvenida local (no consume tokens) -->
+    <div class="msg bot" *ngIf="!mensajes.length">
+      <div class="bubble">
+        <strong>¡Hola! Soy SuMate Bot 👋</strong><br />
+        Puedo ayudarte con el <b>rastreo de tu pedido</b>, el <b>catálogo y precios</b>, los <b>envíos</b> y el <b>cuidado de tu mate</b>. ¿En qué te ayudo?
+      </div>
+    </div>
+
+    <div class="quick" *ngIf="!mensajes.length">
+      <button *ngFor="let a of acciones" (click)="enviar(a.msg)">
+        <ion-icon [name]="a.icon"></ion-icon> {{ a.label }}
+      </button>
+    </div>
+
+    <div class="msg" *ngFor="let m of mensajes" [class.user]="m.role === 'user'" [class.bot]="m.role === 'assistant'">
+      <div class="bubble">
+        <span class="txt">{{ m.content }}</span>
+        <div class="links" *ngIf="m.links?.length">
+          <button *ngFor="let l of m.links" (click)="irA(l.url)">
+            <ion-icon name="open-outline"></ion-icon> {{ l.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg bot" *ngIf="cargando">
+      <div class="bubble typing"><ion-spinner name="dots"></ion-spinner> Consultando en SuMateCL...</div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border chat-footer">
+  <form class="composer" (ngSubmit)="enviar()">
+    <input name="texto" [(ngModel)]="texto" placeholder="Escribe tu consulta..." autocomplete="off" [disabled]="cargando" />
+    <button type="submit" [disabled]="cargando || !texto.trim()" aria-label="Enviar">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </form>
+</ion-footer>

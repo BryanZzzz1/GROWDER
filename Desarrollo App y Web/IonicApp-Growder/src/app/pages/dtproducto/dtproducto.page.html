@@ -84,7 +84,7 @@
                     [ngStyle]="{'color': star <= nuevaCalificacion ? '#ffc107' : '#ccc', 'cursor': 'pointer'}">★</span>
             </div>
             <ion-textarea [(ngModel)]="nuevaResena" placeholder="¿Qué te pareció el producto?" rows="3" style="border: 1px solid #ccc; border-radius: 8px; padding: 5px; margin-bottom: 10px;"></ion-textarea>
-            <button class="btn-primary btn-sm" (click)="agregarResena()">Enviar Reseña</button>
+            <button type="button" class="btn-review" [disabled]="enviandoResena" (click)="agregarResena()">{{ enviandoResena ? 'Enviando...' : 'Enviar Reseña' }}</button>
           </div>
 
           <div class="review-card" *ngFor="let resena of resenas">

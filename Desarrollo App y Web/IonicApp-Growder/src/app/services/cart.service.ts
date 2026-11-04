@@ -27,7 +27,7 @@ export class CartService {
       if (error) throw error;
       
       const products = (data || []).map((item: any) => {
-        item.foto = item.producto?.foto || item.foto || 'assets/placeholder.png';
+        item.foto = item.producto?.foto || item.foto || 'assets/img/placeholder.svg';
         return item as Productos;
       });
       return products;
@@ -224,7 +224,7 @@ export class CartService {
           flatCompras.push({
             id: pedido.codigo_pedido || pedido.id,
             idproducto: p.idproducto,
-            foto: p.imagen || 'assets/placeholder.png',
+            foto: p.imagen || 'assets/img/placeholder.svg',
             nombre: p.nombre,
             precio: p.precio,
             cantidad: p.cantidad,
@@ -254,7 +254,7 @@ export class CartService {
       if (error) throw error;
 
       if (data) {
-        data.foto = data.foto || 'assets/placeholder.png';
+        data.foto = data.foto || 'assets/img/placeholder.svg';
       }
       return data;
     } catch (error) {

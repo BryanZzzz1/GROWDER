@@ -5,6 +5,7 @@ import { ServicebdService } from '../services/servicesbd.service';
 import { Productos } from '../services/productos';
 import { ToastController } from '@ionic/angular';
 import { SupabaseService } from '../services/supabase.service';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-checkout',
@@ -118,7 +119,7 @@ export class CheckoutPage implements OnInit {
         nombre: p.nombre,
         precio: p.precio,
         cantidad: p.cantidad || 1,
-        imagen: p.foto || 'assets/placeholder-mate.png'
+        imagen: p.foto || 'assets/img/placeholder.svg'
       }));
 
       // 1. Guardar en Base de Datos como PENDIENTE
@@ -157,7 +158,7 @@ export class CheckoutPage implements OnInit {
         precio: p.precio,
         cantidad: p.cantidad || 1,
         user_id: usuarioId,
-        foto: p.foto || 'assets/placeholder-mate.png',
+        foto: p.foto || 'assets/img/placeholder.svg',
         fecha: new Date().toISOString()
       }));
 
@@ -203,7 +204,8 @@ export class CheckoutPage implements OnInit {
       this.presentToast('Redirigiendo al pago seguro...', 'success');
 
       if (gatewayData?.url) {
-        window.location.href = gatewayData.url;
+        // Navegador del sistema: al volver con suemate://pago/... la app lo cierra y navega a /pago-exito
+        await Browser.open({ url: gatewayData.url });
       } else {
         this.router.navigate(['/historial-compras']);
       }

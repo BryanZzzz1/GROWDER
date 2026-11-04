@@ -81,7 +81,7 @@
       <ion-list lines="none" class="receipt-list">
         <ion-item *ngFor="let item of pedido?.items">
           <ion-thumbnail slot="start">
-            <img [src]="item.imagen || item.foto || 'assets/placeholder-mate.png'" alt="Producto" />
+            <img [src]="item.imagen || item.foto || 'assets/img/placeholder.svg'" alt="Producto" />
           </ion-thumbnail>
           <ion-label>
             <h2>{{ item.nombre }}</h2>

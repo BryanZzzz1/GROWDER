@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true" class="notif-content">
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <main class="notif-shell">
+    <button class="back-btn" (click)="volver()"><ion-icon name="arrow-back-outline"></ion-icon><span>VOLVER</span></button>
+    <div class="head">
+      <h1 class="brand-serif">Notificaciones</h1>
+      <button class="mark-all" *ngIf="hayNoLeidas" (click)="marcarTodas()">Marcar todas</button>
+    </div>
+
+    <div *ngIf="cargando" class="center"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+
+    <div class="list" *ngIf="!cargando && items.length">
+      <button class="item" *ngFor="let n of items" [class.unread]="!n.leida" (click)="abrir(n)">
+        <div class="icon"><ion-icon name="cube-outline"></ion-icon></div>
+        <div class="body">
+          <strong>{{ n.titulo }}</strong>
+          <p>{{ n.mensaje }}</p>
+          <small>{{ n.created_at | date:'dd/MM/yyyy HH:mm' }}</small>
+        </div>
+        <span class="dot" *ngIf="!n.leida"></span>
+      </button>
+    </div>
+
+    <div class="empty" *ngIf="!cargando && !items.length">
+      <ion-icon name="notifications-off-outline"></ion-icon>
+      <p>Aquí verás los cambios de estado de tus pedidos.</p>
+    </div>
+  </main>
+</ion-content>

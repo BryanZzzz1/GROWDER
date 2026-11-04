@@ -4,6 +4,7 @@ import { ServicebdService } from '../../services/servicesbd.service';
 import { Productos } from '../../services/productos';
 import { take } from 'rxjs/operators';
 import { ToastController } from '@ionic/angular';
+import { FavoritesService } from '../../services/favorites.service';
 
 @Component({
   selector: 'app-dtproducto',
@@ -23,16 +24,21 @@ export class DtproductoPage implements OnInit {
 
   mostrarComentarios: boolean = false;
   isFavorite: boolean = false;
+  private idActual = 0;
+  enviandoResena = false;
 
   constructor(private route: ActivatedRoute,
     private router: Router,
     private bd: ServicebdService,
-    private toastController: ToastController) { }
+    private toastController: ToastController,
+    private favs: FavoritesService) { }
 
   async ngOnInit() {
     const idproducto = this.route.snapshot.paramMap.get('idproducto');
     if (idproducto) {
       await this.bd.dbState().pipe(take(1)).toPromise();
+      this.idActual = parseInt(idproducto);
+      this.favs.ids$.subscribe(ids => this.isFavorite = ids.has(this.idActual));
       this.fetchProducto(parseInt(idproducto));
       await this.fetchResenas(parseInt(idproducto));
       this.getUsername();
@@ -101,27 +107,34 @@ export class DtproductoPage implements OnInit {
   }
 
   async agregarResena() {
+    if (this.enviandoResena) return;
     const currentUser = await this.bd.getCurrentUser();
-    if (currentUser) {
-      if (this.nuevaResena.trim() && this.nuevaCalificacion >= 1) {
-        // CORRECCIÓN 2: Usamos this.username que ya está limpio y asegurado
-        this.bd.insertarResena(this.producto.idproducto, this.username, this.nuevaResena, this.nuevaCalificacion)
-          .then((saved) => {
-            if (!saved) throw new Error('No se pudo guardar la reseña');
-            this.resenas.push({ id: Date.now(), username: this.username, texto: this.nuevaResena, calificacion: this.nuevaCalificacion, respuestas: [], foto: this.foto });
-            this.nuevaResena = '';
-            this.nuevaCalificacion = 0;
-          })
-          .catch(err => {
-            console.error(err);
-            this.bd.presentAlert('Error', 'No se pudo agregar la reseña.');
-          });
-      }
-      else if (this.nuevaCalificacion < 1) {
-        await this.presentToast('Elige una calificación de 1 a 5 estrellas.');
-      }
-    } else {
+    if (!currentUser) {
       this.presentToast('Inicia sesión para dejar una reseña.');
+      return;
+    }
+    if (this.nuevaCalificacion < 1) {
+      this.presentToast('Elige una calificación de 1 a 5 estrellas.');
+      return;
+    }
+    if (!this.nuevaResena.trim()) {
+      this.presentToast('Escribe un comentario antes de enviar.');
+      return;
+    }
+    this.enviandoResena = true;
+    try {
+      const nombre = this.username || currentUser.username || (currentUser.email || 'Cliente').split('@')[0];
+      const saved = await this.bd.insertarResena(this.producto.idproducto, nombre, this.nuevaResena.trim(), this.nuevaCalificacion);
+      if (!saved) throw new Error('No se pudo guardar la reseña');
+      this.nuevaResena = '';
+      this.nuevaCalificacion = 0;
+      await this.fetchResenas(this.producto.idproducto);
+      this.presentToast('¡Gracias por tu reseña!');
+    } catch (err: any) {
+      console.error('[Reseña] Error:', err);
+      this.bd.presentAlert('Error', `No se pudo agregar la reseña. ${err?.message || ''}`);
+    } finally {
+      this.enviandoResena = false;
     }
   }
 
@@ -175,9 +188,13 @@ export class DtproductoPage implements OnInit {
     this.nuevaCalificacion = rating;
   }
 
-  toggleFavorite() {
-    this.isFavorite = !this.isFavorite;
-    this.presentToast(this.isFavorite ? 'Agregado a favoritos' : 'Eliminado de favoritos');
+  async toggleFavorite() {
+    const estado = await this.favs.toggle(this.idActual);
+    if (estado === null) {
+      this.presentToast('Inicia sesión para guardar favoritos.');
+      return;
+    }
+    this.presentToast(estado ? 'Agregado a favoritos' : 'Eliminado de favoritos');
   }
 
   goBack() {

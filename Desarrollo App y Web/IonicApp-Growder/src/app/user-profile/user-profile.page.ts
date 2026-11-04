@@ -17,7 +17,7 @@ export class UserProfilePage implements OnInit {
 
   constructor(
     private serviceBD: ServicebdService,
-    private router: Router,
+    public router: Router,
     private toastController: ToastController
   ) {}
 

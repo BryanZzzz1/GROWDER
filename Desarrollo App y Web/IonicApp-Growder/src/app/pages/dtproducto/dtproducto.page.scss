@@ -452,3 +452,17 @@
   background: var(--app-muted) !important;
   box-shadow: none !important;
 }
+
+.btn-review {
+  width: 100%;
+  background: var(--ion-color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(49, 66, 53, 0.2);
+  &:active { transform: scale(0.98); }
+  &:disabled { opacity: 0.6; }
+}

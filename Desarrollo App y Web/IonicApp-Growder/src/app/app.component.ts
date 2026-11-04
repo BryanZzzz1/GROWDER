@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ServicebdService } from './services/servicesbd.service';
 import { CartService } from './services/cart.service';
+import { NotificationsService } from './services/notifications.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { StatusBar } from '@capacitor/status-bar';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
@@ -29,7 +30,8 @@ export class AppComponent implements OnDestroy {
     private cartService: CartService,
     private zone: NgZone,
     private supabaseService: SupabaseService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private notificationsService: NotificationsService
   ) {
     this.subscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -127,6 +129,10 @@ export class AppComponent implements OnDestroy {
            url.includes('/editar-perfil') ||
            url.includes('/edit-user') ||
            url.includes('/recuperar-password') ||
+           url.includes('/chatbot') ||
+           url.includes('/favoritos') ||
+           url.includes('/notificaciones') ||
+           url.includes('/ayuda') ||
            (url.includes('/carro') && this.cartCount > 0) ||
            url === '/';
   }

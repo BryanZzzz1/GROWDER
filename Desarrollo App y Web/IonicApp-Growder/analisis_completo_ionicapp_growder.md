@@ -1,6 +1,6 @@
 # 📘 Informe Completo de Arquitectura e Implementación: Growder — SumateCL
 
-> **Fecha de Actualización:** 25 de Octubre de 2026  
+> **Fecha de Actualización:** 4 de Noviembre de 2026  
 > **Plataforma:** Growder — SumateCL (Monorepo Móvil / Angular 18 / Ionic 8 / Capacitor 6 / Supabase Cloud / Android Native)  
 > **Aplicación Analizada:** `IonicApp-Growder` (`io.ionic.starter` / Growder Móvil) — E-commerce nativo e híbrido para comercialización de mates, bombillas, termos y accesorios artesanales con pasarelas transaccionales (Webpay Plus / Mercado Pago), sincronización de estado local/nube y deep linking nativo.  
 > **Autoría / Contexto:** Auditoría Técnica Integral de Arquitectura, Ingeniería de Software, Persistencia de Datos, Seguridad Criptográfica y Experiencia de Usuario Móvil.
@@ -78,6 +78,15 @@
 16. [Resiliencia de Red, Casos Límite y Manejo de Excepciones](#16-resiliencia-de-red-casos-límite-y-manejo-de-excepciones)
 17. [Estado de Compilación, Auditoría de Dependencias y Despliegue en Android](#17-estado-de-compilación-auditoría-de-dependencias-y-despliegue-en-android)
 18. [Conclusiones y Recomendaciones de Evolución](#18-conclusiones-y-recomendaciones-de-evolución)
+19. [Novedades de la Versión de Noviembre 2026](#19-novedades-de-la-versión-de-noviembre-2026)
+    - 19.1 Asistente Virtual SuMate Bot (solo clientes)
+    - 19.2 Centro de Ayuda como pantalla independiente
+    - 19.3 Favoritos individuales por usuario
+    - 19.4 Notificaciones de cambio de estado del pedido
+    - 19.5 Correcciones: reseñas, fotos de Mis Compras y tarjetas de Búsqueda
+    - 19.6 Apertura de pasarela con navegador del sistema y retorno por deep link
+    - 19.7 Dónde viven las claves y secretos
+    - 19.8 Lista de verificación de despliegue
 
 ---
 
@@ -361,7 +370,10 @@ La configuración de rutas en [`src/app/app-routing.module.ts`](file:///f:/Growd
 | `/login` | `LoginPage` | Autenticación con email/password y disparador de correo de recuperación. |
 | `/register` | `RegisterPage` | Registro con captura de foto en vivo/galería y barra de progreso de completado. |
 | `/recuperar-password` | `RecuperarPasswordPage` | Sincronización criptográfica de enlace profundo (PKCE / Token Hash) y nueva contraseña. |
-| `/ayuda` | `AyudaPage` | Centro de asistencia y convertidor de divisas USD/CLP con caché nativa. |
+| `/ayuda` | `AyudaPage` | Centro de Ayuda: preguntas frecuentes, botón al chatbot y convertidor USD/CLP con caché nativa. |
+| `/chatbot` | `ChatbotPage` | Asistente virtual SuMate Bot (enfoque exclusivo de cliente). |
+| `/favoritos` | `FavoritosPage` | Productos favoritos del usuario autenticado. |
+| `/notificaciones` | `NotificacionesPage` | Bandeja de avisos de cambio de estado de pedidos. |
 | `**` | `NotfoundPage` | Manejo de rutas inexistentes (404) con botón de regreso a la tienda. |
 
 ### 4.2 Diagrama de Estados de Navegación del Usuario
@@ -425,6 +437,10 @@ ocultabarrabaja(url: string): boolean {
          url.includes('/editar-perfil') ||
          url.includes('/edit-user') ||
          url.includes('/recuperar-password') ||
+         url.includes('/chatbot') ||
+         url.includes('/ayuda') ||
+         url.includes('/favoritos') ||
+         url.includes('/notificaciones') ||
          (url.includes('/carro') && this.cartCount > 0) ||
          url === '/';
 }
@@ -596,7 +612,8 @@ const { data: gatewayData, error: gatewayError } = await this.supabase.client.fu
 });
 
 if (gatewayData?.url) {
-  window.location.href = gatewayData.url; // Apertura de pasarela segura
+  // Navegador del sistema: al volver con suemate://pago/... la app lo cierra
+  await Browser.open({ url: gatewayData.url });
 }
 ```
 
@@ -731,6 +748,8 @@ Para garantizar el cumplimiento de los principios SOLID y evitar el acoplamiento
 | **`ReviewService`** | Inserción y consulta relacional de reseñas comunitarias (`resena`) y respuestas a reseñas (`respuestas`). |
 | **`AdminService`** | Métodos para privilegios administrativos, auditoría de ventas globales y control de usuarios. |
 | **`AlertService`** | Unificación de la retroalimentación visual (`AlertController` y `ToastController`) con estilo visual propio de la marca. |
+| **`FavoritesService`** | Alta/baja y consulta de favoritos por usuario (tabla `favoritos`, protegida por RLS). Expone `ids$` reactivo para pintar los corazones. |
+| **`NotificationsService`** | Suscripción Realtime a `notificaciones`, notificación del sistema con `@capacitor/local-notifications`, contador de no leídas y marcado como leídas. |
 | **`SupabaseService`** | Proveedor Singleton del cliente `createClient()` inicializado con las credenciales de entorno. |
 
 ---
@@ -894,10 +913,124 @@ cd android && gradlew assembleDebug
 El análisis exhaustivo de **IonicApp-Growder** evidencia una arquitectura madura, robusta y concebida con un alto estándar de ingeniería de software para aplicaciones móviles híbridas. La decisión de combinar **Angular 18**, **Ionic 8**, **Capacitor 6** y **Supabase** dota a la plataforma de agilidad de despliegue, escalabilidad serverless y una experiencia de usuario idéntica a una aplicación 100% nativa.
 
 ### Recomendaciones Tácticas para Próximas Versiones:
-1. **Adopción de Notificaciones Push Remotas (FCM):** Ampliar el actual sistema de notificaciones locales recurrentes incorporando `@capacitor/push-notifications` acoplado a Supabase Database Webhooks, alertando al cliente cuando su pedido pase a estado `en despacho` o `entregado`.
-2. **Sincronización en Tiempo Real con Supabase Realtime:** Suscribir la pantalla [`DetallePedidoPage`](file:///f:/Growder/GROWDER/Desarrollo%20App%20y%20Web/IonicApp-Growder/src/app/pages/detalle-pedido/detalle-pedido.page.ts) a canales Realtime de PostgreSQL para mover la barra de progreso automáticamente sin requerir que el usuario refresque la vista.
+1. **Adopción de Notificaciones Push Remotas (FCM):** El aviso de cambio de estado ya funciona con Realtime y notificación local (ver 19.4), pero solo llega con la app abierta o en segundo plano. Para avisar con la app totalmente cerrada se requiere `@capacitor/push-notifications` + Firebase Cloud Messaging, enviado desde una Edge Function disparada por el trigger de `pedidos`.
+2. **Sincronización en Tiempo Real con Supabase Realtime (parcial):** Ya se usa Realtime para notificaciones; falta suscribir la pantalla [`DetallePedidoPage`](file:///f:/Growder/GROWDER/Desarrollo%20App%20y%20Web/IonicApp-Growder/src/app/pages/detalle-pedido/detalle-pedido.page.ts) a canales Realtime de PostgreSQL para mover la barra de progreso automáticamente sin requerir que el usuario refresque la vista.
 3. **Soporte Biométrico para Inicio de Sesión:** Integrar el plugin `@capgo/capacitor-native-biometric` para permitir el acceso mediante huella dactilar o Face ID en el inicio de sesión.
 4. **Pruebas Automatizadas E2E:** Implementar baterías de pruebas de integración con Cypress o Playwright en el flujo crítico de compra (Guest Cart $\rightarrow$ Login $\rightarrow$ Checkout $\rightarrow$ Webpay Mock).
+
+---
+
+## 19. Novedades de la Versión de Noviembre 2026
+
+### 19.1 Asistente Virtual SuMate Bot (solo clientes)
+
+Reutiliza el cerebro del chatbot de GrowderWeb (misma configuración y base de conocimiento en Supabase), pero **restringido a la audiencia cliente**: sin herramientas ni respuestas de administración.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant P as ChatbotPage (/chatbot)
+    participant EF as Edge Function chat-cliente
+    participant DB as Supabase (service role)
+    participant AI as Vercel AI Gateway (gpt-4o-mini)
+
+    C->>P: Escribe consulta o código SM-XXXXXX
+    P->>EF: functions.invoke('chat-cliente', { messages, conversacionId })
+    par Contexto en paralelo
+        EF->>DB: auth.getUser(JWT)
+        EF->>DB: chatbot_config / chatbot_documentos (audiencia cliente|ambos)
+        EF->>DB: pedidos (solo si el código es del usuario)
+        EF->>DB: producto (si es consulta de catálogo)
+    end
+    EF->>AI: chat/completions (system prompt + historial)
+    AI-->>EF: respuesta
+    EF->>DB: INSERT chatbot_mensajes
+    EF-->>P: { respuesta }
+```
+
+- **Archivos:** `src/app/pages/chatbot/*` (UI) y `supabase/functions/chat-cliente/index.ts` (Edge Function).
+- **Seguridad:** la clave de IA vive solo como secreto de Supabase (`AI_GATEWAY_API_KEY`); la app nunca la contiene. Un pedido solo se muestra a su dueño (por `usuario_id` o email de la sesión); sin sesión se pide iniciar sesión.
+- **Candado temático:** solo responde sobre SuMateCL (catálogo, envíos, pagos, cuidado del mate, rastreo, uso de la app) y se niega ante funciones de administrador.
+- **UI:** burbujas, atajos rápidos (*Rastrear pedido*, *Envíos*, *Ver mates*, *Curar mi mate*), indicador "Consultando en SuMateCL...", enlaces `[texto](/ruta)` convertidos en botones y `conversacionId` por sesión.
+- **Navegación:** se oculta la barra de pestañas en `/chatbot`.
+
+### 19.2 Centro de Ayuda como pantalla independiente
+
+- *Mi Cuenta → Centro de Ayuda* ahora navega a `/ayuda` (se eliminó el acordeón embebido en el perfil).
+- Contenido: 7 preguntas frecuentes (despacho, medios de pago, IVA, seguimiento, curado del mate, contraseña, retrasos), **botón destacado "Chatea con SuMate Bot"** (repetido al final de las FAQ) y el conversor USD/CLP existente.
+
+### 19.3 Favoritos individuales por usuario
+
+| Elemento | Detalle |
+| :--- | :--- |
+| **Tabla** | `favoritos (id, user_id uuid → auth.users, idproducto, created_at)` con `unique (user_id, idproducto)`. |
+| **RLS** | Políticas `select / insert / delete` con `auth.uid() = user_id`: cada usuario solo ve y modifica los suyos. |
+| **Servicio** | `FavoritesService` (`toggle`, `isFavorite`, `obtenerProductos`, `ids$`). |
+| **UI** | Corazón rojo en Tienda, Búsqueda y Ficha de Producto; pantalla `/favoritos` desde *Mi Cuenta → Mis Favoritos*. Sin sesión, se invita a iniciar sesión. |
+
+### 19.4 Notificaciones de cambio de estado del pedido
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Panel / Admin
+    participant DB as pedidos
+    participant TR as Trigger notificar_cambio_estado_pedido
+    participant N as notificaciones
+    participant RT as Supabase Realtime
+    participant App as NotificationsService
+    actor U as Cliente
+
+    Admin->>DB: UPDATE pedidos SET estado = 'en despacho'
+    DB->>TR: AFTER UPDATE OF estado
+    TR->>N: INSERT (user_id, codigo_pedido, titulo, mensaje)
+    N-->>RT: evento INSERT (filtro user_id)
+    RT-->>App: payload
+    App->>U: Notificación del sistema (LocalNotifications) + contador en la campana
+    U->>App: Abre /notificaciones y luego el detalle del pedido
+```
+
+- **SQL:** `supabase/favoritos_notificaciones.sql` (tablas, RLS, trigger `SECURITY DEFINER` y publicación Realtime).
+- **App:** campana con contador de no leídas en el inicio, pantalla `/notificaciones` (marcar leída / marcar todas) y aviso del sistema.
+- **Alcance:** funciona con la app abierta o en segundo plano. Las notificaciones pendientes se avisan al abrir la app. Con la app cerrada del todo requiere FCM (ver recomendación 1 del punto 18).
+
+### 19.5 Correcciones
+
+| Problema | Causa | Solución |
+| :--- | :--- | :--- |
+| **Fotos ausentes en Mis Compras** | `historial_compras.foto` guardaba una ruta de placeholder inexistente. | `obtenerHistorialCompras()` completa la foto real desde `producto` (`completarFotosHistorial`) y el checkout deja de guardar rutas inválidas. |
+| **Placeholders rotos** | Se referenciaban `assets/placeholder.png` / `placeholder-mate.png`, que no existían. | Nuevo `assets/img/placeholder.svg` usado en toda la app, con `(error)` de respaldo. |
+| **Botón "Enviar Reseña"** | Sin estilo, sin estado de carga y con errores silenciosos. | Botón de marca con estado "Enviando...", validación de estrellas y texto, recarga de reseñas y alerta con el error real. |
+| **Tarjetas de Búsqueda** | Diseño distinto al del inicio. | Mismo diseño de la Tienda (borde, imagen redondeada, corazón de favoritos). |
+
+### 19.6 Apertura de pasarela con navegador del sistema y retorno por deep link
+
+`checkout.page.ts` ahora usa `Browser.open({ url })` en lugar de `window.location.href`. Flujo de retorno:
+
+1. La Edge Function `procesar-pago` devuelve la URL de Webpay / Mercado Pago, con retorno a `/api/pago/mobile-redirect` de la web.
+2. La ruta `mobile-redirect` de GrowderWeb genera `suemate://pago/exito` o `suemate://pago/fracaso`.
+3. `AppComponent` recibe el deep link, cierra el navegador y navega a `/pago-exito` o `/carro`.
+
+> **Incidencia resuelta:** el error `404 DEPLOYMENT_NOT_FOUND` se debía a que la Edge Function `procesar-pago` seguía desplegada con el dominio antiguo de Vercel. Cambiar el dominio en su código **y volver a desplegarla** lo corrigió.
+
+### 19.7 Dónde viven las claves y secretos
+
+| Clave | Ubicación | Observación |
+| :--- | :--- | :--- |
+| URL y clave pública de Supabase | `src/environments/environment*.ts` | Pensadas para ir en la app; la protección real son las políticas RLS. |
+| `AI_GATEWAY_API_KEY`, `MP_ACCESS_TOKEN`, `SMTP_USER`, `SMTP_PASS` | Secretos de Supabase (*Edge Functions → Secrets*) | Nunca dentro de la app ni del APK. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Solo servidor / Edge Functions (inyectada por Supabase) | Jamás en la app. |
+| Clave de ExchangeRate API | `exchange-rate.service.ts` | Recomendado moverla a `environment.ts`. |
+| Credenciales Webpay | Código de `procesar-pago` | Son las públicas de pruebas de Transbank; en producción pasarlas a secretos. |
+
+### 19.8 Lista de verificación de despliegue
+
+1. Ejecutar `supabase/favoritos_notificaciones.sql` en el SQL Editor de Supabase.
+2. Desplegar la Edge Function `chat-cliente` y cargar el secreto `AI_GATEWAY_API_KEY`.
+3. Verificar que `procesar-pago` use el dominio vigente de la web y esté desplegada.
+4. Compilar: `npm run build -- --configuration production`, luego `npx cap sync android` y `gradlew assembleDebug`.
+5. Prueba de punta a punta: compra (retorno por deep link), correo, cambio de estado (notificación), favoritos, reseña y chatbot.
 
 ---
 *Informe técnico de arquitectura e implementación preparado para el repositorio central de documentación de Growder — SumateCL.*

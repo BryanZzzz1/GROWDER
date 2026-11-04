@@ -28,7 +28,7 @@ export class ProductService {
       if (error) throw error;
       
       const products = (data || []).map((p: any) => {
-        p.foto = p.foto || (p.imagenes && p.imagenes.length > 0 ? p.imagenes[0].url : 'assets/placeholder-mate.png');
+        p.foto = p.foto || (p.imagenes && p.imagenes.length > 0 ? p.imagenes[0].url : 'assets/img/placeholder.svg');
         return p as Productos;
       });
       

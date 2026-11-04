@@ -69,6 +69,7 @@
 }
 
 .icon-btn {
+  position: relative;
   background: white;
   border: 1px solid var(--app-line);
   border-radius: 50%;
@@ -371,3 +372,9 @@
     opacity: 0.5;
   }
 }
+.icon-btn .badge {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 9px; background: #e11d48; color: #fff; font-size: 0.65rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.fav-btn.active ion-icon { color: #e11d48; }

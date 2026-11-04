@@ -28,6 +28,18 @@ const routes: Routes = [
     loadChildren: () => import('./pages/ayuda/ayuda.module').then(m => m.AyudaPageModule)
   },
   {
+    path: 'chatbot',
+    loadChildren: () => import('./pages/chatbot/chatbot.module').then(m => m.ChatbotPageModule)
+  },
+  {
+    path: 'favoritos',
+    loadChildren: () => import('./pages/favoritos/favoritos.module').then(m => m.FavoritosPageModule)
+  },
+  {
+    path: 'notificaciones',
+    loadChildren: () => import('./pages/notificaciones/notificaciones.module').then(m => m.NotificacionesPageModule)
+  },
+  {
     path: 'carro',
     loadChildren: () => import('./pages/carro/carro.module').then(m => m.CarroPageModule)
   },
